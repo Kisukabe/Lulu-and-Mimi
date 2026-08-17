@@ -1,8 +1,6 @@
-# 🚀 Hướng Dẫn Deploy Lulu & Mimi Lên Vercel & Render (0 VNĐ/tháng)
+# 🚀 Hướng Dẫn Deploy Lulu & Mimi Lên Render & Vercel (0 VNĐ/tháng)
 
-Tài liệu này hướng dẫn chi tiết cách triển khai **Lulu & Mimi** lên Cloud để bạn có thể sử dụng bất cứ lúc nào từ điện thoại, iPad hoặc máy tính mà **không cần chạy localhost hay build lại trên máy cá nhân**:
-1. **Frontend (Giao diện người dùng)**: Deploy lên **Vercel** (Global Edge CDN, tốc độ load < 0.5s, miễn phí 100%).
-2. **Backend (API & Scraper & AI)**: Deploy lên **Render** qua **Docker container** (đóng gói sẵn, khởi chạy tự động, miễn phí 100%).
+Code đã được cấu hình tối ưu để người dùng bất kỳ có thể sử dụng web app với **Google Gemini API Key của chính họ** (lưu trên máy cá nhân của người dùng) mà **không làm tốn quota của bạn**.
 
 ---
 
@@ -14,70 +12,55 @@ Tài liệu này hướng dẫn chi tiết cách triển khai **Lulu & Mimi** l�
                ┌──────────────┴──────────────┐
                ▼                             ▼
    [ VERCEL (Static Frontend) ]    [ RENDER (Backend API) ]
-   - React 19 + Tailwind v4        - Express + Cheerio
-   - Auto-deploy khi git push      - Cambridge Scraper & Free Dict
-   - Miễn phí vĩnh viễn            - Tự động pull Docker từ GHCR
+   - React 19 + Vite + Tailwind    - Express + Cheerio Scraper
+   - Lưu API Key trong client      - Cambridge & Free Dictionary
+   - Auto-deploy khi git push      - Dùng API key do user truyền lên
 ```
 
 ---
 
-## 📦 1. Triển Khai Frontend Lên Vercel (2 phút)
+## 📦 1. Triển Khai Backend Lên Render (3 phút)
 
-### Cách 1: Kết Nối Trực Tiếp Trên Vercel Dashboard (Khuyên Dùng)
-1. Đăng nhập [Vercel.com](https://vercel.com/) (bằng tài khoản GitHub).
+1. Đăng nhập [Render.com](https://render.com/) bằng GitHub.
+2. Nhấn **"New +"** ➔ **"Web Service"**.
+3. Chọn repository `Kisukabe/Lulu-and-Mimi` ➔ Nhấn **"Connect"**.
+4. Cấu hình thông tin dịch vụ:
+   - **Name**: `lulu-mimi-backend`
+   - **Region**: `Singapore (Southeast Asia)` (tốc độ tốt nhất cho Việt Nam)
+   - **Branch**: `main`
+   - **Runtime**: `Node`
+   - **Build Command**: `npm install && npm run build:backend`
+   - **Start Command**: `npm run start:backend`
+   - **Instance Type**: `Free`
+5. Thêm các biến môi trường (**Environment Variables**):
+   - `NODE_ENV` = `production`
+   - `PORT` = `10000`
+   *(Mục `GEMINI_API_KEY` có thể để trống vì người dùng tự nhập key của họ)*
+6. Nhấn **"Create Web Service"**.
+7. Chờ Render build hoàn tất (status chuyển sang **Live**) ➔ **Copy URL Backend** (ví dụ: `https://lulu-mimi-backend.onrender.com`).
+
+---
+
+## 🌐 2. Triển Khai Frontend Lên Vercel (2 phút)
+
+1. Đăng nhập [Vercel.com](https://vercel.com/) bằng GitHub.
 2. Nhấn **"Add New..."** ➔ **"Project"**.
-3. Chọn repository `Kisukabe/Lulu-and-Mimi` ➔ Nhấn **"Import"**.
+3. Tìm chọn repository `Kisukabe/Lulu-and-Mimi` ➔ Nhấn **"Import"**.
 4. Cấu hình Project:
-   - **Framework Preset**: `Vite` (Vercel tự nhận diện qua file `vercel.json`).
+   - **Framework Preset**: `Vite`
    - **Build Command**: `npm run build:frontend`
    - **Output Directory**: `dist`
-5. Thêm Environment Variable:
-   - `VITE_API_BASE_URL`: Điền URL Backend Render của bạn (VD: `https://lulu-mimi-backend.onrender.com`).
+5. Thêm biến môi trường (**Environment Variables**):
+   - **Name**: `VITE_API_BASE_URL`
+   - **Value**: Dán URL backend Render của bạn (VD: `https://lulu-mimi-backend.onrender.com` - *không có dấu `/` ở cuối*)
 6. Nhấn **"Deploy"** ➔ Hoàn tất trong ~30 giây!
+7. Vercel sẽ cung cấp đường link web công khai (ví dụ: `https://lulu-and-mimi.vercel.app`).
 
 ---
 
-## 🐳 2. Triển Khai Backend Lên Render (3 phút)
+## 🔑 3. Cách Người Dùng Sử Dụng Trợ Lý AI
 
-### Cách 1: Sử Dụng Render Blueprint (render.yaml)
-1. Đăng nhập [Render.com](https://render.com/).
-2. Nhấn **"New +"** ➔ Chọn **"Blueprint"**.
-3. Chọn repository `Kisukabe/Lulu-and-Mimi`.
-4. Render sẽ tự động đọc file `render.yaml` và tạo dịch vụ `lulu-mimi-backend`.
-5. Trong phần **Environment Variables**, bạn có thể thêm:
-   - `GEMINI_API_KEY`: API Key từ Google AI Studio (nếu muốn kích hoạt Trợ lý AI).
-6. Nhấn **"Apply"** ➔ Backend sẽ tự động chạy!
-
-### Cách 2: Sử Dụng Web Service Docker Trực Tiếp
-1. Vào Render ➔ **"New +"** ➔ **"Web Service"**.
-2. Chọn **"Existing image"** ➔ Điền: `ghcr.io/kisukabe/lulu-backend:latest`.
-3. Điền các biến môi trường:
-   - `PORT`: `10000` (Render tự động định tuyến)
-   - `NODE_ENV`: `production`
-   - `GEMINI_API_KEY`: *(Key của bạn)*
-4. Nhấn **"Create Web Service"**.
-
----
-
-## 🔄 3. Tự Động Hóa CI/CD (GitHub Actions)
-
-Mỗi khi bạn commit code và push lên GitHub:
-- **`ci.yml`**: Tự động kiểm tra TypeCheck (`tsc --noEmit`) và build thử.
-- **`deploy-frontend.yml`**: Tự động deploy bản cập nhật giao diện mới nhất lên Vercel.
-- **`deploy-backend-docker.yml`**: Tự động build Docker Image nhẹ nhất, push lên GitHub Container Registry (`ghcr.io`) và báo cho Render khởi động lại container mới.
-
-Bạn hoàn toàn không cần can thiệp thủ công!
-
----
-
-## 💻 4. Chạy Local Với Docker (Tùy Chọn)
-
-Nếu bạn muốn chạy thử container Docker trên máy cá nhân:
-```bash
-# Khởi động toàn bộ Frontend + Backend
-docker compose up --build
-
-# Mở trình duyệt:
-# Frontend: http://localhost:8080
-# Backend : http://localhost:5050
-```
+- Mọi người dùng khi vào trang web đều có thể:
+  1. **Tra từ điển**: Sử dụng ngay lập tức mà không cần tài khoản hay key.
+  2. **Học Flashcard, Trắc nghiệm, Luyện tập**: Dữ liệu lưu trong trình duyệt của người dùng.
+  3. **Trợ lý AI**: Nhấn biểu tượng 🔑 trên thanh Header ➔ Nhập Gemini API Key miễn phí (lấy tại [Google AI Studio](https://aistudio.google.com/apikey)) ➔ Key được lưu an toàn trong trình duyệt của họ.
