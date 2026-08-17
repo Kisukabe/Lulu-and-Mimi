@@ -1,0 +1,98 @@
+name: CD Backend — Build Docker Image & Push to GHCR
+
+on:
+  push:
+    branches: [ main, master ]
+    paths:
+      - 'server/**'
+      - 'Dockerfile.backend'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/deploy-backend-docker.yml'
+  workflow_dispatch:
+    inputs:
+      version_tag:
+        description: 'Version tag để gắn vào image (VD: v1.0.0). Để trống sẽ chỉ dùng "latest" và SHA.'
+        required: false
+        default: ''
+
+jobs:
+  build-and-push:
+    name: Build Docker Image & Push to GHCR
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # Đăng nhập GHCR bằng GITHUB_TOKEN tự động
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Tạo metadata: tags và labels cho Docker Image
+      - name: Extract Docker Metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/lulu-backend
+          tags: |
+            type=raw,value=latest
+            type=sha,prefix=sha-,format=short
+            type=raw,value=${{ github.event.inputs.version_tag }},enable=${{ github.event.inputs.version_tag != '' }}
+
+      # Kích hoạt Docker Buildx
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # Build và Push image lên GHCR
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile.backend
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # Trigger Render kéo image mới về deploy
+      - name: Trigger Render Deploy via Deploy Hook
+        env:
+          RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -z "$RENDER_DEPLOY_HOOK_URL" ]; then
+            echo "⚠️  RENDER_DEPLOY_HOOK_URL chưa được cấu hình trong GitHub Secrets."
+            echo "    Hướng dẫn lấy Deploy Hook URL:"
+            echo "    Render Dashboard → Service lulu-mimi-backend → Settings → Deploy Hook"
+            echo "    Sau đó thêm vào GitHub: Settings → Secrets → RENDER_DEPLOY_HOOK_URL"
+            exit 0
+          fi
+          echo "🚀 Đang trigger Render deploy..."
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$RENDER_DEPLOY_HOOK_URL")
+          if [ "$HTTP_STATUS" -eq 200 ] || [ "$HTTP_STATUS" -eq 201 ]; then
+            echo "✅ Render deploy đã được kích hoạt thành công (HTTP $HTTP_STATUS)."
+          else
+            echo "❌ Render deploy hook phản hồi lỗi: HTTP $HTTP_STATUS"
+            exit 1
+          fi
+
+      # In tóm tắt kết quả
+      - name: Deployment Summary
+        run: |
+          echo "## 🐳 Docker Build & Push Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Thông tin | Giá trị |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|" >> $GITHUB_STEP_SUMMARY
+          echo "| **Image** | \`ghcr.io/kisukabe/lulu-backend:latest\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Commit SHA** | \`${{ github.sha }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Tags** | \`${{ steps.meta.outputs.tags }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Render Deploy** | Đã trigger ✅ |" >> $GITHUB_STEP_SUMMARY
