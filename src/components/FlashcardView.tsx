@@ -497,11 +497,11 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
       ) : (
         <div className="space-y-6">
           
-          {/* ════════ MAIN GRID: WIDE FLASHCARD (LEFT 67%) + COMPANION WIDGETS (RIGHT 33%) ════════ */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+          {/* ════════ MAIN GRID: WIDE FLASHCARD (LEFT 75%) + COMPANION WIDGETS (RIGHT 25%) ════════ */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
             
-            {/* 🎴 WIDE FLASHCARD CENTER STAGE (8 COLS) */}
-            <div className="lg:col-span-8 space-y-4 flex flex-col">
+            {/* 🎴 WIDE FLASHCARD CENTER STAGE (9 COLS - EXPANSIVE WIDTH) */}
+            <div className="lg:col-span-9 xl:col-span-9 space-y-3.5 flex flex-col">
               
               {/* WIDE HORIZONTAL CARD CONTAINER (RỘNG VÀ DÀI CÂN ĐỐI) */}
               <div className={`perspective-[1200px] w-full h-[460px] sm:h-[500px] lg:h-[530px] relative select-none ${animClass}`}>
@@ -911,100 +911,102 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
 
             </div>
 
-            {/* ════════ RIGHT COLUMN: COMPANION WIDGETS (4 COLS) ════════ */}
-            <div className="lg:col-span-4 space-y-5 flex flex-col justify-between">
-              
-              {/* 1. LULU & MIMI ĐỒNG HÀNH WIDGET */}
-              <div className={`rounded-3xl ${currentTheme.companion1Bg} border-2 ${currentTheme.companion1Border} p-6 sm:p-7 text-white space-y-4`}>
-                <div className="flex items-center justify-between">
-                  <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${currentTheme.companion1TagBg} ${currentTheme.companion1TagText}`}>
-                    LULU & MIMI ĐỒNG HÀNH
-                  </span>
-                  <div className="w-10 h-10 rounded-2xl bg-amber-400 flex items-center justify-center text-xl shadow-md">
-                    {currentTheme.companion1Mascot}
-                  </div>
-                </div>
-
-                <div className="space-y-1.5">
-                  <h3 className="text-lg font-black tracking-tight leading-snug">
-                    Cố lên, chinh phục cả bộ từ nào! 🌱
-                  </h3>
-                  <div className="inline-block px-3 py-1.5 rounded-xl bg-black/40 text-xs font-black text-yellow-300">
-                    Còn lại {unmasteredCount} từ chưa thuộc
-                  </div>
-                </div>
-              </div>
-
-              {/* 2. MỨC ĐỘ THÀNH THẠO WIDGET */}
-              <div className={`rounded-3xl ${currentTheme.companion2Bg} border-2 ${currentTheme.companion2Border} p-6 sm:p-7 space-y-5`}>
+            {/* ════════ RIGHT COLUMN: COMPANION WIDGETS (3 COLS, SCALED DOWN 80% & SNUG) ════════ */}
+            <div className="lg:col-span-3 xl:col-span-3 space-y-3 flex flex-col items-end w-full">
+              <div className="w-full space-y-3">
                 
-                <div className="flex items-center justify-between">
-                  <h4 className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-200">
-                    MỨC ĐỘ THÀNH THẠO
-                  </h4>
-                  <span className="px-2.5 py-0.5 rounded-md bg-amber-500/20 text-amber-500 text-[10px] font-black">
-                    Cấp {Math.min(5, Math.floor(masteredPercent / 20) + 1)}
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-4">
-                  {/* Percent Circle */}
-                  <div className="relative w-16 h-16 rounded-full border-4 border-slate-200 dark:border-slate-800 flex items-center justify-center shrink-0">
-                    <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 36 36">
-                      <path
-                        className="text-amber-400 stroke-current transition-all duration-500"
-                        strokeWidth="4"
-                        strokeDasharray={`${masteredPercent}, 100`}
-                        strokeLinecap="round"
-                        fill="none"
-                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                      />
-                    </svg>
-                    <span className="text-sm font-black text-slate-900 dark:text-white">
-                      {masteredPercent}%
+                {/* 1. LULU & MIMI ĐỒNG HÀNH WIDGET (COMPACT 80%) */}
+                <div className={`rounded-2xl ${currentTheme.companion1Bg} border-2 ${currentTheme.companion1Border} p-4 sm:p-4.5 text-white space-y-2 shadow-sm`}>
+                  <div className="flex items-center justify-between">
+                    <span className={`px-2.5 py-0.5 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-wider ${currentTheme.companion1TagBg} ${currentTheme.companion1TagText}`}>
+                      LULU & MIMI ĐỒNG HÀNH
                     </span>
+                    <div className="w-7 h-7 rounded-xl bg-amber-400 flex items-center justify-center text-sm shadow-xs">
+                      {currentTheme.companion1Mascot}
+                    </div>
                   </div>
 
-                  {/* Level text */}
-                  <div className="space-y-1 flex-1">
-                    <p className="text-xs font-bold text-slate-600 dark:text-slate-300 leading-snug">
-                      Bạn đã thuộc <strong className="text-amber-500">{masteredTotalInFolder}</strong>/{totalInFolder} từ trong bộ này.
-                    </p>
-                    {/* 5 progress bars */}
-                    <div className="grid grid-cols-5 gap-1 pt-1">
-                      {[1, 2, 3, 4, 5].map((lvl) => (
-                        <div
-                          key={lvl}
-                          className={`h-1.5 rounded-full transition-colors ${
-                            masteredPercent >= lvl * 20 ? 'bg-amber-400' : 'bg-slate-200 dark:bg-slate-800'
-                          }`}
-                        />
-                      ))}
+                  <div className="space-y-1">
+                    <h3 className="text-xs sm:text-sm font-black tracking-tight leading-snug">
+                      Cố lên, chinh phục cả bộ từ nào! 🌱
+                    </h3>
+                    <div className="inline-block px-2.5 py-1 rounded-lg bg-black/40 text-[10px] sm:text-[11px] font-black text-yellow-300">
+                      Còn lại {unmasteredCount} từ chưa thuộc
                     </div>
                   </div>
                 </div>
 
-                {/* Bottom Navigation Buttons (‹ Trước | Tiếp theo ›) */}
-                <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
-                  <button
-                    onClick={prevCard}
-                    className="flex items-center justify-center gap-1.5 py-3 rounded-2xl bg-slate-100 dark:bg-slate-800/80 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-black transition cursor-pointer active:scale-95"
-                  >
-                    <ChevronLeft className="w-4 h-4" />
-                    <span>Trước</span>
-                  </button>
+                {/* 2. MỨC ĐỘ THÀNH THẠO WIDGET (COMPACT 80%) */}
+                <div className={`rounded-2xl ${currentTheme.companion2Bg} border-2 ${currentTheme.companion2Border} p-4 sm:p-4.5 space-y-3 shadow-sm`}>
+                  
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-slate-800 dark:text-slate-200">
+                      MỨC ĐỘ THÀNH THẠO
+                    </h4>
+                    <span className="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-500 text-[9px] sm:text-[10px] font-black">
+                      Cấp {Math.min(5, Math.floor(masteredPercent / 20) + 1)}
+                    </span>
+                  </div>
 
-                  <button
-                    onClick={nextCard}
-                    className={`flex items-center justify-center gap-1.5 py-3 rounded-2xl ${currentTheme.nextBtnBg} text-xs font-black transition cursor-pointer active:scale-95 shadow-md`}
-                  >
-                    <span>Tiếp theo</span>
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
+                  <div className="flex items-center gap-3">
+                    {/* Percent Circle (Compact) */}
+                    <div className="relative w-11 h-11 rounded-full border-3 border-slate-200 dark:border-slate-800 flex items-center justify-center shrink-0">
+                      <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 36 36">
+                        <path
+                          className="text-amber-400 stroke-current transition-all duration-500"
+                          strokeWidth="4"
+                          strokeDasharray={`${masteredPercent}, 100`}
+                          strokeLinecap="round"
+                          fill="none"
+                          d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                        />
+                      </svg>
+                      <span className="text-xs font-black text-slate-900 dark:text-white">
+                        {masteredPercent}%
+                      </span>
+                    </div>
+
+                    {/* Level text */}
+                    <div className="space-y-0.5 flex-1 min-w-0">
+                      <p className="text-[10px] sm:text-[11px] font-bold text-slate-600 dark:text-slate-300 leading-tight">
+                        Thuộc <strong className="text-amber-500">{masteredTotalInFolder}</strong>/{totalInFolder} từ trong bộ.
+                      </p>
+                      {/* 5 progress bars */}
+                      <div className="grid grid-cols-5 gap-1 pt-0.5">
+                        {[1, 2, 3, 4, 5].map((lvl) => (
+                          <div
+                            key={lvl}
+                            className={`h-1.5 rounded-full transition-colors ${
+                              masteredPercent >= lvl * 20 ? 'bg-amber-400' : 'bg-slate-200 dark:bg-slate-800'
+                            }`}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Bottom Navigation Buttons (‹ Trước | Tiếp theo ›) */}
+                  <div className="grid grid-cols-2 gap-2 pt-1 border-t border-slate-100 dark:border-slate-800/80">
+                    <button
+                      onClick={prevCard}
+                      className="flex items-center justify-center gap-1 py-2 rounded-xl bg-slate-100 dark:bg-slate-800/80 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-black transition cursor-pointer active:scale-95"
+                    >
+                      <ChevronLeft className="w-3.5 h-3.5" />
+                      <span>Trước</span>
+                    </button>
+
+                    <button
+                      onClick={nextCard}
+                      className={`flex items-center justify-center gap-1 py-2 rounded-xl ${currentTheme.nextBtnBg} text-xs font-black transition cursor-pointer active:scale-95 shadow-xs`}
+                    >
+                      <span>Tiếp theo</span>
+                      <ChevronRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+
                 </div>
 
               </div>
-
             </div>
 
           </div>
