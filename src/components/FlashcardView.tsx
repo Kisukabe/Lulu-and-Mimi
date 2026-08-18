@@ -304,8 +304,8 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
               onClick={() => setSelectedVocabType(type.id as any)}
               className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition cursor-pointer shrink-0 ${
                 selectedVocabType === type.id
-                  ? 'bg-indigo-600 text-white shadow-xs'
-                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
+                  ? 'bg-blue-500 text-white shadow-xs'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-blue-50 dark:hover:bg-slate-700'
               }`}
             >
               {type.label}
@@ -318,7 +318,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
           {onOpenQuickAdd && (
             <button
               onClick={onOpenQuickAdd}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white text-[11px] font-black rounded-xl shadow-xs transition cursor-pointer"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-blue-500 to-sky-500 hover:from-blue-600 hover:to-sky-600 text-white text-[11px] font-black rounded-xl shadow-xs transition cursor-pointer"
               title="Thêm từ vựng mới và tự động tạo flashcard"
             >
               <Wand2 className="w-3.5 h-3.5" />
@@ -344,8 +344,8 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
             onClick={() => setShowBackSettings((v) => !v)}
             className={`p-1.5 rounded-xl border text-[11px] font-bold transition cursor-pointer flex items-center gap-1 ${
               showBackSettings
-                ? 'bg-indigo-600 text-white border-indigo-600 shadow-xs'
-                : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-indigo-50 hover:text-indigo-600 dark:hover:bg-slate-700'
+                ? 'bg-blue-500 text-white border-blue-500 shadow-xs'
+                : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-slate-700'
             }`}
             title="Tuỳ chỉnh mặt sau thẻ"
           >
@@ -366,7 +366,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
       {showBackSettings && (
         <div className="bg-white dark:bg-slate-900 border border-indigo-200 dark:border-indigo-800/70 rounded-2xl p-3.5 shadow-xs animate-in fade-in slide-in-from-top-2 duration-150">
           <div className="flex items-center justify-between mb-2.5">
-            <span className="text-[11px] font-black uppercase text-indigo-700 dark:text-indigo-300 flex items-center gap-1.5">
+            <span className="text-[11px] font-black uppercase text-blue-700 dark:text-blue-300 flex items-center gap-1.5">
               <SlidersHorizontal className="w-3.5 h-3.5" />
               Tuỳ Chỉnh Mặt Sau Flashcard
             </span>
@@ -391,13 +391,13 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                 onClick={() => updateBackSetting(key, !backSettings[key])}
                 className={`flex items-center gap-2 px-2.5 py-2 rounded-xl border text-[11px] font-bold transition cursor-pointer text-left ${
                   backSettings[key]
-                    ? 'bg-indigo-50 dark:bg-indigo-950/60 border-indigo-300 dark:border-indigo-700 text-indigo-800 dark:text-indigo-200'
+                    ? 'bg-blue-50 dark:bg-blue-950/60 border-blue-300 dark:border-blue-700 text-blue-800 dark:text-blue-200'
                     : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-500 line-through'
                 }`}
               >
                 <span className={`w-3.5 h-3.5 rounded flex items-center justify-center shrink-0 border ${
                   backSettings[key]
-                    ? 'bg-indigo-600 border-indigo-600 text-white'
+                    ? 'bg-blue-500 border-blue-500 text-white'
                     : 'bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-600'
                 }`}>
                   {backSettings[key] && <span className="text-[9px]">✓</span>}
@@ -414,8 +414,8 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
 
       {/* Main Flashcard Container */}
       {cardsList.length === 0 ? (
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-12 text-center space-y-4 shadow-sm">
-          <div className="w-16 h-16 rounded-3xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mx-auto">
+        <div className="bg-blue-50/60 dark:bg-slate-900 border border-blue-200 dark:border-slate-800 rounded-3xl p-12 text-center space-y-4 shadow-sm">
+          <div className="w-16 h-16 rounded-3xl bg-blue-100 dark:bg-blue-950/60 text-blue-500 dark:text-blue-400 flex items-center justify-center mx-auto">
             <Layers className="w-8 h-8" />
           </div>
           <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100">
@@ -433,7 +433,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
               setSelectedVocabType('all');
               setStatusFilter('all');
             }}
-            className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition cursor-pointer"
+            className="px-5 py-2.5 bg-blue-500 hover:bg-blue-600 text-white text-xs font-bold rounded-xl transition cursor-pointer"
           >
             Xem Tất Cả Flashcards
           </button>
@@ -471,7 +471,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="font-bold text-indigo-600 dark:text-indigo-400">
+              <span className="font-bold text-blue-600 dark:text-blue-400">
                 Thẻ {currentIndex + 1} / {cardsList.length}
               </span>
 
@@ -495,7 +495,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
 
           {/* 3D Flip Card */}
           <div
-            className="perspective-1000 w-full h-[420px] sm:h-[480px] cursor-pointer select-none relative"
+            className="perspective-1000 w-full h-[500px] sm:h-[580px] lg:h-[640px] cursor-pointer select-none relative"
             onClick={() => setIsFlipped(!isFlipped)}
           >
             <div
@@ -505,12 +505,12 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
             >
               
               {/* ════════ FRONT SIDE (ENGLISH WORD) ════════ */}
-              <div className="absolute inset-0 w-full h-full bg-gradient-to-b from-white to-slate-50 dark:from-slate-900 dark:to-slate-950 border-2 border-slate-200/90 dark:border-slate-800/90 rounded-3xl p-6 sm:p-10 flex flex-col justify-between shadow-xl backface-hidden group hover:border-indigo-400 dark:hover:border-indigo-600 transition-all overflow-y-auto custom-scrollbar">
+              <div className="absolute inset-0 w-full h-full bg-gradient-to-br from-sky-50 via-blue-50 to-white dark:from-slate-900 dark:via-blue-950/30 dark:to-slate-950 border-2 border-blue-200/80 dark:border-blue-900/60 rounded-3xl p-6 sm:p-10 flex flex-col justify-between shadow-xl backface-hidden group hover:border-blue-400 dark:hover:border-blue-600 hover:shadow-blue-200/50 dark:hover:shadow-blue-900/30 hover:shadow-2xl transition-all overflow-y-auto custom-scrollbar">
                 
                 {/* Top Info on Front */}
                 <div className="flex items-center justify-between shrink-0">
-                  <span className="text-[11px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center gap-1.5">
-                    <Sparkles className="w-3.5 h-3.5 text-indigo-500" />
+                  <span className="text-[11px] font-black uppercase tracking-wider text-blue-400 dark:text-blue-500 flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-blue-500" />
                     Mặt Trước • Thuật Ngữ Tiếng Anh
                   </span>
                   
@@ -536,13 +536,13 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
 
                 {/* Center Word & Pronunciation */}
                 <div className="my-auto text-center space-y-4 py-6">
-                  <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
+                  <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
                     {currentCard.front}
                   </h2>
 
                   {(currentCard.pronunciation || currentCard.pronunciationUs || currentCard.pronunciationUk) && (
                     <div className="flex items-center justify-center gap-3">
-                      <span className="font-mono text-base sm:text-lg text-indigo-600 dark:text-indigo-400 font-semibold bg-indigo-50/70 dark:bg-indigo-950/60 px-4 py-1 rounded-2xl border border-indigo-100 dark:border-indigo-900/60">
+                      <span className="font-mono text-base sm:text-lg text-blue-600 dark:text-blue-400 font-semibold bg-blue-50/80 dark:bg-blue-950/60 px-4 py-1.5 rounded-2xl border border-blue-200 dark:border-blue-900/60">
                         {currentCard.pronunciationUs || currentCard.pronunciation || currentCard.pronunciationUk}
                       </span>
                     </div>
@@ -563,31 +563,31 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                 </div>
 
                 {/* Bottom Instruction */}
-                <div className="text-center text-[11px] text-slate-400 dark:text-slate-500 font-medium shrink-0 pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+                <div className="text-center text-[11px] text-slate-400 dark:text-slate-500 font-medium shrink-0 pt-3 border-t border-blue-100 dark:border-slate-800/80 flex items-center justify-between">
                   <span className="hidden sm:inline">
-                    Phím <kbd className="px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 font-bold rounded">Space</kbd> để lật thẻ
+                    Phím <kbd className="px-1.5 py-0.5 bg-blue-100 dark:bg-slate-800 font-bold rounded text-blue-700 dark:text-slate-300">Space</kbd> để lật thẻ
                   </span>
-                  <span className="mx-auto sm:mx-0 flex items-center gap-1 text-indigo-600 dark:text-indigo-400 font-bold">
+                  <span className="mx-auto sm:mx-0 flex items-center gap-1 text-blue-500 dark:text-blue-400 font-bold">
                     <RotateCw className="w-3.5 h-3.5" /> Chạm để xem định nghĩa tiếng Anh & nghĩa tiếng Việt
                   </span>
                   <span className="hidden sm:inline">
-                    Phím <kbd className="px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 font-bold rounded">←</kbd> <kbd className="px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 font-bold rounded">→</kbd>
+                    Phím <kbd className="px-1.5 py-0.5 bg-blue-100 dark:bg-slate-800 font-bold rounded text-blue-700 dark:text-slate-300">←</kbd> <kbd className="px-1.5 py-0.5 bg-blue-100 dark:bg-slate-800 font-bold rounded text-blue-700 dark:text-slate-300">→</kbd>
                   </span>
                 </div>
               </div>
 
               {/* ════════ BACK SIDE (ENGLISH DEFINITION & VIETNAMESE MEANING) ════════ */}
-              <div className="absolute inset-0 w-full h-full bg-gradient-to-b from-slate-900 to-slate-950 text-white border-2 border-indigo-900/60 rounded-3xl p-6 sm:p-8 flex flex-col justify-between shadow-2xl backface-hidden rotate-y-180 overflow-y-auto custom-scrollbar">
+              <div className="absolute inset-0 w-full h-full bg-gradient-to-br from-blue-600 via-blue-500 to-sky-400 dark:from-blue-900 dark:via-blue-800 dark:to-sky-900 text-white border-2 border-blue-400/60 dark:border-blue-700/60 rounded-3xl p-6 sm:p-8 flex flex-col justify-between shadow-2xl shadow-blue-500/20 backface-hidden rotate-y-180 overflow-y-auto custom-scrollbar">
                 
                 {/* Top Info on Back */}
                 <div className="flex items-center justify-between shrink-0">
-                  <span className="text-[11px] font-black uppercase tracking-wider text-indigo-400 flex items-center gap-1.5">
+                  <span className="text-[11px] font-black uppercase tracking-wider text-blue-100 flex items-center gap-1.5">
                     <Sparkles className="w-3.5 h-3.5" />
                     Mặt Sau • Định Nghĩa Chi Tiết
                   </span>
                   {currentCardSRS && (
-                    <span className="text-[10px] font-bold text-slate-400 flex items-center gap-1">
-                      <Clock className="w-3 h-3 text-amber-400" />
+                    <span className="text-[10px] font-bold text-blue-100/80 flex items-center gap-1">
+                      <Clock className="w-3 h-3 text-yellow-300" />
                       Ôn tiếp: {formatSRSCountdown(currentCardSRS.nextReviewDate)}
                     </span>
                   )}
@@ -602,18 +602,18 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                   
                   {/* 🇬🇧 English Definition (PRIORITY SPOTLIGHT) */}
                   {backSettings.showDefinitionEn && (
-                    <div className={`bg-gradient-to-br from-indigo-950/90 to-purple-950/80 border-2 border-indigo-500/40 rounded-2xl space-y-2 text-left transition-all duration-300 shadow-lg ${
+                    <div className={`bg-white/20 backdrop-blur-sm border-2 border-white/30 rounded-2xl space-y-2 text-left transition-all duration-300 shadow-lg ${
                       backDensity === 'minimal' ? 'p-8 w-full' :
                       backDensity === 'medium'  ? 'p-6' : 'p-4 sm:p-5'
                     }`}>
                       <div className="flex items-center justify-between">
-                        <span className={`font-black uppercase tracking-wider text-indigo-300 flex items-center gap-1.5 ${
+                        <span className={`font-black uppercase tracking-wider text-blue-100 flex items-center gap-1.5 ${
                           backDensity === 'minimal' ? 'text-sm' :
                           backDensity === 'medium'  ? 'text-xs' : 'text-[11px]'
                         }`}>
-                          <Sparkles className="w-3.5 h-3.5 text-indigo-400" /> 🇬🇧 English Definition (Định Nghĩa Tiếng Anh):
+                          <Sparkles className="w-3.5 h-3.5 text-yellow-300" /> 🇬🇧 English Definition (Định Nghĩa Tiếng Anh):
                         </span>
-                        <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-md bg-indigo-500/20 text-indigo-200 border border-indigo-400/30">
+                        <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-md bg-white/20 text-white border border-white/30">
                           {currentCard.wordForm || 'word'}
                         </span>
                       </div>
@@ -628,16 +628,16 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
 
                   {/* 🇻🇳 Vietnamese Meaning (Supporting Translation) */}
                   {backSettings.showMeaningVi && (
-                    <div className={`bg-slate-800/60 border border-slate-700/60 rounded-2xl space-y-1 text-left transition-all duration-300 ${
+                    <div className={`bg-white/15 backdrop-blur-sm border border-white/25 rounded-2xl space-y-1 text-left transition-all duration-300 ${
                       backDensity === 'minimal' ? 'p-5 w-full' :
                       backDensity === 'medium'  ? 'p-4' : 'p-3'
                     }`}>
-                      <span className={`font-bold uppercase tracking-wider text-emerald-400 ${
+                      <span className={`font-bold uppercase tracking-wider text-yellow-200 ${
                         backDensity === 'minimal' ? 'text-xs block' : 'text-[10px]'
                       }`}>
                         🇻🇳 Bản dịch tiếng Việt:
                       </span>
-                      <p className={`font-extrabold text-emerald-300 leading-snug transition-all ${
+                      <p className={`font-extrabold text-white leading-snug transition-all ${
                         backDensity === 'minimal' ? 'text-xl sm:text-2xl' :
                         backDensity === 'medium'  ? 'text-base sm:text-lg' : 'text-sm sm:text-base'
                       }`}>
@@ -648,12 +648,12 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
 
                   {/* Example Sentence */}
                   {backSettings.showExample && currentCard.example && (
-                    <div className={`bg-slate-800/50 border border-slate-700/50 rounded-2xl space-y-2 text-left transition-all duration-300 ${
+                    <div className={`bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl space-y-2 text-left transition-all duration-300 ${
                       backDensity === 'minimal' ? 'p-6 w-full' :
                       backDensity === 'medium'  ? 'p-5' : 'p-3'
                     }`}>
                       <div className="flex items-center justify-between">
-                        <span className={`uppercase font-black tracking-wider text-slate-400 ${
+                        <span className={`uppercase font-black tracking-wider text-blue-100 ${
                           backDensity === 'minimal' ? 'text-sm' :
                           backDensity === 'medium'  ? 'text-xs' : 'text-[10px]'
                         }`}>
@@ -661,20 +661,20 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                         </span>
                         <button
                           onClick={(e) => playSpeechFallback(currentCard.example || '', 'US')}
-                          className="text-slate-400 hover:text-indigo-300 transition cursor-pointer"
+                          className="text-blue-200 hover:text-white transition cursor-pointer"
                           title="Đọc câu ví dụ"
                         >
                           <Volume2 className={backDensity === 'minimal' ? 'w-6 h-6' : backDensity === 'medium' ? 'w-5 h-5' : 'w-3.5 h-3.5'} />
                         </button>
                       </div>
-                      <p className={`font-medium text-slate-100 leading-relaxed italic transition-all ${
+                      <p className={`font-medium text-white/90 leading-relaxed italic transition-all ${
                         backDensity === 'minimal' ? 'text-xl sm:text-2xl' :
                         backDensity === 'medium'  ? 'text-base sm:text-lg' : 'text-xs sm:text-sm'
                       }`}>
                         &quot;{currentCard.example}&quot;
                       </p>
                       {currentCard.exampleVi && (
-                        <p className={`text-slate-400 pt-0.5 ${
+                        <p className={`text-blue-100/70 pt-0.5 ${
                           backDensity === 'minimal' ? 'text-base' :
                           backDensity === 'medium'  ? 'text-sm' : 'text-[11px]'
                         }`}>
@@ -690,17 +690,17 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                       backDensity !== 'full' ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2'
                     }`}>
                       {backSettings.showSynonyms && currentCard.synonyms && currentCard.synonyms.length > 0 && (
-                        <div className={`bg-slate-800/40 rounded-2xl border border-slate-700/40 transition-all duration-300 ${
+                        <div className={`bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 transition-all duration-300 ${
                           backDensity === 'minimal' ? 'p-6' :
                           backDensity === 'medium'  ? 'p-4' : 'p-2.5'
                         }`}>
-                          <span className={`font-bold uppercase text-indigo-400 block ${
+                          <span className={`font-bold uppercase text-yellow-200 block ${
                             backDensity === 'minimal' ? 'text-sm mb-2' :
                             backDensity === 'medium'  ? 'text-xs mb-1' : 'text-[10px] mb-0.5'
                           }`}>
                             🔗 Từ Đồng Nghĩa:
                           </span>
-                          <span className={`text-slate-200 font-medium transition-all ${
+                          <span className={`text-white font-medium transition-all ${
                             backDensity === 'minimal' ? 'text-xl sm:text-2xl' :
                             backDensity === 'medium'  ? 'text-base' : 'text-[11px]'
                           }`}>
@@ -710,17 +710,17 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                       )}
 
                       {backSettings.showCollocations && currentCard.collocations && currentCard.collocations.length > 0 && (
-                        <div className={`bg-slate-800/40 rounded-2xl border border-slate-700/40 transition-all duration-300 ${
+                        <div className={`bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 transition-all duration-300 ${
                           backDensity === 'minimal' ? 'p-6' :
                           backDensity === 'medium'  ? 'p-4' : 'p-2.5'
                         }`}>
-                          <span className={`font-bold uppercase text-amber-400 block ${
+                          <span className={`font-bold uppercase text-yellow-200 block ${
                             backDensity === 'minimal' ? 'text-sm mb-2' :
                             backDensity === 'medium'  ? 'text-xs mb-1' : 'text-[10px] mb-0.5'
                           }`}>
                             📌 Cụm Đi Kèm:
                           </span>
-                          <span className={`text-slate-200 font-medium transition-all ${
+                          <span className={`text-white font-medium transition-all ${
                             backDensity === 'minimal' ? 'text-xl sm:text-2xl' :
                             backDensity === 'medium'  ? 'text-base' : 'text-[11px]'
                           }`}>
@@ -734,8 +734,8 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
 
                 {/* Bottom SRS Rating Buttons (SM-2 Algorithm) */}
                 {backSettings.showSRSButtons && (
-                  <div className="pt-2 border-t border-slate-800 space-y-2 shrink-0">
-                    <div className={`font-bold text-center text-slate-400 ${
+                  <div className="pt-2 border-t border-white/20 space-y-2 shrink-0">
+                    <div className={`font-bold text-center text-blue-100/70 ${
                       backDensity === 'minimal' ? 'text-xs' : 'text-[10px]'
                     }`}>
                       Đánh giá mức độ ghi nhớ theo thuật toán Spaced Repetition (SM-2):
@@ -747,7 +747,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                           e.stopPropagation();
                           handleRateSRS(1);
                         }}
-                        className={`rounded-xl bg-rose-950/70 border border-rose-800/80 hover:bg-rose-900/80 text-rose-300 font-bold transition flex flex-col items-center justify-center cursor-pointer ${
+                        className={`rounded-xl bg-red-500/30 border border-red-300/40 hover:bg-red-500/50 text-white font-bold transition flex flex-col items-center justify-center cursor-pointer backdrop-blur-sm ${
                           backDensity === 'minimal' ? 'py-4 px-3 text-sm' : 'py-2 px-2 text-xs'
                         }`}
                         title="Phím tắt: 1"
@@ -763,7 +763,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                           e.stopPropagation();
                           handleRateSRS(3);
                         }}
-                        className={`rounded-xl bg-amber-950/70 border border-amber-800/80 hover:bg-amber-900/80 text-amber-300 font-bold transition flex flex-col items-center justify-center cursor-pointer ${
+                        className={`rounded-xl bg-yellow-400/30 border border-yellow-200/40 hover:bg-yellow-400/50 text-white font-bold transition flex flex-col items-center justify-center cursor-pointer backdrop-blur-sm ${
                           backDensity === 'minimal' ? 'py-4 px-3 text-sm' : 'py-2 px-2 text-xs'
                         }`}
                         title="Phím tắt: 2"
@@ -779,7 +779,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                           e.stopPropagation();
                           handleRateSRS(5);
                         }}
-                        className={`rounded-xl bg-emerald-950/70 border border-emerald-800/80 hover:bg-emerald-900/80 text-emerald-300 font-bold transition flex flex-col items-center justify-center cursor-pointer ${
+                        className={`rounded-xl bg-emerald-400/30 border border-emerald-200/40 hover:bg-emerald-400/50 text-white font-bold transition flex flex-col items-center justify-center cursor-pointer backdrop-blur-sm ${
                           backDensity === 'minimal' ? 'py-4 px-3 text-sm' : 'py-2 px-2 text-xs'
                         }`}
                         title="Phím tắt: 3"
@@ -838,7 +838,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
 
               <button
                 onClick={handleNext}
-                className="flex items-center gap-1.5 px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white rounded-xl text-xs font-bold transition shadow-md shadow-indigo-600/25 cursor-pointer"
+                className="flex items-center gap-1.5 px-5 py-2.5 bg-gradient-to-r from-blue-500 to-sky-500 hover:from-blue-600 hover:to-sky-600 text-white rounded-xl text-xs font-bold transition shadow-md shadow-blue-500/25 cursor-pointer"
               >
                 Tiếp Theo
                 <ChevronRight className="w-4 h-4" />
