@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Flashcard, Topic, VocabType, TopicId, SRSCardData, WordForm } from '../types';
 import {
   RotateCw,
@@ -9,8 +9,6 @@ import {
   ChevronRight,
   BookOpen,
   Layers,
-  ArrowUpDown,
-  Link2,
   Filter,
   Clock,
   ThumbsDown,
@@ -26,18 +24,11 @@ import {
   Palette,
   Eye,
   CheckCircle2,
-  Bookmark,
-  BookmarkCheck,
-  Moon,
-  Flame,
-  Award,
   Headphones,
   HelpCircle,
-  Mic,
-  Smile,
   Star
 } from 'lucide-react';
-import { calculateNextSRS, isCardDue, formatSRSCountdown, getMemoryLevelName, previewNextInterval } from '../utils/srs';
+import { calculateNextSRS, isCardDue, formatSRSCountdown, getMemoryLevelName } from '../utils/srs';
 
 export type ThemeVibe = 'dark-space' | 'blue' | 'rose' | 'amber' | 'emerald' | 'purple';
 
@@ -47,20 +38,56 @@ interface ThemeConfig {
   emoji: string;
   dotClass: string;
   
+  // Page / Container
+  topBarBg: string;
+  topBarBorder: string;
+  
   // Front card
   frontBg: string;
   frontBorder: string;
   frontTextColor: string;
-  starColor: string;
+  frontAccent: string;
+  frontTagBg: string;
+  frontTagText: string;
   
   // Back card
   backBg: string;
   backBorder: string;
   backTextColor: string;
+  backBoxBg: string;
+  backBoxBorder: string;
   
-  // Accent & Buttons
+  // Action Buttons
+  btn1Bg: string;
+  btn1Border: string;
+  btn1Text: string;
+  btn1Kbd: string;
+  
+  btnSpaceBg: string;
+  btnSpaceBorder: string;
+  btnSpaceText: string;
+  btnSpaceKbd: string;
+  
+  btn2Bg: string;
+  btn2Border: string;
+  btn2Text: string;
+  btn2Kbd: string;
+  
+  // Companion Widgets
+  companion1Bg: string;
+  companion1Border: string;
+  companion1TagBg: string;
+  companion1TagText: string;
+  
+  companion2Bg: string;
+  companion2Border: string;
+  
+  // Accent & Highlights
   accentColor: string;
-  actionBtnBg: string;
+  accentBg: string;
+  accentText: string;
+  progressBarColor: string;
+  nextBtnBg: string;
 }
 
 const THEME_CONFIGS: Record<ThemeVibe, ThemeConfig> = {
@@ -69,90 +96,252 @@ const THEME_CONFIGS: Record<ThemeVibe, ThemeConfig> = {
     label: 'IELTS Đêm Sao',
     emoji: '🌌',
     dotClass: 'bg-indigo-900 border border-amber-400',
+    topBarBg: 'bg-[#111722]',
+    topBarBorder: 'border-slate-800/80',
     frontBg: 'bg-gradient-to-b from-[#132743] via-[#0f1d33] to-[#0a1526]',
-    frontBorder: 'border-blue-500/30 shadow-[0_0_40px_rgba(15,29,51,0.6)]',
+    frontBorder: 'border-blue-500/40 shadow-[0_0_50px_rgba(15,29,51,0.8)]',
     frontTextColor: 'text-white',
-    starColor: 'text-blue-200/50',
-    backBg: 'bg-gradient-to-b from-[#3f5624] via-[#4d692b] to-[#36491e]',
-    backBorder: 'border-lime-500/30 shadow-[0_0_40px_rgba(63,86,36,0.5)]',
+    frontAccent: 'text-amber-400',
+    frontTagBg: 'bg-slate-900/70 border-white/10',
+    frontTagText: 'text-slate-200',
+    backBg: 'bg-gradient-to-b from-[#203a43] via-[#0f2027] to-[#2c5364]',
+    backBorder: 'border-cyan-500/40 shadow-[0_0_50px_rgba(32,58,67,0.8)]',
     backTextColor: 'text-white',
-    accentColor: 'text-amber-400',
-    actionBtnBg: 'bg-[#556b2f] hover:bg-[#627b37]',
+    backBoxBg: 'bg-black/35 backdrop-blur-md',
+    backBoxBorder: 'border-cyan-500/20',
+    btn1Bg: 'bg-rose-950/70 hover:bg-rose-900/80',
+    btn1Border: 'border-rose-700/60',
+    btn1Text: 'text-rose-200',
+    btn1Kbd: 'bg-rose-950 text-rose-300 border-rose-700/60',
+    btnSpaceBg: 'bg-cyan-950/70 hover:bg-cyan-900/80',
+    btnSpaceBorder: 'border-cyan-600/60',
+    btnSpaceText: 'text-cyan-100',
+    btnSpaceKbd: 'bg-cyan-950 text-cyan-300 border-cyan-700/60',
+    btn2Bg: 'bg-emerald-950/70 hover:bg-emerald-900/80',
+    btn2Border: 'border-emerald-600/60',
+    btn2Text: 'text-emerald-200',
+    btn2Kbd: 'bg-emerald-950 text-emerald-300 border-emerald-600/60',
+    companion1Bg: 'bg-gradient-to-b from-[#132743] to-[#0a1526]',
+    companion1Border: 'border-blue-500/30',
+    companion1TagBg: 'bg-blue-950/80 border-blue-400/30',
+    companion1TagText: 'text-blue-300',
+    companion2Bg: 'bg-[#111722]',
+    companion2Border: 'border-slate-800',
+    accentColor: '#f59e0b',
+    accentBg: 'bg-amber-500 hover:bg-amber-400',
+    accentText: 'text-amber-400',
+    progressBarColor: 'bg-amber-400',
+    nextBtnBg: 'bg-amber-500 hover:bg-amber-400 text-slate-950',
   },
   blue: {
     id: 'blue',
     label: 'Xanh Đại Dương',
     emoji: '🌊',
     dotClass: 'bg-blue-500',
+    topBarBg: 'bg-[#091b35]',
+    topBarBorder: 'border-blue-900/60',
     frontBg: 'bg-gradient-to-b from-[#0f2c59] via-[#091e3d] to-[#06142a]',
-    frontBorder: 'border-cyan-500/30 shadow-[0_0_40px_rgba(15,44,89,0.5)]',
+    frontBorder: 'border-cyan-500/40 shadow-[0_0_50px_rgba(15,44,89,0.8)]',
     frontTextColor: 'text-white',
-    starColor: 'text-cyan-200/50',
-    backBg: 'bg-gradient-to-b from-[#0284c7] via-[#0369a1] to-[#075985]',
-    backBorder: 'border-cyan-400/40 shadow-[0_0_40px_rgba(2,132,199,0.4)]',
+    frontAccent: 'text-cyan-300',
+    frontTagBg: 'bg-blue-950/80 border-cyan-400/20',
+    frontTagText: 'text-cyan-200',
+    backBg: 'bg-gradient-to-b from-[#1e3a8a] via-[#172554] to-[#0f172a]',
+    backBorder: 'border-blue-400/50 shadow-[0_0_50px_rgba(30,58,138,0.8)]',
     backTextColor: 'text-white',
-    accentColor: 'text-cyan-300',
-    actionBtnBg: 'bg-cyan-700 hover:bg-cyan-600',
+    backBoxBg: 'bg-blue-950/50 backdrop-blur-md',
+    backBoxBorder: 'border-blue-400/30',
+    btn1Bg: 'bg-rose-950/80 hover:bg-rose-900',
+    btn1Border: 'border-rose-700/60',
+    btn1Text: 'text-rose-200',
+    btn1Kbd: 'bg-rose-950 text-rose-300 border-rose-700/60',
+    btnSpaceBg: 'bg-blue-900/80 hover:bg-blue-800',
+    btnSpaceBorder: 'border-blue-500/60',
+    btnSpaceText: 'text-blue-100',
+    btnSpaceKbd: 'bg-blue-950 text-blue-300 border-blue-600/60',
+    btn2Bg: 'bg-emerald-950/80 hover:bg-emerald-900',
+    btn2Border: 'border-emerald-600/60',
+    btn2Text: 'text-emerald-200',
+    btn2Kbd: 'bg-emerald-950 text-emerald-300 border-emerald-600/60',
+    companion1Bg: 'bg-gradient-to-b from-[#0f2c59] to-[#07172f]',
+    companion1Border: 'border-cyan-500/30',
+    companion1TagBg: 'bg-blue-950/90 border-cyan-400/30',
+    companion1TagText: 'text-cyan-300',
+    companion2Bg: 'bg-[#091b35]',
+    companion2Border: 'border-blue-900/60',
+    accentColor: '#38bdf8',
+    accentBg: 'bg-cyan-500 hover:bg-cyan-400',
+    accentText: 'text-cyan-300',
+    progressBarColor: 'bg-cyan-400',
+    nextBtnBg: 'bg-cyan-500 hover:bg-cyan-400 text-slate-950',
   },
   rose: {
     id: 'rose',
     label: 'Đỏ Ruby',
     emoji: '🔥',
     dotClass: 'bg-rose-500',
+    topBarBg: 'bg-[#220712]',
+    topBarBorder: 'border-rose-950/80',
     frontBg: 'bg-gradient-to-b from-[#3d0f1e] via-[#2a0914] to-[#1a050c]',
-    frontBorder: 'border-rose-500/30 shadow-[0_0_40px_rgba(61,15,30,0.5)]',
+    frontBorder: 'border-rose-500/40 shadow-[0_0_50px_rgba(61,15,30,0.8)]',
     frontTextColor: 'text-white',
-    starColor: 'text-rose-200/50',
-    backBg: 'bg-gradient-to-b from-[#be123c] via-[#9f1239] to-[#881337]',
-    backBorder: 'border-rose-400/40 shadow-[0_0_40px_rgba(190,18,60,0.4)]',
+    frontAccent: 'text-rose-300',
+    frontTagBg: 'bg-rose-950/80 border-rose-400/20',
+    frontTagText: 'text-rose-200',
+    backBg: 'bg-gradient-to-b from-[#881337] via-[#4c0519] to-[#1f020a]',
+    backBorder: 'border-rose-400/50 shadow-[0_0_50px_rgba(136,19,55,0.8)]',
     backTextColor: 'text-white',
-    accentColor: 'text-rose-300',
-    actionBtnBg: 'bg-rose-800 hover:bg-rose-700',
+    backBoxBg: 'bg-rose-950/50 backdrop-blur-md',
+    backBoxBorder: 'border-rose-400/30',
+    btn1Bg: 'bg-rose-950/90 hover:bg-rose-900',
+    btn1Border: 'border-rose-700/60',
+    btn1Text: 'text-rose-200',
+    btn1Kbd: 'bg-rose-950 text-rose-300 border-rose-700/60',
+    btnSpaceBg: 'bg-rose-900/80 hover:bg-rose-800',
+    btnSpaceBorder: 'border-rose-500/60',
+    btnSpaceText: 'text-rose-100',
+    btnSpaceKbd: 'bg-rose-950 text-rose-300 border-rose-600/60',
+    btn2Bg: 'bg-emerald-950/80 hover:bg-emerald-900',
+    btn2Border: 'border-emerald-600/60',
+    btn2Text: 'text-emerald-200',
+    btn2Kbd: 'bg-emerald-950 text-emerald-300 border-emerald-600/60',
+    companion1Bg: 'bg-gradient-to-b from-[#380e1c] to-[#1f050e]',
+    companion1Border: 'border-rose-500/30',
+    companion1TagBg: 'bg-rose-950/90 border-rose-400/30',
+    companion1TagText: 'text-rose-300',
+    companion2Bg: 'bg-[#220712]',
+    companion2Border: 'border-rose-950/80',
+    accentColor: '#fb7185',
+    accentBg: 'bg-rose-500 hover:bg-rose-400',
+    accentText: 'text-rose-300',
+    progressBarColor: 'bg-rose-400',
+    nextBtnBg: 'bg-rose-500 hover:bg-rose-400 text-white',
   },
   amber: {
     id: 'amber',
     label: 'Vàng Sunset',
     emoji: '✨',
     dotClass: 'bg-amber-500',
-    frontBg: 'bg-gradient-to-b from-[#33220c] via-[#241708] to-[#170e05]',
-    frontBorder: 'border-amber-500/30 shadow-[0_0_40px_rgba(51,34,12,0.5)]',
+    topBarBg: 'bg-[#221303]',
+    topBarBorder: 'border-amber-950/80',
+    frontBg: 'bg-gradient-to-b from-[#3a2208] via-[#281604] to-[#170c02]',
+    frontBorder: 'border-amber-500/40 shadow-[0_0_50px_rgba(58,34,8,0.8)]',
     frontTextColor: 'text-white',
-    starColor: 'text-amber-200/50',
-    backBg: 'bg-gradient-to-b from-[#b45309] via-[#92400e] to-[#78350f]',
-    backBorder: 'border-amber-400/40 shadow-[0_0_40px_rgba(180,83,9,0.4)]',
+    frontAccent: 'text-amber-300',
+    frontTagBg: 'bg-amber-950/80 border-amber-400/20',
+    frontTagText: 'text-amber-200',
+    backBg: 'bg-gradient-to-b from-[#78350f] via-[#451a03] to-[#1c0a01]',
+    backBorder: 'border-amber-400/50 shadow-[0_0_50px_rgba(120,53,15,0.8)]',
     backTextColor: 'text-white',
-    accentColor: 'text-amber-300',
-    actionBtnBg: 'bg-amber-700 hover:bg-amber-600',
+    backBoxBg: 'bg-amber-950/50 backdrop-blur-md',
+    backBoxBorder: 'border-amber-400/30',
+    btn1Bg: 'bg-rose-950/80 hover:bg-rose-900',
+    btn1Border: 'border-rose-700/60',
+    btn1Text: 'text-rose-200',
+    btn1Kbd: 'bg-rose-950 text-rose-300 border-rose-700/60',
+    btnSpaceBg: 'bg-amber-900/80 hover:bg-amber-800',
+    btnSpaceBorder: 'border-amber-500/60',
+    btnSpaceText: 'text-amber-100',
+    btnSpaceKbd: 'bg-amber-950 text-amber-300 border-amber-600/60',
+    btn2Bg: 'bg-emerald-950/80 hover:bg-emerald-900',
+    btn2Border: 'border-emerald-600/60',
+    btn2Text: 'text-emerald-200',
+    btn2Kbd: 'bg-emerald-950 text-emerald-300 border-emerald-600/60',
+    companion1Bg: 'bg-gradient-to-b from-[#351e06] to-[#1d0f02]',
+    companion1Border: 'border-amber-500/30',
+    companion1TagBg: 'bg-amber-950/90 border-amber-400/30',
+    companion1TagText: 'text-amber-300',
+    companion2Bg: 'bg-[#221303]',
+    companion2Border: 'border-amber-950/80',
+    accentColor: '#f59e0b',
+    accentBg: 'bg-amber-500 hover:bg-amber-400',
+    accentText: 'text-amber-300',
+    progressBarColor: 'bg-amber-400',
+    nextBtnBg: 'bg-amber-500 hover:bg-amber-400 text-slate-950',
   },
   emerald: {
     id: 'emerald',
     label: 'Xanh Rừng Rậm',
     emoji: '🌿',
     dotClass: 'bg-emerald-500',
-    frontBg: 'bg-gradient-to-b from-[#0a2f1d] via-[#062013] to-[#04150c]',
-    frontBorder: 'border-emerald-500/30 shadow-[0_0_40px_rgba(10,47,29,0.5)]',
+    topBarBg: 'bg-[#082016]',
+    topBarBorder: 'border-emerald-950/80',
+    frontBg: 'bg-gradient-to-b from-[#0a2f1d] via-[#062013] to-[#03130b]',
+    frontBorder: 'border-emerald-500/40 shadow-[0_0_50px_rgba(10,47,29,0.8)]',
     frontTextColor: 'text-white',
-    starColor: 'text-emerald-200/50',
-    backBg: 'bg-gradient-to-b from-[#047857] via-[#065f46] to-[#064e3b]',
-    backBorder: 'border-emerald-400/40 shadow-[0_0_40px_rgba(4,120,87,0.4)]',
+    frontAccent: 'text-emerald-300',
+    frontTagBg: 'bg-emerald-950/80 border-emerald-400/20',
+    frontTagText: 'text-emerald-200',
+    backBg: 'bg-gradient-to-b from-[#065f46] via-[#064e3b] to-[#022c22]',
+    backBorder: 'border-emerald-400/50 shadow-[0_0_50px_rgba(6,95,70,0.8)]',
     backTextColor: 'text-white',
-    accentColor: 'text-emerald-300',
-    actionBtnBg: 'bg-emerald-800 hover:bg-emerald-700',
+    backBoxBg: 'bg-emerald-950/50 backdrop-blur-md',
+    backBoxBorder: 'border-emerald-400/30',
+    btn1Bg: 'bg-rose-950/80 hover:bg-rose-900',
+    btn1Border: 'border-rose-700/60',
+    btn1Text: 'text-rose-200',
+    btn1Kbd: 'bg-rose-950 text-rose-300 border-rose-700/60',
+    btnSpaceBg: 'bg-emerald-900/80 hover:bg-emerald-800',
+    btnSpaceBorder: 'border-emerald-500/60',
+    btnSpaceText: 'text-emerald-100',
+    btnSpaceKbd: 'bg-emerald-950 text-emerald-300 border-emerald-600/60',
+    btn2Bg: 'bg-emerald-950/80 hover:bg-emerald-900',
+    btn2Border: 'border-emerald-600/60',
+    btn2Text: 'text-emerald-200',
+    btn2Kbd: 'bg-emerald-950 text-emerald-300 border-emerald-600/60',
+    companion1Bg: 'bg-gradient-to-b from-[#0a2e1d] to-[#04170e]',
+    companion1Border: 'border-emerald-500/30',
+    companion1TagBg: 'bg-emerald-950/90 border-emerald-400/30',
+    companion1TagText: 'text-emerald-300',
+    companion2Bg: 'bg-[#082016]',
+    companion2Border: 'border-emerald-950/80',
+    accentColor: '#34d399',
+    accentBg: 'bg-emerald-500 hover:bg-emerald-400',
+    accentText: 'text-emerald-300',
+    progressBarColor: 'bg-emerald-400',
+    nextBtnBg: 'bg-emerald-500 hover:bg-emerald-400 text-slate-950',
   },
   purple: {
     id: 'purple',
     label: 'Tím Huyền Bí',
     emoji: '🔮',
     dotClass: 'bg-purple-500',
-    frontBg: 'bg-gradient-to-b from-[#24133b] via-[#190c29] to-[#0f071a]',
-    frontBorder: 'border-purple-500/30 shadow-[0_0_40px_rgba(36,19,59,0.5)]',
+    topBarBg: 'bg-[#1a0a2b]',
+    topBarBorder: 'border-purple-950/80',
+    frontBg: 'bg-gradient-to-b from-[#24133b] via-[#190c29] to-[#0e0618]',
+    frontBorder: 'border-purple-500/40 shadow-[0_0_50px_rgba(36,19,59,0.8)]',
     frontTextColor: 'text-white',
-    starColor: 'text-purple-200/50',
-    backBg: 'bg-gradient-to-b from-[#7e22ce] via-[#6b21a8] to-[#581c87]',
-    backBorder: 'border-purple-400/40 shadow-[0_0_40px_rgba(126,34,206,0.4)]',
+    frontAccent: 'text-purple-300',
+    frontTagBg: 'bg-purple-950/80 border-purple-400/20',
+    frontTagText: 'text-purple-200',
+    backBg: 'bg-gradient-to-b from-[#581c87] via-[#3b0764] to-[#1c0332]',
+    backBorder: 'border-purple-400/50 shadow-[0_0_50px_rgba(88,28,135,0.8)]',
     backTextColor: 'text-white',
-    accentColor: 'text-purple-300',
-    actionBtnBg: 'bg-purple-800 hover:bg-purple-700',
+    backBoxBg: 'bg-purple-950/50 backdrop-blur-md',
+    backBoxBorder: 'border-purple-400/30',
+    btn1Bg: 'bg-rose-950/80 hover:bg-rose-900',
+    btn1Border: 'border-rose-700/60',
+    btn1Text: 'text-rose-200',
+    btn1Kbd: 'bg-rose-950 text-rose-300 border-rose-700/60',
+    btnSpaceBg: 'bg-purple-900/80 hover:bg-purple-800',
+    btnSpaceBorder: 'border-purple-500/60',
+    btnSpaceText: 'text-purple-100',
+    btnSpaceKbd: 'bg-purple-950 text-purple-300 border-purple-600/60',
+    btn2Bg: 'bg-emerald-950/80 hover:bg-emerald-900',
+    btn2Border: 'border-emerald-600/60',
+    btn2Text: 'text-emerald-200',
+    btn2Kbd: 'bg-emerald-950 text-emerald-300 border-emerald-600/60',
+    companion1Bg: 'bg-gradient-to-b from-[#25103d] to-[#120520]',
+    companion1Border: 'border-purple-500/30',
+    companion1TagBg: 'bg-purple-950/90 border-purple-400/30',
+    companion1TagText: 'text-purple-300',
+    companion2Bg: 'bg-[#1a0a2b]',
+    companion2Border: 'border-purple-950/80',
+    accentColor: '#c084fc',
+    accentBg: 'bg-purple-500 hover:bg-purple-400',
+    accentText: 'text-purple-300',
+    progressBarColor: 'bg-purple-400',
+    nextBtnBg: 'bg-purple-500 hover:bg-purple-400 text-white',
   },
 };
 
@@ -193,7 +382,6 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
   const [statusFilter, setStatusFilter] = useState<'all' | 'due_srs' | 'unmastered' | 'review' | 'mastered'>('all');
   const [cardsList, setCardsList] = useState<Flashcard[]>([]);
   const [showThemePicker, setShowThemePicker] = useState(false);
-  const [showBackSettings, setShowBackSettings] = useState(false);
 
   // Auto-play audio preference
   const [autoPlayAudio, setAutoPlayAudio] = useState<boolean>(() => {
@@ -215,13 +403,13 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
   };
 
   // Theme Vibe
-  const THEME_VIBE_KEY = 'lulu_mimi_card_theme_vibe_v2';
+  const THEME_VIBE_KEY = 'lulu_mimi_card_theme_vibe_v3';
   const [themeVibe, setThemeVibe] = useState<ThemeVibe>(() => {
     try {
       const saved = localStorage.getItem(THEME_VIBE_KEY) as ThemeVibe;
       if (saved && THEME_CONFIGS[saved]) return saved;
     } catch {}
-    return 'dark-space'; // Default matching The IELTS Dictionary!
+    return 'dark-space';
   });
 
   const changeThemeVibe = (newVibe: ThemeVibe) => {
@@ -238,34 +426,6 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
   // In-Card Editor State
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditForm] = useState<Partial<Flashcard>>({});
-
-  // Back settings
-  const BACK_SETTINGS_KEY = 'lulu_mimi_back_card_settings_v2';
-  const [backSettings, setBackSettings] = useState<{
-    showDefinitionEn: boolean;
-    showMeaningVi: boolean;
-    showExample: boolean;
-    showSynonyms: boolean;
-    showCollocations: boolean;
-  }>(() => {
-    try {
-      const saved = localStorage.getItem(BACK_SETTINGS_KEY);
-      if (saved) return JSON.parse(saved);
-    } catch {}
-    return {
-      showDefinitionEn: true,
-      showMeaningVi: true,
-      showExample: true,
-      showSynonyms: true,
-      showCollocations: true,
-    };
-  });
-
-  const updateBackSetting = (key: keyof typeof backSettings, value: boolean) => {
-    const updated = { ...backSettings, [key]: value };
-    setBackSettings(updated);
-    try { localStorage.setItem(BACK_SETTINGS_KEY, JSON.stringify(updated)); } catch {}
-  };
 
   // Due SRS Count
   const dueCardsCount = useMemo(() => {
@@ -512,8 +672,8 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
   return (
     <div className="max-w-6xl mx-auto px-2 sm:px-4 py-2 sm:py-4 space-y-4 font-sans text-slate-100">
       
-      {/* ════════ TOP BREADCRUMB & CONTROLS BAR (IELTS DICTIONARY STYLE) ════════ */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#161a15] dark:bg-[#121612] p-3 sm:p-4 rounded-2xl border border-slate-800/80 shadow-md">
+      {/* ════════ TOP BREADCRUMB & CONTROLS BAR (COORDINATED WITH THEME) ════════ */}
+      <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${currentTheme.topBarBg} p-3.5 sm:p-4 rounded-3xl border ${currentTheme.topBarBorder} shadow-lg transition-colors duration-300`}>
         
         {/* Left: Breadcrumbs */}
         <div className="space-y-0.5">
@@ -524,7 +684,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
             <h2 className="text-base sm:text-lg font-black text-white tracking-tight">
               {currentTopicObj?.emoji || '📚'} {currentTopicObj?.title || 'IELTS Từ Vựng'}
             </h2>
-            <span className="text-[10px] font-black px-2 py-0.5 rounded-md bg-slate-800 text-slate-300 border border-slate-700">
+            <span className="text-[10px] font-black px-2.5 py-0.5 rounded-lg bg-black/40 text-slate-300 border border-white/10">
               {currentCard?.vocabType || 'Academic'}
             </span>
           </div>
@@ -536,10 +696,10 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
           {/* Trộn thẻ */}
           <button
             onClick={handleShuffle}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 border border-slate-700 text-xs font-black text-slate-200 transition cursor-pointer active:scale-95 shadow-2xs"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-black/30 hover:bg-black/50 border border-white/10 text-xs font-black text-slate-200 transition cursor-pointer active:scale-95 shadow-2xs"
             title="Xáo trộn ngẫu nhiên bộ thẻ"
           >
-            <Shuffle className="w-3.5 h-3.5 text-amber-400" />
+            <Shuffle className={`w-3.5 h-3.5 ${currentTheme.accentText}`} />
             <span>Trộn thẻ</span>
           </button>
 
@@ -548,14 +708,14 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
             onClick={toggleAutoPlayAudio}
             className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border text-xs font-black transition cursor-pointer active:scale-95 ${
               autoPlayAudio
-                ? 'bg-amber-500/20 border-amber-500/40 text-amber-300'
-                : 'bg-slate-800/90 border-slate-700 text-slate-400 hover:text-slate-200'
+                ? 'bg-white/15 border-white/30 text-white'
+                : 'bg-black/30 border-white/10 text-slate-400 hover:text-slate-200'
             }`}
             title="Bật/Tắt tự động phát âm khi chuyển thẻ"
           >
             <Volume2 className="w-3.5 h-3.5" />
             <span className="hidden md:inline">Tự động phát âm</span>
-            <div className={`w-7 h-4 rounded-full transition-colors relative flex items-center p-0.5 ${autoPlayAudio ? 'bg-amber-500' : 'bg-slate-700'}`}>
+            <div className={`w-7 h-4 rounded-full transition-colors relative flex items-center p-0.5 ${autoPlayAudio ? currentTheme.accentBg : 'bg-slate-700'}`}>
               <div className={`w-3 h-3 rounded-full bg-white transition-transform ${autoPlayAudio ? 'translate-x-3' : 'translate-x-0'}`} />
             </div>
           </button>
@@ -564,7 +724,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
           <select
             value={preferredAccent}
             onChange={(e) => setPreferredAccent(e.target.value as 'US' | 'UK')}
-            className="bg-slate-800/90 border border-slate-700 text-slate-200 text-xs font-black rounded-xl px-2.5 py-1.5 outline-none cursor-pointer"
+            className="bg-black/40 border border-white/10 text-slate-200 text-xs font-black rounded-xl px-2.5 py-1.5 outline-none cursor-pointer"
           >
             <option value="US">🎙️ Giọng: US (Mỹ)</option>
             <option value="UK">🎙️ Giọng: UK (Anh)</option>
@@ -574,16 +734,17 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
           <div className="relative">
             <button
               onClick={() => setShowThemePicker((v) => !v)}
-              className="p-2 rounded-xl bg-slate-800/90 hover:bg-slate-700 border border-slate-700 text-slate-200 transition cursor-pointer active:scale-95"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-black/30 hover:bg-black/50 border border-white/10 text-slate-200 text-xs font-black transition cursor-pointer active:scale-95"
               title="Đổi phong cách màu thẻ"
             >
-              <Palette className="w-4 h-4 text-amber-400" />
+              <Palette className={`w-3.5 h-3.5 ${currentTheme.accentText}`} />
+              <span className="hidden sm:inline">{currentTheme.label}</span>
             </button>
 
             {showThemePicker && (
-              <div className="absolute right-0 top-full mt-1.5 z-50 bg-[#161a15] border border-slate-800 rounded-2xl p-2 shadow-2xl w-48 space-y-1 animate-in fade-in zoom-in-95 duration-100">
+              <div className="absolute right-0 top-full mt-1.5 z-50 bg-slate-900 border border-slate-700 rounded-2xl p-2 shadow-2xl w-48 space-y-1 animate-in fade-in zoom-in-95 duration-100">
                 <div className="text-[10px] font-black uppercase text-slate-400 px-2 py-1">
-                  Chọn Phong Cách Thẻ
+                  Chọn Vibe Màu
                 </div>
                 {(Object.values(THEME_CONFIGS) as ThemeConfig[]).map((theme) => (
                   <button
@@ -594,15 +755,15 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                     }}
                     className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-xl text-xs font-black transition cursor-pointer ${
                       themeVibe === theme.id
-                        ? 'bg-slate-800 text-white'
-                        : 'text-slate-400 hover:bg-slate-800/60'
+                        ? 'bg-white/20 text-white'
+                        : 'text-slate-400 hover:bg-white/10'
                     }`}
                   >
                     <span className="flex items-center gap-2">
                       <span className={`w-3 h-3 rounded-full ${theme.dotClass}`} />
                       <span>{theme.emoji} {theme.label}</span>
                     </span>
-                    {themeVibe === theme.id && <Check className="w-3.5 h-3.5 text-amber-400" />}
+                    {themeVibe === theme.id && <Check className="w-3.5 h-3.5 text-white" />}
                   </button>
                 ))}
               </div>
@@ -613,7 +774,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
           {onOpenQuickAdd && (
             <button
               onClick={onOpenQuickAdd}
-              className="flex items-center gap-1 px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black rounded-xl shadow-xs transition cursor-pointer active:scale-95"
+              className={`flex items-center gap-1 px-3 py-1.5 ${currentTheme.accentBg} text-slate-950 text-xs font-black rounded-xl shadow-xs transition cursor-pointer active:scale-95`}
             >
               <Plus className="w-3.5 h-3.5" />
               <span>Thêm từ</span>
@@ -624,7 +785,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
       </div>
 
       {cardsList.length === 0 ? (
-        <div className="bg-[#161a15] border border-slate-800 rounded-3xl p-12 text-center space-y-4 shadow-sm">
+        <div className="bg-[#111722] border border-slate-800 rounded-3xl p-12 text-center space-y-4 shadow-sm">
           <div className="w-16 h-16 rounded-3xl bg-amber-500/10 text-amber-400 flex items-center justify-center mx-auto">
             <Layers className="w-8 h-8" />
           </div>
@@ -633,7 +794,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
           </h3>
           <button
             onClick={() => setStatusFilter('all')}
-            className="px-5 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black rounded-xl transition cursor-pointer"
+            className={`px-5 py-2.5 ${currentTheme.accentBg} text-slate-950 text-xs font-black rounded-xl transition cursor-pointer`}
           >
             Xem Tất Cả Flashcards
           </button>
@@ -647,15 +808,15 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
             {/* 🎴 FLASHCARD CENTER STAGE (8 COLS) */}
             <div className="lg:col-span-8 space-y-3">
               
-              {/* Card Viewport Container */}
-              <div className={`perspective-1000 w-full h-[460px] sm:h-[500px] relative select-none ${animClass}`}>
+              {/* Card Viewport Container (TĂNG KÍCH THƯỚC KHUNG FLASHCARD) */}
+              <div className={`perspective-[1200px] w-full h-[520px] sm:h-[580px] lg:h-[620px] relative select-none ${animClass}`}>
                 
                 {/* ✏️ IN-CARD EDITOR OVERLAY */}
                 {isEditing ? (
-                  <div className="w-full h-full bg-[#18201a] border-2 border-amber-500/50 rounded-3xl p-5 shadow-2xl overflow-y-auto custom-scrollbar flex flex-col justify-between animate-in zoom-in-95 duration-150 text-slate-200">
+                  <div className={`w-full h-full ${currentTheme.frontBg} border-2 ${currentTheme.frontBorder} rounded-3xl p-5 sm:p-7 shadow-2xl overflow-y-auto custom-scrollbar flex flex-col justify-between animate-in zoom-in-95 duration-150 text-slate-200 z-30`}>
                     <form onSubmit={handleSaveEdit} className="space-y-3 my-auto">
-                      <div className="flex items-center justify-between pb-2 border-b border-slate-800">
-                        <span className="text-xs font-black uppercase text-amber-400 flex items-center gap-1.5">
+                      <div className="flex items-center justify-between pb-2 border-b border-white/15">
+                        <span className={`text-xs font-black uppercase ${currentTheme.accentText} flex items-center gap-1.5`}>
                           <Edit3 className="w-4 h-4" /> Sửa Từ Vựng Trực Tiếp
                         </span>
                         <button
@@ -667,34 +828,34 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                         </button>
                       </div>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
-                          <label className="block text-[10px] font-black uppercase text-slate-400 mb-0.5">Từ vựng *</label>
+                          <label className="block text-[10px] font-black uppercase text-slate-300 mb-1">Từ vựng *</label>
                           <input
                             type="text"
                             value={editForm.front || ''}
                             onChange={(e) => setEditForm({ ...editForm, front: e.target.value })}
                             required
-                            className="w-full px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-xl text-sm font-black text-white outline-none focus:border-amber-500"
+                            className="w-full px-3 py-2 bg-black/40 border border-white/20 rounded-xl text-sm font-black text-white outline-none focus:border-cyan-400"
                           />
                         </div>
 
                         <div>
-                          <label className="block text-[10px] font-black uppercase text-slate-400 mb-0.5">Phiên âm IPA</label>
+                          <label className="block text-[10px] font-black uppercase text-slate-300 mb-1">Phiên âm IPA</label>
                           <input
                             type="text"
                             value={editForm.pronunciationUs || ''}
                             onChange={(e) => setEditForm({ ...editForm, pronunciationUs: e.target.value })}
-                            className="w-full px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-xl text-sm font-mono font-bold text-white outline-none focus:border-amber-500"
+                            className="w-full px-3 py-2 bg-black/40 border border-white/20 rounded-xl text-sm font-mono font-bold text-white outline-none focus:border-cyan-400"
                           />
                         </div>
 
                         <div>
-                          <label className="block text-[10px] font-black uppercase text-slate-400 mb-0.5">Loại từ</label>
+                          <label className="block text-[10px] font-black uppercase text-slate-300 mb-1">Loại từ</label>
                           <select
                             value={editForm.wordForm || 'noun'}
                             onChange={(e) => setEditForm({ ...editForm, wordForm: e.target.value as WordForm })}
-                            className="w-full px-2 py-1.5 bg-slate-900 border border-slate-700 rounded-xl text-xs font-bold text-slate-200 outline-none"
+                            className="w-full px-2 py-2 bg-black/40 border border-white/20 rounded-xl text-xs font-bold text-slate-200 outline-none"
                           >
                             <option value="noun">Danh từ (Noun)</option>
                             <option value="verb">Động từ (Verb)</option>
@@ -706,48 +867,48 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                         </div>
 
                         <div>
-                          <label className="block text-[10px] font-black uppercase text-slate-400 mb-0.5">Nghĩa tiếng Việt *</label>
+                          <label className="block text-[10px] font-black uppercase text-slate-300 mb-1">Nghĩa tiếng Việt *</label>
                           <input
                             type="text"
                             value={editForm.back || ''}
                             onChange={(e) => setEditForm({ ...editForm, back: e.target.value })}
                             required
-                            className="w-full px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-xl text-xs font-black text-white outline-none focus:border-amber-500"
+                            className="w-full px-3 py-2 bg-black/40 border border-white/20 rounded-xl text-sm font-black text-white outline-none focus:border-cyan-400"
                           />
                         </div>
 
                         <div className="sm:col-span-2">
-                          <label className="block text-[10px] font-black uppercase text-slate-400 mb-0.5">Định nghĩa tiếng Anh</label>
+                          <label className="block text-[10px] font-black uppercase text-slate-300 mb-1">Định nghĩa tiếng Anh</label>
                           <textarea
                             rows={2}
                             value={editForm.definitionEn || ''}
                             onChange={(e) => setEditForm({ ...editForm, definitionEn: e.target.value })}
-                            className="w-full px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-xl text-xs font-bold text-white outline-none focus:border-amber-500"
+                            className="w-full px-3 py-2 bg-black/40 border border-white/20 rounded-xl text-xs font-bold text-white outline-none focus:border-cyan-400"
                           />
                         </div>
 
                         <div className="sm:col-span-2">
-                          <label className="block text-[10px] font-black uppercase text-slate-400 mb-0.5">Câu ví dụ tiếng Anh</label>
+                          <label className="block text-[10px] font-black uppercase text-slate-300 mb-1">Câu ví dụ tiếng Anh</label>
                           <input
                             type="text"
                             value={editForm.example || ''}
                             onChange={(e) => setEditForm({ ...editForm, example: e.target.value })}
-                            className="w-full px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-xl text-xs font-medium text-white outline-none focus:border-amber-500"
+                            className="w-full px-3 py-2 bg-black/40 border border-white/20 rounded-xl text-xs font-medium text-white outline-none focus:border-cyan-400"
                           />
                         </div>
                       </div>
 
-                      <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-800">
+                      <div className="flex items-center justify-end gap-2 pt-2 border-t border-white/15">
                         <button
                           type="button"
                           onClick={() => setIsEditing(false)}
-                          className="px-3 py-1.5 bg-slate-800 text-slate-300 text-xs font-black rounded-xl cursor-pointer"
+                          className="px-4 py-2 bg-white/10 hover:bg-white/20 text-slate-200 text-xs font-black rounded-xl cursor-pointer"
                         >
                           Hủy
                         </button>
                         <button
                           type="submit"
-                          className="px-4 py-1.5 bg-amber-500 text-slate-950 text-xs font-black rounded-xl cursor-pointer shadow-md"
+                          className={`px-5 py-2 ${currentTheme.accentBg} text-slate-950 text-xs font-black rounded-xl cursor-pointer shadow-md`}
                         >
                           Lưu Thay Đổi
                         </button>
@@ -755,7 +916,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                     </form>
                   </div>
                 ) : (
-                  /* ════════ 3D FLIP CARD BODY ════════ */
+                  /* ════════ 3D FLIP CARD BODY (SMOOTH ROTATION & NO CLIP) ════════ */
                   <div
                     className="w-full h-full cursor-pointer select-none"
                     onClick={() => setIsFlipped(!isFlipped)}
@@ -766,23 +927,22 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                       }`}
                     >
                       
-                      {/* 🌌 FRONT SIDE (NIGHT SKY / STARRY DEEP OCEAN AESTHETIC) */}
-                      <div className={`absolute inset-0 w-full h-full ${currentTheme.frontBg} border-2 ${currentTheme.frontBorder} rounded-3xl p-6 sm:p-8 flex flex-col justify-between backface-hidden shadow-2xl overflow-hidden`}>
+                      {/* 🌌 FRONT SIDE (STARRY DEEP OCEAN AESTHETIC) */}
+                      <div className={`absolute inset-0 w-full h-full ${currentTheme.frontBg} border-2 ${currentTheme.frontBorder} rounded-3xl p-6 sm:p-10 flex flex-col justify-between backface-hidden shadow-2xl overflow-hidden`}>
                         
-                        {/* Star Sparkle Particles Overlay */}
+                        {/* Star Sparkle Overlay */}
                         <div className="absolute inset-0 pointer-events-none opacity-40">
                           <div className="absolute top-6 left-12 text-white/40 text-xs">✦</div>
                           <div className="absolute top-16 right-20 text-white/50 text-sm">✨</div>
                           <div className="absolute bottom-20 left-24 text-white/30 text-xs">✦</div>
                           <div className="absolute bottom-12 right-16 text-white/40 text-sm">✨</div>
                           <div className="absolute top-1/2 left-1/3 text-white/20 text-xs">✦</div>
-                          <div className="absolute top-1/3 right-1/4 text-white/30 text-xs">✦</div>
                         </div>
 
                         {/* Top Bar on Front */}
                         <div className="flex items-center justify-between z-10">
                           {/* Part of Speech Pill */}
-                          <span className="px-3 py-1 rounded-full bg-slate-900/60 backdrop-blur-md border border-white/10 text-xs font-black text-slate-200">
+                          <span className={`px-3.5 py-1 rounded-full ${currentTheme.frontTagBg} border ${currentTheme.frontTagText} text-xs font-black backdrop-blur-md`}>
                             {getWordFormLabel(currentCard.wordForm)}
                           </span>
 
@@ -790,7 +950,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                             {/* Speaker Button */}
                             <button
                               onClick={(e) => playAudio(e, preferredAccent)}
-                              className="p-2 rounded-xl bg-slate-900/60 hover:bg-slate-900/90 text-slate-200 border border-white/10 transition cursor-pointer active:scale-95"
+                              className="p-2.5 rounded-xl bg-black/40 hover:bg-black/60 text-slate-200 border border-white/15 transition cursor-pointer active:scale-95 shadow-xs"
                               title={`Nghe phát âm chuẩn ${preferredAccent}`}
                             >
                               <Volume2 className={`w-4 h-4 ${isPlayingAudio ? 'text-amber-400 scale-110' : ''}`} />
@@ -799,7 +959,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                             {/* Edit Button */}
                             <button
                               onClick={handleOpenEdit}
-                              className="p-2 rounded-xl bg-slate-900/60 hover:bg-slate-900/90 text-slate-200 border border-white/10 transition cursor-pointer active:scale-95"
+                              className="p-2.5 rounded-xl bg-black/40 hover:bg-black/60 text-slate-200 border border-white/15 transition cursor-pointer active:scale-95 shadow-xs"
                               title="Chỉnh sửa từ vựng (E)"
                             >
                               <Edit3 className="w-4 h-4" />
@@ -808,29 +968,29 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                         </div>
 
                         {/* Center Stage: Word, Phonetics, Category Tag */}
-                        <div className="my-auto text-center space-y-3 z-10">
-                          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight drop-shadow-md">
+                        <div className="my-auto text-center space-y-4 z-10 py-4">
+                          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight drop-shadow-lg leading-tight">
                             {currentCard.front}
                           </h1>
 
                           {(currentCard.pronunciation || currentCard.pronunciationUs || currentCard.pronunciationUk) && (
                             <div className="flex items-center justify-center gap-2">
-                              <span className="font-mono text-base sm:text-lg font-bold text-slate-300">
+                              <span className="font-mono text-base sm:text-xl font-bold text-slate-300">
                                 {currentCard.pronunciationUs || currentCard.pronunciation || currentCard.pronunciationUk}
                               </span>
                               <button
                                 onClick={(e) => playAudio(e, 'US')}
-                                className="p-1 rounded-lg bg-white/10 hover:bg-white/20 text-slate-200 transition cursor-pointer"
+                                className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-slate-200 transition cursor-pointer"
                                 title="Phát âm"
                               >
-                                <Volume2 className="w-3.5 h-3.5 text-amber-300" />
+                                <Volume2 className={`w-4 h-4 ${currentTheme.accentText}`} />
                               </button>
                             </div>
                           )}
 
                           {/* Category Hashtag Pill */}
-                          <div className="inline-block">
-                            <span className="inline-flex items-center px-3 py-1 rounded-full bg-white/10 text-xs font-black text-slate-300 border border-white/10">
+                          <div className="inline-block pt-1">
+                            <span className="inline-flex items-center px-3.5 py-1 rounded-full bg-white/10 text-xs font-black text-slate-200 border border-white/15">
                               # {currentTopicObj?.title || 'Từ vựng'}
                             </span>
                           </div>
@@ -839,12 +999,12 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                         {/* Bottom Row on Front */}
                         <div className="flex items-end justify-between z-10">
                           {/* Cute Mascot Moon Avatar in Corner */}
-                          <div className="w-12 h-12 rounded-full bg-slate-900/70 border border-white/20 flex items-center justify-center shadow-lg text-amber-300">
+                          <div className="w-12 h-12 rounded-full bg-black/40 border border-white/20 flex items-center justify-center shadow-lg text-amber-300">
                             <span className="text-xl">🌙</span>
                           </div>
 
                           {/* Flip CTA Link */}
-                          <div className="text-xs font-black text-slate-300/90 flex items-center gap-1 hover:text-white transition">
+                          <div className="text-xs font-black text-slate-200 flex items-center gap-1 hover:text-white transition">
                             <span>Nhấn để xem nghĩa</span>
                             <ChevronRight className="w-4 h-4" />
                           </div>
@@ -852,24 +1012,24 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
 
                       </div>
 
-                      {/* 🍃 BACK SIDE (OLIVE FOREST GREEN / HIGH CONTRAST) */}
-                      <div className={`absolute inset-0 w-full h-full ${currentTheme.backBg} border-2 ${currentTheme.backBorder} rounded-3xl p-6 sm:p-8 flex flex-col justify-between backface-hidden rotate-y-180 shadow-2xl overflow-y-auto custom-scrollbar`}>
+                      {/* 🍃 BACK SIDE (COLOR-COORDINATED & HIGH CONTRAST) */}
+                      <div className={`absolute inset-0 w-full h-full ${currentTheme.backBg} border-2 ${currentTheme.backBorder} rounded-3xl p-6 sm:p-10 flex flex-col justify-between backface-hidden rotate-y-180 shadow-2xl overflow-y-auto custom-scrollbar`}>
                         
                         {/* Top Row on Back */}
-                        <div className="flex items-center justify-between">
+                        <div className="flex items-center justify-between shrink-0">
                           <span className="text-[11px] font-black uppercase tracking-wider text-white/80">
                             NGHĨA TIẾNG VIỆT
                           </span>
                           <div className="flex items-center gap-1.5">
                             <button
                               onClick={(e) => playAudio(e, preferredAccent)}
-                              className="p-2 rounded-xl bg-black/20 hover:bg-black/40 text-white border border-white/20 transition cursor-pointer active:scale-95"
+                              className="p-2.5 rounded-xl bg-black/30 hover:bg-black/50 text-white border border-white/20 transition cursor-pointer active:scale-95"
                             >
                               <Volume2 className="w-4 h-4" />
                             </button>
                             <button
                               onClick={handleOpenEdit}
-                              className="p-2 rounded-xl bg-black/20 hover:bg-black/40 text-white border border-white/20 transition cursor-pointer active:scale-95"
+                              className="p-2.5 rounded-xl bg-black/30 hover:bg-black/50 text-white border border-white/20 transition cursor-pointer active:scale-95"
                             >
                               <Edit3 className="w-4 h-4" />
                             </button>
@@ -877,17 +1037,17 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                         </div>
 
                         {/* Center Stage: Vietnamese Meaning & Example Container */}
-                        <div className="my-auto space-y-4 py-2">
+                        <div className="my-auto space-y-4 py-3">
                           
                           {/* Big Bold Meaning */}
-                          <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight">
+                          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight">
                             {currentCard.back}
                           </h2>
 
                           {/* English Definition Box */}
-                          {backSettings.showDefinitionEn && currentCard.definitionEn && (
-                            <div className="bg-black/20 backdrop-blur-md rounded-2xl p-3 sm:p-4 border border-white/15 space-y-1 text-left">
-                              <span className="text-[10px] font-black uppercase text-yellow-200">
+                          {currentCard.definitionEn && (
+                            <div className={`${currentTheme.backBoxBg} rounded-2xl p-4 border ${currentTheme.backBoxBorder} space-y-1 text-left shadow-lg`}>
+                              <span className={`text-[10px] font-black uppercase ${currentTheme.accentText}`}>
                                 🇬🇧 ĐỊNH NGHĨA TIẾNG ANH:
                               </span>
                               <p className="text-sm sm:text-base font-bold text-white leading-relaxed">
@@ -897,16 +1057,16 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                           )}
 
                           {/* Real Example Box */}
-                          {backSettings.showExample && currentCard.example && (
-                            <div className="bg-black/25 backdrop-blur-md rounded-2xl p-3 sm:p-4 border-l-4 border-amber-300 border-t border-r border-b border-white/10 space-y-1 text-left">
+                          {currentCard.example && (
+                            <div className={`${currentTheme.backBoxBg} rounded-2xl p-4 border-l-4 border-amber-300 border-t border-r border-b ${currentTheme.backBoxBorder} space-y-1.5 text-left shadow-lg`}>
                               <span className="text-[10px] font-black uppercase text-white/80">
                                 VÍ DỤ
                               </span>
-                              <p className="text-sm sm:text-base font-bold italic text-white/95 leading-relaxed">
+                              <p className="text-sm sm:text-base font-bold italic text-white leading-relaxed">
                                 &quot;{currentCard.example}&quot;
                               </p>
                               {currentCard.exampleVi && (
-                                <p className="text-xs text-white/80 font-medium pt-0.5">
+                                <p className="text-xs sm:text-sm text-white/80 font-bold pt-0.5">
                                   👉 {currentCard.exampleVi}
                                 </p>
                               )}
@@ -917,12 +1077,12 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                           {(currentCard.synonyms?.length || currentCard.collocations?.length) ? (
                             <div className="flex flex-wrap gap-1.5 pt-1">
                               {currentCard.synonyms?.map((syn, idx) => (
-                                <span key={idx} className="px-2.5 py-0.5 rounded-lg bg-black/20 text-xs font-bold text-white border border-white/10">
+                                <span key={idx} className="px-3 py-1 rounded-xl bg-black/30 text-xs font-black text-white border border-white/15">
                                   🔗 {syn}
                                 </span>
                               ))}
                               {currentCard.collocations?.map((col, idx) => (
-                                <span key={idx} className="px-2.5 py-0.5 rounded-lg bg-black/20 text-xs font-bold text-yellow-200 border border-white/10">
+                                <span key={idx} className={`px-3 py-1 rounded-xl bg-black/30 text-xs font-black ${currentTheme.accentText} border border-white/15`}>
                                   📌 {col}
                                 </span>
                               ))}
@@ -932,9 +1092,11 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                         </div>
 
                         {/* Bottom Row on Back */}
-                        <div className="flex items-center justify-between text-xs font-black text-white/70">
-                          {currentCardSRS && (
+                        <div className="flex items-center justify-between text-xs font-black text-white/80 shrink-0 pt-2 border-t border-white/15">
+                          {currentCardSRS ? (
                             <span>Ôn tiếp: {formatSRSCountdown(currentCardSRS.nextReviewDate)}</span>
+                          ) : (
+                            <span>Mới học</span>
                           )}
                           <span className="ml-auto hover:text-white transition flex items-center gap-1">
                             <RotateCw className="w-3.5 h-3.5" /> Chạm để lật lại
@@ -949,39 +1111,39 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
 
               </div>
 
-              {/* ════════ 3 BIG ROUNDED ACTION BUTTONS (IELTS DICTIONARY STYLE) ════════ */}
-              <div className="grid grid-cols-3 gap-2.5 pt-2">
+              {/* ════════ 3 BIG ROUNDED ACTION BUTTONS (THEME COORDINATED) ════════ */}
+              <div className="grid grid-cols-3 gap-3 pt-2">
                 
                 {/* 🔴 Button 1: Chưa nhớ [1] */}
                 <button
                   onClick={handleMarkNotRemembered}
-                  className="py-3 px-2 rounded-2xl bg-[#3d1818] hover:bg-[#4d1f1f] border border-rose-800/60 text-rose-200 text-xs sm:text-sm font-black transition cursor-pointer active:scale-95 flex items-center justify-center gap-1.5 shadow-md"
+                  className={`py-3.5 px-3 rounded-2xl ${currentTheme.btn1Bg} border ${currentTheme.btn1Border} ${currentTheme.btn1Text} text-xs sm:text-sm font-black transition cursor-pointer active:scale-95 flex items-center justify-center gap-2 shadow-md`}
                   title="Phím tắt: 1"
                 >
                   <span>❓ Chưa nhớ</span>
-                  <kbd className="px-1.5 py-0.5 bg-rose-950/80 border border-rose-700/60 rounded-md text-[10px] text-rose-300 font-bold">1</kbd>
+                  <kbd className={`px-2 py-0.5 rounded-md text-[10px] font-black border ${currentTheme.btn1Kbd}`}>1</kbd>
                 </button>
 
                 {/* 🟢 Button 2: Lật thẻ [Space] */}
                 <button
                   onClick={() => setIsFlipped((prev) => !prev)}
-                  className="py-3 px-2 rounded-2xl bg-[#4a5f28] hover:bg-[#577030] border border-lime-600/60 text-lime-100 text-xs sm:text-sm font-black transition cursor-pointer active:scale-95 flex items-center justify-center gap-1.5 shadow-md"
+                  className={`py-3.5 px-3 rounded-2xl ${currentTheme.btnSpaceBg} border ${currentTheme.btnSpaceBorder} ${currentTheme.btnSpaceText} text-xs sm:text-sm font-black transition cursor-pointer active:scale-95 flex items-center justify-center gap-2 shadow-md`}
                   title="Phím tắt: Space"
                 >
-                  <RotateCw className="w-4 h-4 text-lime-200" />
+                  <RotateCw className="w-4 h-4" />
                   <span>Lật thẻ</span>
-                  <kbd className="px-1.5 py-0.5 bg-lime-950/80 border border-lime-700/60 rounded-md text-[10px] text-lime-300 font-bold">Space</kbd>
+                  <kbd className={`px-2 py-0.5 rounded-md text-[10px] font-black border ${currentTheme.btnSpaceKbd}`}>Space</kbd>
                 </button>
 
                 {/* 🟢 Button 3: Đã nhớ [2] */}
                 <button
                   onClick={handleMarkRemembered}
-                  className="py-3 px-2 rounded-2xl bg-[#1e4428] hover:bg-[#255532] border border-emerald-700/60 text-emerald-200 text-xs sm:text-sm font-black transition cursor-pointer active:scale-95 flex items-center justify-center gap-1.5 shadow-md"
+                  className={`py-3.5 px-3 rounded-2xl ${currentTheme.btn2Bg} border ${currentTheme.btn2Border} ${currentTheme.btn2Text} text-xs sm:text-sm font-black transition cursor-pointer active:scale-95 flex items-center justify-center gap-2 shadow-md`}
                   title="Phím tắt: 2"
                 >
-                  <Check className="w-4 h-4 text-emerald-300" />
+                  <Check className="w-4 h-4" />
                   <span>Đã nhớ</span>
-                  <kbd className="px-1.5 py-0.5 bg-emerald-950/80 border border-emerald-600/60 rounded-md text-[10px] text-emerald-300 font-bold">2</kbd>
+                  <kbd className={`px-2 py-0.5 rounded-md text-[10px] font-black border ${currentTheme.btn2Kbd}`}>2</kbd>
                 </button>
 
               </div>
@@ -998,14 +1160,14 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
               </div>
 
               {/* 📊 PROGRESS BAR */}
-              <div className="space-y-1 pt-1">
+              <div className="space-y-1.5 pt-1">
                 <div className="flex items-center justify-between text-xs font-black text-slate-400">
                   <span>Thẻ <strong className="text-white">{currentIndex + 1}</strong> / {totalCardsInSet}</span>
                   <span>{Math.round(((currentIndex + 1) / (totalCardsInSet || 1)) * 100)}%</span>
                 </div>
-                <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                <div className="w-full bg-slate-800/80 h-2.5 rounded-full overflow-hidden border border-slate-700/50">
                   <div
-                    className="bg-amber-400 h-full rounded-full transition-all duration-300"
+                    className={`${currentTheme.progressBarColor} h-full rounded-full transition-all duration-300`}
                     style={{ width: `${((currentIndex + 1) / (totalCardsInSet || 1)) * 100}%` }}
                   />
                 </div>
@@ -1013,21 +1175,20 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
 
             </div>
 
-            {/* 🌟 RIGHT SIDE COMPANION PANELS (4 COLS) */}
-            <div className="lg:col-span-4 space-y-3">
+            {/* 🌟 RIGHT SIDE COMPANION PANELS (4 COLS - FULLY COORDINATED WITH THEME) */}
+            <div className="lg:col-span-4 space-y-4">
               
-              {/* 1. TID / LULU & MIMI ĐỒNG HÀNH WIDGET */}
-              <div className="bg-gradient-to-b from-[#182a46] to-[#101d32] border border-blue-500/20 rounded-3xl p-5 shadow-lg relative overflow-hidden space-y-3">
-                {/* Floating sparkle background */}
-                <div className="absolute top-2 right-2 text-blue-300/30 text-xs">✨</div>
-                <div className="absolute bottom-4 right-6 text-blue-300/20 text-sm">✦</div>
+              {/* 1. LULU & MIMI ĐỒNG HÀNH WIDGET */}
+              <div className={`${currentTheme.companion1Bg} border ${currentTheme.companion1Border} rounded-3xl p-5 shadow-xl relative overflow-hidden space-y-3`}>
+                <div className="absolute top-2 right-2 text-white/20 text-xs">✨</div>
+                <div className="absolute bottom-4 right-6 text-white/10 text-sm">✦</div>
 
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-black uppercase tracking-wider text-blue-300 flex items-center gap-1.5">
-                    <Sparkles className="w-3 h-3 text-amber-400" />
+                  <span className="text-[10px] font-black uppercase tracking-wider text-slate-200 flex items-center gap-1.5">
+                    <Sparkles className={`w-3 h-3 ${currentTheme.accentText}`} />
                     LULU & MIMI ĐỒNG HÀNH
                   </span>
-                  <div className="w-8 h-8 rounded-full bg-blue-900/60 border border-blue-400/30 flex items-center justify-center text-sm shadow-xs">
+                  <div className="w-9 h-9 rounded-full bg-black/30 border border-white/20 flex items-center justify-center text-base shadow-xs">
                     🐱
                   </div>
                 </div>
@@ -1036,23 +1197,23 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                   <h4 className="text-sm font-black text-white leading-snug">
                     Cố lên, chinh phục cả bộ từ nào! 🌱
                   </h4>
-                  <p className="text-xs text-blue-200/80 mt-1 font-medium">
+                  <p className="text-xs text-slate-300 mt-1 font-medium leading-relaxed">
                     Học ngắt quãng hàng ngày giúp bạn nhớ lâu hơn gấp 3 lần.
                   </p>
                 </div>
 
-                <div className="inline-block px-3 py-1.5 rounded-xl bg-blue-950/80 border border-blue-400/20 text-xs font-black text-blue-300">
-                  Còn lại <strong className="text-amber-400">{unmasteredCardsInSet}</strong> từ chưa thuộc
+                <div className={`inline-block px-3.5 py-1.5 rounded-xl ${currentTheme.companion1TagBg} text-xs font-black ${currentTheme.companion1TagText}`}>
+                  Còn lại <strong className="text-white">{unmasteredCardsInSet}</strong> từ chưa thuộc
                 </div>
               </div>
 
               {/* 2. MỨC ĐỘ THÀNH THẠO (PROGRESS & MASTERY RING) */}
-              <div className="bg-[#18201a] border border-slate-800 rounded-3xl p-5 shadow-lg space-y-3">
+              <div className={`${currentTheme.companion2Bg} border ${currentTheme.companion2Border} rounded-3xl p-5 shadow-xl space-y-3.5`}>
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">
                     MỨC ĐỘ THÀNH THẠO
                   </span>
-                  <span className="text-[10px] font-black px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                  <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-lg bg-white/10 ${currentTheme.accentText} border border-white/10`}>
                     Cấp {masteryLevel}
                   </span>
                 </div>
@@ -1069,7 +1230,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                         d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                       />
                       <path
-                        className="text-amber-400 transition-all duration-500"
+                        className={`${currentTheme.progressBarColor} transition-all duration-500`}
                         strokeDasharray={`${masteryPercentage}, 100`}
                         strokeWidth="3.5"
                         strokeLinecap="round"
@@ -1085,14 +1246,14 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
 
                   <div className="space-y-1">
                     <div className="text-xs font-bold text-slate-300">
-                      Bạn đã thuộc <strong className="text-amber-400">{masteredCardsInSet}/{totalCardsInSet}</strong> từ trong bộ này.
+                      Bạn đã thuộc <strong className="text-white">{masteredCardsInSet}/{totalCardsInSet}</strong> từ trong bộ này.
                     </div>
                     <div className="flex items-center gap-1 pt-1">
                       {[1, 2, 3, 4, 5].map((lvl) => (
                         <div
                           key={lvl}
                           className={`h-1.5 flex-1 rounded-full ${
-                            lvl <= masteryLevel ? 'bg-amber-400' : 'bg-slate-800'
+                            lvl <= masteryLevel ? currentTheme.progressBarColor : 'bg-slate-800'
                           }`}
                         />
                       ))}
@@ -1101,11 +1262,11 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                 </div>
               </div>
 
-              {/* 3. BỘ ĐIỀU HƯỚNG TRƯỚC / SAU (COMPACT) */}
+              {/* 3. BỘ ĐIỀU HƯỚNG TRƯỚC / SAU */}
               <div className="flex items-center justify-between gap-2 pt-1">
                 <button
                   onClick={handlePrev}
-                  className="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-slate-800/80 hover:bg-slate-700 border border-slate-700 rounded-xl text-xs font-black text-slate-200 transition cursor-pointer active:scale-95"
+                  className="flex-1 flex items-center justify-center gap-1.5 py-3 bg-black/40 hover:bg-black/60 border border-white/10 rounded-2xl text-xs font-black text-slate-200 transition cursor-pointer active:scale-95 shadow-md"
                 >
                   <ChevronLeft className="w-4 h-4" />
                   <span>Trước</span>
@@ -1113,7 +1274,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
 
                 <button
                   onClick={handleNext}
-                  className="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-xl text-xs font-black transition shadow-md cursor-pointer active:scale-95"
+                  className={`flex-1 flex items-center justify-center gap-1.5 py-3 ${currentTheme.nextBtnBg} rounded-2xl text-xs font-black transition shadow-lg cursor-pointer active:scale-95`}
                 >
                   <span>Tiếp theo</span>
                   <ChevronRight className="w-4 h-4" />
