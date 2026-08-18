@@ -39,8 +39,23 @@ export const QuickAddWordModal: React.FC<QuickAddWordModalProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState<'single' | 'bulk'>('single');
   const [targetFolder, setTargetFolder] = useState<string>(() => {
+    if (initialTargetFolder && initialTargetFolder !== 'all') return initialTargetFolder;
     return selectedTopic === 'all' ? (folders.find((f) => f.id !== 'all')?.id || 'toeic') : selectedTopic;
   });
+
+  useEffect(() => {
+    if (isOpen) {
+      if (initialTargetFolder && initialTargetFolder !== 'all') {
+        setTargetFolder(initialTargetFolder);
+      } else if (selectedTopic && selectedTopic !== 'all') {
+        setTargetFolder(selectedTopic);
+      } else {
+        setTargetFolder(folders.find((f) => f.id !== 'all')?.id || 'toeic');
+      }
+      setSuccessSaved(false);
+      setErrorMsg(null);
+    }
+  }, [isOpen, initialTargetFolder, selectedTopic, folders]);
 
   // Single word state
   const [wordInput, setWordInput] = useState('');

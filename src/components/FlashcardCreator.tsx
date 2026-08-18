@@ -20,6 +20,7 @@ import { API_ENDPOINTS } from '../config/api';
 
 interface FlashcardCreatorProps {
   topics: Topic[];
+  selectedTopic?: string;
   customFlashcards: Flashcard[];
   onSaveFlashcard: (flashcard: Flashcard) => void;
   onDeleteFlashcard: (id: string) => void;
@@ -29,12 +30,23 @@ interface FlashcardCreatorProps {
 
 export const FlashcardCreator: React.FC<FlashcardCreatorProps> = ({
   topics,
+  selectedTopic,
   customFlashcards,
   onSaveFlashcard,
   onDeleteFlashcard,
   onImportFlashcards,
   onOpenFolderManager,
 }) => {
+  const getDefaultFolderId = () => {
+    if (selectedTopic && selectedTopic !== 'all' && topics.some((t) => t.id === selectedTopic)) {
+      return selectedTopic;
+    }
+    const nonAll = topics.filter((t) => t.id !== 'all');
+    const custom = nonAll.find((t) => t.isCustom);
+    if (custom) return custom.id;
+    return nonAll[0]?.id || 'toeic';
+  };
+
   // Form State
   const [editingId, setEditingId] = useState<string | null>(null);
   const [front, setFront] = useState('');
@@ -47,13 +59,20 @@ export const FlashcardCreator: React.FC<FlashcardCreatorProps> = ({
   const [audioUs, setAudioUs] = useState('');
   const [vocabType, setVocabType] = useState<VocabType>('word');
   const [wordForm, setWordForm] = useState<WordForm>('noun');
-  const [topic, setTopic] = useState<TopicId | string>('custom');
+  const [topic, setTopic] = useState<TopicId | string>(() => getDefaultFolderId());
   const [example, setExample] = useState('');
   const [exampleVi, setExampleVi] = useState('');
   const [synonymsInput, setSynonymsInput] = useState('');
   const [collocationsInput, setCollocationsInput] = useState('');
   const [wordForms, setWordForms] = useState<WordFormItem[]>([]);
   const [notes, setNotes] = useState('');
+
+  // Keep topic synced with selectedTopic if not editing an existing card
+  React.useEffect(() => {
+    if (!editingId) {
+      setTopic(getDefaultFolderId());
+    }
+  }, [selectedTopic, topics, editingId]);
 
   // Live preview & UI states
   const [previewFlipped, setPreviewFlipped] = useState(false);
@@ -164,7 +183,7 @@ export const FlashcardCreator: React.FC<FlashcardCreatorProps> = ({
     setAudioUs('');
     setVocabType('word');
     setWordForm('noun');
-    setTopic('custom');
+    setTopic(getDefaultFolderId());
     setExample('');
     setExampleVi('');
     setSynonymsInput('');
@@ -187,7 +206,7 @@ export const FlashcardCreator: React.FC<FlashcardCreatorProps> = ({
     setAudioUs(card.audioUs || '');
     setVocabType(card.vocabType || 'word');
     setWordForm(card.wordForm || 'noun');
-    setTopic(card.topic || 'custom');
+    setTopic(card.topic || getDefaultFolderId());
     setExample(card.example || '');
     setExampleVi(card.exampleVi || '');
     setSynonymsInput(card.synonyms ? card.synonyms.join(', ') : '');

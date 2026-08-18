@@ -233,6 +233,34 @@ export default function App() {
     return [...filteredStatic, ...filteredCustom];
   }, [userProgress.customFlashcards, userProgress.deletedCardIds]);
 
+  // Auto-migrate orphaned custom cards (e.g. topic='custom' or invalid topic) to the user's custom folder or first valid folder
+  useEffect(() => {
+    const validFolderIds = new Set(folders.map((f) => f.id));
+    const targetCustomFolder =
+      folders.find((f) => f.isCustom && f.id !== 'all')?.id ||
+      folders.find((f) => f.id !== 'all')?.id ||
+      'toeic';
+
+    let hasInvalidTopic = false;
+    const migrated = (userProgress.customFlashcards || []).map((card) => {
+      if (!card.topic || card.topic === 'custom' || !validFolderIds.has(card.topic)) {
+        hasInvalidTopic = true;
+        return {
+          ...card,
+          topic: targetCustomFolder,
+        };
+      }
+      return card;
+    });
+
+    if (hasInvalidTopic) {
+      setUserProgress((prev) => ({
+        ...prev,
+        customFlashcards: migrated,
+      }));
+    }
+  }, [folders]);
+
   // ═══════════════════════════════════════════════════════════════
   // 3. FOLDER (TOPIC) CRUD HANDLERS
   // ═══════════════════════════════════════════════════════════════
@@ -601,6 +629,7 @@ export default function App() {
           {activeTab === 'dictionary' && (
             <DictionaryLookup
               topics={allFolders}
+              selectedTopic={selectedTopic}
               onAddCustomFlashcard={handleSaveCustomFlashcard}
               searchHistory={userProgress.searchHistory || []}
               onUpdateSearchHistory={handleUpdateSearchHistory}
@@ -611,6 +640,7 @@ export default function App() {
           {activeTab === 'create' && (
             <FlashcardCreator
               topics={allFolders}
+              selectedTopic={selectedTopic}
               customFlashcards={userProgress.customFlashcards || []}
               onSaveFlashcard={handleSaveCustomFlashcard}
               onDeleteFlashcard={handleDeleteCustomFlashcard}

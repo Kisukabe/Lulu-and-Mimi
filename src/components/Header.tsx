@@ -34,6 +34,7 @@ interface HeaderProps {
   onOpenFolderManager: () => void;
   geminiKey: string;
   onOpenApiKeyModal: () => void;
+  topicCounts?: { [topicId: string]: number };
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -49,6 +50,7 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenFolderManager,
   geminiKey,
   onOpenApiKeyModal,
+  topicCounts,
 }) => {
   const [showThemeMenu, setShowThemeMenu] = useState(false);
   const [showFolderMenu, setShowFolderMenu] = useState(false);
@@ -183,6 +185,7 @@ export const Header: React.FC<HeaderProps> = ({
 
                     {folders.map((f) => {
                       const isSelected = selectedTopic === f.id;
+                      const count = topicCounts ? topicCounts[f.id] : undefined;
                       return (
                         <button
                           key={f.id}
@@ -200,7 +203,14 @@ export const Header: React.FC<HeaderProps> = ({
                             <span className="text-sm shrink-0">{f.emoji || '📁'}</span>
                             <span className="truncate">{f.title}</span>
                           </div>
-                          {isSelected && <Check className="w-3.5 h-3.5 text-indigo-600 shrink-0" />}
+                          <div className="flex items-center gap-1.5 shrink-0">
+                            {count !== undefined && (
+                              <span className="text-[10px] font-black px-1.5 py-0.2 rounded-md bg-slate-200/80 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
+                                {count}
+                              </span>
+                            )}
+                            {isSelected && <Check className="w-3.5 h-3.5 text-indigo-600 shrink-0" />}
+                          </div>
                         </button>
                       );
                     })}

@@ -181,8 +181,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
               {!isCollapsed && (
                 <div className="flex items-center gap-2 truncate">
                   <span>Bộ từ</span>
-                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-lg bg-black/30 text-white/90 truncate max-w-[120px]">
+                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-lg bg-black/30 text-white/90 truncate max-w-[110px]">
                     {currentFolder?.title || 'Từ vựng'}
+                  </span>
+                  <span className="text-[10px] font-black px-1.5 py-0.5 rounded-md bg-yellow-400/20 text-yellow-300 shrink-0">
+                    {totalCards}
                   </span>
                 </div>
               )}

@@ -18,6 +18,7 @@ import { API_ENDPOINTS } from '../config/api';
 
 interface DictionaryLookupProps {
   topics: Topic[];
+  selectedTopic?: string;
   onAddCustomFlashcard: (flashcard: Flashcard) => void;
   searchHistory: string[];
   onUpdateSearchHistory: (history: string[]) => void;
@@ -25,17 +26,32 @@ interface DictionaryLookupProps {
 
 export const DictionaryLookup: React.FC<DictionaryLookupProps> = ({
   topics,
+  selectedTopic,
   onAddCustomFlashcard,
   searchHistory,
   onUpdateSearchHistory,
 }) => {
+  const getDefaultTopic = () => {
+    if (selectedTopic && selectedTopic !== 'all' && topics.some((t) => t.id === selectedTopic)) {
+      return selectedTopic;
+    }
+    const nonAll = topics.filter((t) => t.id !== 'all');
+    return nonAll[0]?.id || 'toeic';
+  };
+
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<DictionaryResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [addedSuccess, setAddedSuccess] = useState(false);
-  const [selectedTopicForAdd, setSelectedTopicForAdd] = useState<TopicId | string>('daily');
+  const [selectedTopicForAdd, setSelectedTopicForAdd] = useState<TopicId | string>(() => getDefaultTopic());
   const [customMeaningVi, setCustomMeaningVi] = useState('');
+
+  React.useEffect(() => {
+    if (selectedTopic && selectedTopic !== 'all' && topics.some((t) => t.id === selectedTopic)) {
+      setSelectedTopicForAdd(selectedTopic);
+    }
+  }, [selectedTopic, topics]);
 
   const handleSearch = async (wordToSearch?: string) => {
     const word = (wordToSearch || searchTerm).trim().toLowerCase();
