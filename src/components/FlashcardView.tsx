@@ -810,17 +810,19 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                             </div>
                           )}
 
-                          {/* Collocations & Synonyms Badges */}
+                          {/* Collocations & Synonyms Badges (Tăng 2 size theo yêu cầu) */}
                           {((currentCard?.collocations && currentCard.collocations.length > 0) || (currentCard?.synonyms && currentCard.synonyms.length > 0)) && (
-                            <div className="flex flex-wrap gap-1.5 pt-1">
-                              {currentCard.collocations?.slice(0, 4).map((col, idx) => (
-                                <span key={idx} className="px-2.5 py-1 rounded-lg bg-black/40 text-yellow-300 text-xs font-black border border-yellow-400/20">
-                                  🔗 {col}
+                            <div className="flex flex-wrap gap-2.5 pt-1.5">
+                              {currentCard.collocations?.slice(0, 5).map((col, idx) => (
+                                <span key={idx} className="px-4 py-2 rounded-xl bg-black/40 text-yellow-300 text-sm sm:text-base font-black border-2 border-yellow-400/30 shadow-xs flex items-center gap-1.5 tracking-tight">
+                                  <span>🔗</span>
+                                  <span>{col}</span>
                                 </span>
                               ))}
-                              {currentCard.synonyms?.slice(0, 3).map((syn, idx) => (
-                                <span key={idx} className="px-2.5 py-1 rounded-lg bg-black/40 text-lime-300 text-xs font-black border border-lime-400/20">
-                                  ✨ {syn}
+                              {currentCard.synonyms?.slice(0, 4).map((syn, idx) => (
+                                <span key={idx} className="px-4 py-2 rounded-xl bg-black/40 text-lime-300 text-sm sm:text-base font-black border-2 border-lime-400/30 shadow-xs flex items-center gap-1.5 tracking-tight">
+                                  <span>✨</span>
+                                  <span>{syn}</span>
                                 </span>
                               ))}
                             </div>
