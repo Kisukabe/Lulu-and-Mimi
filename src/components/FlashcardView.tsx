@@ -1124,57 +1124,6 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
 
           </div>
 
-          {/* ════════ BOTTOM PRACTICE MODES STRIP (CHẾ ĐỘ LUYỆN TẬP) ════════ */}
-          <div className="space-y-2 pt-4 border-t border-slate-800/80">
-            <div className="text-[11px] font-black uppercase text-slate-400 tracking-wider">
-              CHẾ ĐỘ LUYỆN TẬP MỞ RỘNG
-            </div>
-            
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-              
-              <div className="bg-gradient-to-r from-amber-600/30 to-amber-700/20 border border-amber-500/40 rounded-2xl p-3 flex items-center gap-3">
-                <div className="p-2 bg-amber-500/20 text-amber-400 rounded-xl">
-                  <Layers className="w-4 h-4" />
-                </div>
-                <div>
-                  <div className="text-xs font-black text-white">3D Flashcard</div>
-                  <div className="text-[10px] text-amber-300/80 font-bold">Đang học</div>
-                </div>
-              </div>
-
-              <div className="bg-slate-900 border border-slate-800 rounded-2xl p-3 flex items-center gap-3 hover:border-slate-700 transition cursor-pointer">
-                <div className="p-2 bg-blue-500/20 text-blue-400 rounded-xl">
-                  <Headphones className="w-4 h-4" />
-                </div>
-                <div>
-                  <div className="text-xs font-black text-white">Luyện Nghe</div>
-                  <div className="text-[10px] text-slate-400 font-bold">Phát âm chuẩn</div>
-                </div>
-              </div>
-
-              <div className="bg-slate-900 border border-slate-800 rounded-2xl p-3 flex items-center gap-3 hover:border-slate-700 transition cursor-pointer">
-                <div className="p-2 bg-purple-500/20 text-purple-400 rounded-xl">
-                  <HelpCircle className="w-4 h-4" />
-                </div>
-                <div>
-                  <div className="text-xs font-black text-white">Trắc Nghiệm</div>
-                  <div className="text-[10px] text-slate-400 font-bold">Kiểm tra nhớ</div>
-                </div>
-              </div>
-
-              <div className="bg-slate-900 border border-slate-800 rounded-2xl p-3 flex items-center gap-3 hover:border-slate-700 transition cursor-pointer">
-                <div className="p-2 bg-emerald-500/20 text-emerald-400 rounded-xl">
-                  <BookOpen className="w-4 h-4" />
-                </div>
-                <div>
-                  <div className="text-xs font-black text-white">Sổ Ghi Chú</div>
-                  <div className="text-[10px] text-slate-400 font-bold">Xem danh sách</div>
-                </div>
-              </div>
-
-            </div>
-          </div>
-
         </div>
       )}
 
