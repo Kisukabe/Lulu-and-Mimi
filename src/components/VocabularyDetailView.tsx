@@ -15,6 +15,9 @@ import {
   ChevronDown,
   ChevronUp,
   Clock,
+  Trash2,
+  Plus,
+  Wand2,
 } from 'lucide-react';
 import { formatSRSCountdown, getMemoryLevelName } from '../utils/srs';
 
@@ -28,6 +31,8 @@ interface VocabularyDetailViewProps {
   onToggleMastered: (cardId: string) => void;
   onToggleNeedReview: (cardId: string) => void;
   onMoveCardToFolder?: (cardId: string, newTopicId: string) => void;
+  onDeleteCard?: (cardId: string) => void;
+  onOpenQuickAdd?: () => void;
 }
 
 export const VocabularyDetailView: React.FC<VocabularyDetailViewProps> = ({
@@ -40,6 +45,8 @@ export const VocabularyDetailView: React.FC<VocabularyDetailViewProps> = ({
   onToggleMastered,
   onToggleNeedReview,
   onMoveCardToFolder,
+  onDeleteCard,
+  onOpenQuickAdd,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedVocabType, setSelectedVocabType] = useState<VocabType | 'all'>('all');
@@ -187,9 +194,35 @@ export const VocabularyDetailView: React.FC<VocabularyDetailViewProps> = ({
     );
   };
 
+  const currentTopicObj = topics.find((t) => t.id === selectedTopic) || { title: 'Tất Cả Thư Mục', emoji: '📚' };
+
   return (
     <div className="max-w-5xl mx-auto px-4 py-6 space-y-6">
       
+      {/* Top Banner & Quick Add Action */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white/80 dark:bg-slate-900/80 p-5 rounded-3xl border border-slate-200/80 dark:border-slate-800/80 shadow-xs backdrop-blur-md">
+        <div>
+          <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-slate-100 tracking-tight flex items-center gap-2">
+            <span>{currentTopicObj.emoji || '📚'}</span>
+            <span>{currentTopicObj.title}</span>
+          </h2>
+          <p className="text-xs text-slate-400 mt-0.5">
+            {filteredAndSortedCards.length} / {flashcards.length} từ vựng trong danh sách
+          </p>
+        </div>
+
+        {/* Quick Add Button */}
+        {onOpenQuickAdd && (
+          <button
+            onClick={onOpenQuickAdd}
+            className="flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-2xl text-xs font-black transition shadow-md shadow-indigo-600/20 cursor-pointer shrink-0"
+          >
+            <Wand2 className="w-4 h-4" />
+            <span>+ Thêm Từ & Tự Động Tạo Flashcard</span>
+          </button>
+        )}
+      </div>
+
       {/* 🔍 Search & Multi-filter Bar */}
       <div className="bg-white/80 dark:bg-slate-900/80 p-5 rounded-3xl border border-slate-200/80 dark:border-slate-800/80 shadow-xs backdrop-blur-md space-y-4">
         
@@ -408,6 +441,21 @@ export const VocabularyDetailView: React.FC<VocabularyDetailViewProps> = ({
                         <Copy className="w-4 h-4" />
                       )}
                     </button>
+
+                    {/* Delete Card Button */}
+                    {onDeleteCard && (
+                      <button
+                        onClick={() => {
+                          if (confirm(`Bạn có chắc chắn muốn XÓA từ "${card.front}" khỏi thư mục không?`)) {
+                            onDeleteCard(card.id);
+                          }
+                        }}
+                        className="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition cursor-pointer"
+                        title="Xóa từ vựng này khỏi thư mục"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    )}
 
                     <button
                       onClick={() => toggleExpand(card.id)}

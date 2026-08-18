@@ -117,6 +117,7 @@ export interface QuizResult {
 export interface UserProgress {
   masteredFlashcardIds: string[];
   needReviewFlashcardIds: string[];
+  deletedCardIds?: string[];         // Danh sách ID các thẻ đã bị người dùng xóa
   quizHistory: QuizResult[];
   bookmarkedQuestions: number[];
   customFlashcards: Flashcard[];

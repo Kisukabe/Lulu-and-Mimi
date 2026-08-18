@@ -18,6 +18,9 @@ import {
   Zap,
   SlidersHorizontal,
   X,
+  Trash2,
+  Plus,
+  Wand2,
 } from 'lucide-react';
 import { calculateNextSRS, isCardDue, formatSRSCountdown, getMemoryLevelName } from '../utils/srs';
 
@@ -32,6 +35,8 @@ interface FlashcardViewProps {
   onToggleNeedReview: (cardId: string) => void;
   onRateCardSRS?: (cardId: string, rating: 1 | 3 | 5) => void;
   onMoveCardToFolder?: (cardId: string, newTopicId: string) => void;
+  onDeleteCard?: (cardId: string) => void;
+  onOpenQuickAdd?: () => void;
 }
 
 export const FlashcardView: React.FC<FlashcardViewProps> = ({
@@ -45,6 +50,8 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
   onToggleNeedReview,
   onRateCardSRS,
   onMoveCardToFolder,
+  onDeleteCard,
+  onOpenQuickAdd,
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
@@ -306,8 +313,19 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
           ))}
         </div>
 
-        {/* Right: SRS Filter, Back Settings & Shuffle */}
+        {/* Right: Quick Add, SRS Filter, Back Settings & Shuffle */}
         <div className="flex items-center gap-1.5 shrink-0">
+          {onOpenQuickAdd && (
+            <button
+              onClick={onOpenQuickAdd}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white text-[11px] font-black rounded-xl shadow-xs transition cursor-pointer"
+              title="Thêm từ vựng mới và tự động tạo flashcard"
+            >
+              <Wand2 className="w-3.5 h-3.5" />
+              <span>+ Thêm Từ</span>
+            </button>
+          )}
+
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value as any)}
@@ -456,6 +474,22 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
               <span className="font-bold text-indigo-600 dark:text-indigo-400">
                 Thẻ {currentIndex + 1} / {cardsList.length}
               </span>
+
+              {/* Delete Current Card Button */}
+              {onDeleteCard && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (confirm(`Bạn có chắc chắn muốn XÓA từ "${currentCard.front}" khỏi thư mục không?`)) {
+                      onDeleteCard(currentCard.id);
+                    }
+                  }}
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition cursor-pointer"
+                  title="Xóa từ vựng này khỏi thư mục"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              )}
             </div>
           </div>
 

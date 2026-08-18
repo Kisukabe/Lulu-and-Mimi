@@ -23,6 +23,7 @@ import { StatsView } from './components/StatsView';
 import { FolderManagerModal } from './components/FolderManagerModal';
 import { PracticeView } from './components/PracticeView';
 import { ApiKeyModal } from './components/ApiKeyModal';
+import { QuickAddWordModal } from './components/QuickAddWordModal';
 
 const STORAGE_KEY = 'lulu_mimi_user_progress_v1';
 const THEME_KEY = 'lulu_mimi_theme_mode_v1';
@@ -46,6 +47,8 @@ export default function App() {
     }
   });
   const [isApiKeyModalOpen, setIsApiKeyModalOpen] = useState(false);
+  const [isQuickAddModalOpen, setIsQuickAddModalOpen] = useState(false);
+  const [quickAddTopic, setQuickAddTopic] = useState<string>('toeic');
 
   const handleSaveGeminiKey = (key: string) => {
     setGeminiKey(key);
@@ -166,6 +169,7 @@ export default function App() {
         return {
           masteredFlashcardIds: parsed.masteredFlashcardIds || [],
           needReviewFlashcardIds: parsed.needReviewFlashcardIds || [],
+          deletedCardIds: parsed.deletedCardIds || [],
           quizHistory: parsed.quizHistory || [],
           bookmarkedQuestions: parsed.bookmarkedQuestions || [],
           customFlashcards: parsed.customFlashcards || [],
@@ -180,6 +184,7 @@ export default function App() {
     return {
       masteredFlashcardIds: [],
       needReviewFlashcardIds: [],
+      deletedCardIds: [],
       quizHistory: [],
       bookmarkedQuestions: [],
       customFlashcards: [],
@@ -200,12 +205,14 @@ export default function App() {
   // All Folders (Persistent dynamic list)
   const allFolders: Topic[] = folders;
 
-  // Combined flashcards pool (static + user custom cards)
+  // Combined flashcards pool (filtered with deleted IDs)
   const allFlashcards = useMemo(() => {
+    const deletedIds = new Set(userProgress.deletedCardIds || []);
     const customCardIds = new Set((userProgress.customFlashcards || []).map((c) => c.id));
-    const filteredStatic = FLASHCARDS.filter((c) => !customCardIds.has(c.id));
-    return [...filteredStatic, ...(userProgress.customFlashcards || [])];
-  }, [userProgress.customFlashcards]);
+    const filteredStatic = FLASHCARDS.filter((c) => !customCardIds.has(c.id) && !deletedIds.has(c.id));
+    const filteredCustom = (userProgress.customFlashcards || []).filter((c) => !deletedIds.has(c.id));
+    return [...filteredStatic, ...filteredCustom];
+  }, [userProgress.customFlashcards, userProgress.deletedCardIds]);
 
   // ═══════════════════════════════════════════════════════════════
   // 3. FOLDER (TOPIC) CRUD HANDLERS
@@ -394,12 +401,52 @@ export default function App() {
   };
 
   const handleDeleteCustomFlashcard = (id: string) => {
-    setUserProgress((prev) => ({
-      ...prev,
-      customFlashcards: prev.customFlashcards.filter((c) => c.id !== id),
-      masteredFlashcardIds: prev.masteredFlashcardIds.filter((cid) => cid !== id),
-      needReviewFlashcardIds: prev.needReviewFlashcardIds.filter((cid) => cid !== id),
-    }));
+    handleDeleteFlashcard(id);
+  };
+
+  // Universal card deletion (Both built-in and user-created)
+  const handleDeleteFlashcard = (id: string) => {
+    setUserProgress((prev) => {
+      const updatedDeleted = Array.from(new Set([...(prev.deletedCardIds || []), id]));
+      return {
+        ...prev,
+        deletedCardIds: updatedDeleted,
+        customFlashcards: (prev.customFlashcards || []).filter((c) => c.id !== id),
+        masteredFlashcardIds: (prev.masteredFlashcardIds || []).filter((cid) => cid !== id),
+        needReviewFlashcardIds: (prev.needReviewFlashcardIds || []).filter((cid) => cid !== id),
+      };
+    });
+  };
+
+  const handleQuickAddSingleCard = (card: Flashcard) => {
+    setUserProgress((prev) => {
+      const deletedSet = new Set(prev.deletedCardIds || []);
+      deletedSet.delete(card.id);
+      return {
+        ...prev,
+        deletedCardIds: Array.from(deletedSet),
+        customFlashcards: [card, ...(prev.customFlashcards || []).filter((c) => c.id !== card.id)],
+      };
+    });
+  };
+
+  const handleQuickAddMultipleCards = (cards: Flashcard[]) => {
+    setUserProgress((prev) => {
+      const newIds = new Set(cards.map((c) => c.id));
+      const deletedSet = new Set(prev.deletedCardIds || []);
+      cards.forEach((c) => deletedSet.delete(c.id));
+      return {
+        ...prev,
+        deletedCardIds: Array.from(deletedSet),
+        customFlashcards: [...cards, ...(prev.customFlashcards || []).filter((c) => !newIds.has(c.id))],
+      };
+    });
+  };
+
+  const handleOpenQuickAddModal = (targetFolderId?: string) => {
+    const topicToUse = targetFolderId || (selectedTopic === 'all' ? (folders.find((f) => f.id !== 'all')?.id || 'toeic') : selectedTopic);
+    setQuickAddTopic(topicToUse);
+    setIsQuickAddModalOpen(true);
   };
 
   const handleImportFlashcards = (cards: Flashcard[]) => {
@@ -469,6 +516,8 @@ export default function App() {
             onToggleNeedReview={handleToggleNeedReview}
             onRateCardSRS={handleRateCardSRS}
             onMoveCardToFolder={handleMoveCardToFolder}
+            onDeleteCard={handleDeleteFlashcard}
+            onOpenQuickAdd={() => handleOpenQuickAddModal(selectedTopic)}
           />
         )}
 
@@ -484,6 +533,8 @@ export default function App() {
             onToggleMastered={handleToggleMastered}
             onToggleNeedReview={handleToggleNeedReview}
             onMoveCardToFolder={handleMoveCardToFolder}
+            onDeleteCard={handleDeleteFlashcard}
+            onOpenQuickAdd={() => handleOpenQuickAddModal(selectedTopic)}
           />
         )}
 
@@ -575,6 +626,18 @@ export default function App() {
         onUpdateFolder={handleUpdateFolder}
         onDeleteFolder={handleDeleteFolder}
         onRestoreDefaultFolders={handleRestoreDefaultFolders}
+        onOpenQuickAdd={(folderId) => handleOpenQuickAddModal(folderId)}
+      />
+
+      {/* 🪄 Quick Add Word Modal (Tự động tra từ & tạo Flashcard) */}
+      <QuickAddWordModal
+        isOpen={isQuickAddModalOpen}
+        onClose={() => setIsQuickAddModalOpen(false)}
+        folders={allFolders}
+        selectedTopic={quickAddTopic}
+        onAddFlashcard={handleQuickAddSingleCard}
+        onAddMultipleFlashcards={handleQuickAddMultipleCards}
+        geminiKey={geminiKey}
       />
 
       {/* Footer */}

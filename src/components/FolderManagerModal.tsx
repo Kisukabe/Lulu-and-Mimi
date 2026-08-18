@@ -10,6 +10,7 @@ import {
   Sparkles,
   ArrowRight,
   RotateCcw,
+  Wand2,
 } from 'lucide-react';
 
 interface FolderManagerModalProps {
@@ -23,6 +24,7 @@ interface FolderManagerModalProps {
   onUpdateFolder: (id: string, updates: { title: string; emoji: string; description?: string }) => void;
   onDeleteFolder: (id: string) => void;
   onRestoreDefaultFolders?: () => void;
+  onOpenQuickAdd?: (targetFolderId?: string) => void;
 }
 
 const POPULAR_EMOJIS = ['📁', '🎯', '💼', '🎓', '💬', '📚', '✈️', '💻', '💡', '🚀', '🌟', '🔥', '🏆', '📈', '🎨', '🏷️', '📖', '🔑'];
@@ -38,6 +40,7 @@ export const FolderManagerModal: React.FC<FolderManagerModalProps> = ({
   onUpdateFolder,
   onDeleteFolder,
   onRestoreDefaultFolders,
+  onOpenQuickAdd,
 }) => {
   const [isCreating, setIsCreating] = useState(false);
   const [editingFolderId, setEditingFolderId] = useState<string | null>(null);
@@ -293,11 +296,24 @@ export const FolderManagerModal: React.FC<FolderManagerModalProps> = ({
                       </div>
                     </div>
 
-                    {/* Right Controls: Edit, Delete, Select */}
+                    {/* Right Controls: Quick Add Word, Edit, Delete, Select */}
                     <div className="flex items-center space-x-1 shrink-0">
                       <span className="text-[11px] font-black px-2 py-0.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300">
                         {count} từ
                       </span>
+
+                      {onOpenQuickAdd && !isDefaultAll && (
+                        <button
+                          onClick={() => {
+                            onSelectTopic(f.id);
+                            onOpenQuickAdd(f.id);
+                          }}
+                          className="p-1.5 rounded-lg text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950 transition cursor-pointer"
+                          title="Thêm từ vựng nhanh vào thư mục này"
+                        >
+                          <Wand2 className="w-3.5 h-3.5" />
+                        </button>
+                      )}
 
                       {!isDefaultAll && (
                         <>
