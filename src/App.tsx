@@ -7,6 +7,8 @@ import {
   Topic,
 } from './types';
 import { DEFAULT_TOPICS } from './data/topics';
+import { FLASHCARDS } from './data/flashcards';
+import { QUIZ_QUESTIONS } from './data/quizQuestions';
 import { calculateNextSRS, isCardDue } from './utils/srs';
 
 // Components
