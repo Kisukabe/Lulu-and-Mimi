@@ -468,28 +468,28 @@ export const VocabularyDetailView: React.FC<VocabularyDetailViewProps> = ({
 
                 </div>
 
-                {/* Card Body: English Definition & Vietnamese Meaning */}
-                <div className="mt-3 pt-3 border-t border-slate-100 dark:border-slate-800/80 space-y-2">
+                {/* Card Body: English Definition (PRIORITY) & Vietnamese Meaning */}
+                <div className="mt-3 pt-3 border-t border-slate-100 dark:border-slate-800/80 space-y-2.5">
                   
-                  {/* 🇬🇧 English Definition */}
-                  {card.definitionEn && (
-                    <div className="p-2.5 rounded-xl bg-indigo-50/60 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900/60 text-xs">
-                      <span className="text-[10px] font-black uppercase text-indigo-600 dark:text-indigo-400 tracking-wider mr-1.5">
-                        🇬🇧 Definition:
-                      </span>
-                      <span className="font-semibold text-slate-800 dark:text-slate-200">
-                        {card.definitionEn}
-                      </span>
-                    </div>
-                  )}
-
-                  {/* 🇻🇳 Vietnamese Meaning */}
-                  <p className="text-sm sm:text-base font-extrabold text-slate-800 dark:text-slate-100">
-                    <span className="text-xs font-black uppercase text-emerald-600 dark:text-emerald-400 mr-1.5">
-                      🇻🇳 Nghĩa:
+                  {/* 🇬🇧 English Definition (HERO BLOCK) */}
+                  <div className="p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-indigo-50/90 via-purple-50/60 to-slate-50 dark:from-indigo-950/70 dark:via-purple-950/40 dark:to-slate-900 border border-indigo-200/90 dark:border-indigo-800/80 shadow-2xs space-y-1">
+                    <span className="text-[11px] font-black uppercase text-indigo-600 dark:text-indigo-400 tracking-wider flex items-center gap-1.5">
+                      <Sparkles className="w-3.5 h-3.5" /> 🇬🇧 English Definition:
                     </span>
-                    {card.back}
-                  </p>
+                    <p className="text-sm sm:text-base font-bold text-slate-900 dark:text-slate-100 leading-relaxed">
+                      {card.definitionEn || card.back}
+                    </p>
+                  </div>
+
+                  {/* 🇻🇳 Vietnamese Meaning (Supporting Translation) */}
+                  <div className="flex items-center gap-2 px-1 text-xs sm:text-sm">
+                    <span className="text-[11px] font-extrabold uppercase text-emerald-600 dark:text-emerald-400 shrink-0">
+                      🇻🇳 Bản dịch:
+                    </span>
+                    <span className="font-bold text-slate-700 dark:text-slate-300">
+                      {card.back}
+                    </span>
+                  </div>
                 </div>
 
                 {/* Expanded Details Section */}

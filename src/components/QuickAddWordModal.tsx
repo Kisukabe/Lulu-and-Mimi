@@ -458,10 +458,24 @@ export const QuickAddWordModal: React.FC<QuickAddWordModalProps> = ({
                     </div>
                   </div>
 
-                  {/* Vietnamese Meaning (Editable) */}
+                  {/* 🇬🇧 English Definition (Primary) */}
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-black uppercase tracking-wider text-indigo-600 dark:text-indigo-400 block flex items-center gap-1">
+                      <Sparkles className="w-3 h-3" /> 🇬🇧 Định Nghĩa Tiếng Anh (English Definition):
+                    </label>
+                    <textarea
+                      rows={2}
+                      value={previewCard.definitionEn || ''}
+                      onChange={(e) => setPreviewCard({ ...previewCard, definitionEn: e.target.value })}
+                      placeholder="English definition..."
+                      className="w-full p-2.5 bg-white dark:bg-slate-900 border border-indigo-200 dark:border-indigo-800 rounded-xl text-xs sm:text-sm font-bold text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 leading-relaxed"
+                    />
+                  </div>
+
+                  {/* 🇻🇳 Vietnamese Meaning (Supporting) */}
                   <div className="space-y-1">
                     <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider block">
-                      Nghĩa Tiếng Việt:
+                      🇻🇳 Bản Dịch Tiếng Việt:
                     </label>
                     <input
                       type="text"
@@ -470,18 +484,6 @@ export const QuickAddWordModal: React.FC<QuickAddWordModalProps> = ({
                       className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-emerald-600 dark:text-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                     />
                   </div>
-
-                  {/* English Definition */}
-                  {previewCard.definitionEn && (
-                    <div className="space-y-1">
-                      <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider block">
-                        Định nghĩa tiếng Anh (EN Definition):
-                      </label>
-                      <p className="text-xs text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-900 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700/80">
-                        {previewCard.definitionEn}
-                      </p>
-                    </div>
-                  )}
 
                   {/* Example sentence */}
                   {previewCard.example && (

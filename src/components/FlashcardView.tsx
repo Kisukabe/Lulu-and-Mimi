@@ -600,45 +600,49 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                   'space-y-3.5'
                 }`}>
                   
-                  {/* 🇬🇧 English Definition */}
-                  {backSettings.showDefinitionEn && currentCard.definitionEn && (
-                    <div className={`bg-indigo-950/60 border border-indigo-800/60 rounded-2xl space-y-1.5 text-left transition-all duration-300 ${
-                      backDensity === 'minimal' ? 'p-7 w-full' :
-                      backDensity === 'medium'  ? 'p-5' : 'p-3'
+                  {/* 🇬🇧 English Definition (PRIORITY SPOTLIGHT) */}
+                  {backSettings.showDefinitionEn && (
+                    <div className={`bg-gradient-to-br from-indigo-950/90 to-purple-950/80 border-2 border-indigo-500/40 rounded-2xl space-y-2 text-left transition-all duration-300 shadow-lg ${
+                      backDensity === 'minimal' ? 'p-8 w-full' :
+                      backDensity === 'medium'  ? 'p-6' : 'p-4 sm:p-5'
                     }`}>
-                      <span className={`font-black uppercase tracking-wider text-indigo-300 flex items-center gap-1 ${
-                        backDensity === 'minimal' ? 'text-sm mb-1' :
-                        backDensity === 'medium'  ? 'text-xs' : 'text-[10px]'
+                      <div className="flex items-center justify-between">
+                        <span className={`font-black uppercase tracking-wider text-indigo-300 flex items-center gap-1.5 ${
+                          backDensity === 'minimal' ? 'text-sm' :
+                          backDensity === 'medium'  ? 'text-xs' : 'text-[11px]'
+                        }`}>
+                          <Sparkles className="w-3.5 h-3.5 text-indigo-400" /> 🇬🇧 English Definition (Định Nghĩa Tiếng Anh):
+                        </span>
+                        <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-md bg-indigo-500/20 text-indigo-200 border border-indigo-400/30">
+                          {currentCard.wordForm || 'word'}
+                        </span>
+                      </div>
+                      <p className={`font-bold text-white leading-relaxed transition-all tracking-wide ${
+                        backDensity === 'minimal' ? 'text-3xl sm:text-4xl' :
+                        backDensity === 'medium'  ? 'text-xl sm:text-2xl' : 'text-base sm:text-lg'
                       }`}>
-                        🇬🇧 English Definition:
-                      </span>
-                      <p className={`font-semibold text-indigo-100 leading-relaxed transition-all ${
-                        backDensity === 'minimal' ? 'text-2xl sm:text-3xl' :
-                        backDensity === 'medium'  ? 'text-base sm:text-lg' : 'text-xs sm:text-sm'
-                      }`}>
-                        {currentCard.definitionEn}
+                        {currentCard.definitionEn || currentCard.back}
                       </p>
                     </div>
                   )}
 
-                  {/* 🇻🇳 Vietnamese Meaning */}
+                  {/* 🇻🇳 Vietnamese Meaning (Supporting Translation) */}
                   {backSettings.showMeaningVi && (
-                    <div className={`bg-slate-800/80 border border-slate-700/80 rounded-2xl space-y-1.5 text-left transition-all duration-300 ${
-                      backDensity === 'minimal' ? 'p-7 w-full' :
-                      backDensity === 'medium'  ? 'p-5' : 'p-3'
+                    <div className={`bg-slate-800/60 border border-slate-700/60 rounded-2xl space-y-1 text-left transition-all duration-300 ${
+                      backDensity === 'minimal' ? 'p-5 w-full' :
+                      backDensity === 'medium'  ? 'p-4' : 'p-3'
                     }`}>
-                      <span className={`font-black uppercase tracking-wider text-emerald-400 ${
-                        backDensity === 'minimal' ? 'text-sm mb-1 block' :
-                        backDensity === 'medium'  ? 'text-xs' : 'text-[10px]'
+                      <span className={`font-bold uppercase tracking-wider text-emerald-400 ${
+                        backDensity === 'minimal' ? 'text-xs block' : 'text-[10px]'
                       }`}>
-                        🇻🇳 Nghĩa Tiếng Việt:
+                        🇻🇳 Bản dịch tiếng Việt:
                       </span>
-                      <h3 className={`font-black text-emerald-300 leading-snug transition-all ${
-                        backDensity === 'minimal' ? 'text-3xl sm:text-4xl' :
-                        backDensity === 'medium'  ? 'text-xl sm:text-2xl' : 'text-base sm:text-lg'
+                      <p className={`font-extrabold text-emerald-300 leading-snug transition-all ${
+                        backDensity === 'minimal' ? 'text-xl sm:text-2xl' :
+                        backDensity === 'medium'  ? 'text-base sm:text-lg' : 'text-sm sm:text-base'
                       }`}>
                         {currentCard.back}
-                      </h3>
+                      </p>
                     </div>
                   )}
 
