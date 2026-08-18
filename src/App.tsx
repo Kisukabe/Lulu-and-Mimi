@@ -540,7 +540,7 @@ export default function App() {
       <div className="flex-1 min-w-0 flex flex-col h-screen overflow-y-auto custom-scrollbar">
         
         {/* Main Content Viewport */}
-        <main className="flex-1 p-2 sm:p-6 pb-20 flex flex-col items-center">
+        <main className="flex-1 p-2 sm:p-4 xl:p-6 pb-16 flex flex-col items-center w-full">
           
           {/* Tab 1: 3D Flashcards */}
           {activeTab === 'flashcards' && (

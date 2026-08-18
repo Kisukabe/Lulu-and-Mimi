@@ -366,7 +366,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
   const unmasteredCount = Math.max(0, totalInFolder - masteredTotalInFolder);
 
   return (
-    <div className="w-full max-w-6xl xl:max-w-7xl mx-auto px-4 sm:px-6 py-2 sm:py-4 flex flex-col justify-center min-h-[calc(100vh-80px)] space-y-6 font-sans">
+    <div className="w-full max-w-[1560px] mx-auto px-2 sm:px-6 xl:px-8 py-2 sm:py-4 flex flex-col justify-center min-h-[calc(100vh-70px)] space-y-4 font-sans">
       
       {/* ════════ TOP BREADCRUMB & TOOLBAR (THEME-COORDINATED) ════════ */}
       <div className={`flex flex-wrap items-center justify-between gap-4 pb-3 border-b ${currentTheme.topBarBorder}`}>
@@ -495,16 +495,16 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
           </button>
         </div>
       ) : (
-        <div className="space-y-6">
+        <div className="space-y-4">
           
           {/* ════════ MAIN GRID: WIDE FLASHCARD (LEFT 75%) + COMPANION WIDGETS (RIGHT 25%) ════════ */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
             
-            {/* 🎴 WIDE FLASHCARD CENTER STAGE (9 COLS - EXPANSIVE WIDTH) */}
+            {/* 🎴 WIDE FLASHCARD CENTER STAGE (9 COLS - EXPANSIVE HORIZONTAL REACH) */}
             <div className="lg:col-span-9 xl:col-span-9 space-y-3.5 flex flex-col">
               
               {/* WIDE HORIZONTAL CARD CONTAINER (RỘNG VÀ DÀI CÂN ĐỐI) */}
-              <div className={`perspective-[1200px] w-full h-[460px] sm:h-[500px] lg:h-[530px] relative select-none ${animClass}`}>
+              <div className={`perspective-[1200px] w-full h-[480px] sm:h-[520px] lg:h-[560px] relative select-none ${animClass}`}>
                 
                 {/* ✏️ IN-CARD EDITOR OVERLAY */}
                 {isEditing ? (
@@ -647,7 +647,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                         {/* Front Top Bar */}
                         <div className="flex items-center justify-between">
                           {/* Part of Speech Pill */}
-                          <div className="w-11 h-11 rounded-2xl bg-black/85 text-white flex items-center justify-center font-black text-sm tracking-tight shadow-md border border-white/20">
+                          <div className="w-12 h-12 rounded-2xl bg-black/85 text-white flex items-center justify-center font-black text-sm tracking-tight shadow-md border border-white/20">
                             {currentCard?.wordForm ? currentCard.wordForm.substring(0, 4) : 'word'}
                           </div>
 
@@ -658,7 +658,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                                 e.stopPropagation();
                                 playPronunciation(preferredAccent);
                               }}
-                              className="w-10 h-10 rounded-2xl bg-black/20 hover:bg-black/40 text-slate-950 dark:text-white flex items-center justify-center transition cursor-pointer active:scale-90"
+                              className="w-11 h-11 rounded-2xl bg-black/20 hover:bg-black/40 text-slate-950 dark:text-white flex items-center justify-center transition cursor-pointer active:scale-90"
                               title="Phát âm từ vựng"
                             >
                               <Volume2 className="w-5 h-5" />
@@ -669,7 +669,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                                 e.stopPropagation();
                                 if (currentCard) onToggleNeedReview(currentCard.id);
                               }}
-                              className={`w-10 h-10 rounded-2xl flex items-center justify-center transition cursor-pointer active:scale-90 ${
+                              className={`w-11 h-11 rounded-2xl flex items-center justify-center transition cursor-pointer active:scale-90 ${
                                 isCurrentNeedReview ? 'bg-amber-400 text-slate-950 shadow-md' : 'bg-black/20 text-slate-950 dark:text-white hover:bg-black/40'
                               }`}
                               title={isCurrentNeedReview ? 'Đã đánh dấu cần ôn tập' : 'Đánh dấu cần ôn tập'}
@@ -679,7 +679,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
 
                             <button
                               onClick={handleStartEdit}
-                              className="w-10 h-10 rounded-2xl bg-black/20 hover:bg-black/40 text-slate-950 dark:text-white flex items-center justify-center transition cursor-pointer active:scale-90"
+                              className="w-11 h-11 rounded-2xl bg-black/20 hover:bg-black/40 text-slate-950 dark:text-white flex items-center justify-center transition cursor-pointer active:scale-90"
                               title="Chỉnh sửa từ vựng này"
                             >
                               <Edit3 className="w-4 h-4" />
@@ -689,13 +689,13 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
 
                         {/* Front Center: BIG BOLD WORD + IPA PHONETICS */}
                         <div className="my-auto text-center space-y-4">
-                          <h1 className={`text-5xl sm:text-6xl lg:text-7xl font-black tracking-tight ${currentTheme.frontTextColor} drop-shadow-xs leading-none`}>
+                          <h1 className={`text-6xl sm:text-7xl lg:text-8xl xl:text-9xl font-black tracking-tight ${currentTheme.frontTextColor} drop-shadow-xs leading-none`}>
                             {currentCard?.front}
                           </h1>
 
                           {/* Phonetic transcription badge */}
-                          <div className="flex items-center justify-center gap-2">
-                            <span className="text-base sm:text-xl font-mono font-bold tracking-wider text-slate-900/90 dark:text-white/90 bg-black/15 dark:bg-white/15 px-4 py-1.5 rounded-full border border-black/10 dark:border-white/10">
+                          <div className="flex items-center justify-center gap-2.5">
+                            <span className="text-lg sm:text-2xl font-mono font-bold tracking-wider text-slate-900/90 dark:text-white/90 bg-black/15 dark:bg-white/15 px-6 py-2 rounded-full border border-black/10 dark:border-white/10 shadow-xs">
                               {currentCard?.pronunciationUs || currentCard?.pronunciationUk || '/.../'}
                             </span>
                             <button
@@ -703,16 +703,16 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                                 e.stopPropagation();
                                 playPronunciation(preferredAccent);
                               }}
-                              className="p-1.5 rounded-full bg-black/20 hover:bg-black/40 text-slate-900 dark:text-white transition cursor-pointer"
+                              className="p-2 rounded-full bg-black/20 hover:bg-black/40 text-slate-900 dark:text-white transition cursor-pointer"
                               title="Nghe phát âm"
                             >
-                              <Volume2 className="w-4 h-4" />
+                              <Volume2 className="w-5 h-5" />
                             </button>
                           </div>
 
                           {/* Topic Hashtag */}
                           <div className="flex items-center justify-center">
-                            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black ${currentTheme.frontTagBg} ${currentTheme.frontTagText}`}>
+                            <span className={`inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs sm:text-sm font-black ${currentTheme.frontTagBg} ${currentTheme.frontTagText}`}>
                               <span>#</span>
                               <span>{currentTopic?.title || 'Từ vựng'}</span>
                             </span>
@@ -721,7 +721,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
 
                         {/* Front Bottom Bar: Mascot on left, Flip hint on right */}
                         <div className="flex items-center justify-between pt-2">
-                          <div className={`w-14 h-14 rounded-2xl ${currentTheme.mascotBg} flex items-center justify-center text-3xl shadow-lg transform -rotate-6 hover:rotate-0 transition-transform`}>
+                          <div className={`w-16 h-16 rounded-2xl ${currentTheme.mascotBg} flex items-center justify-center text-4xl shadow-lg transform -rotate-6 hover:rotate-0 transition-transform`}>
                             {currentTheme.mascotEmoji}
                           </div>
 
@@ -733,7 +733,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
 
                       </div>
 
-                      {/* ──────────────── BACK FACE (MẶT SAU: NGHĨA & VÍ DỤ ĐỒNG BỘ MÀU) ──────────────── */}
+                      {/* ──────────────── BACK FACE (MẶT SAU: NGHĨA VI GỌN & ĐỊNH NGHĨA ANH TO RÕ) ──────────────── */}
                       <div
                         className={`card-face-back rounded-3xl ${currentTheme.backBg} border-2 ${currentTheme.backBorder} p-6 sm:p-8 flex flex-col justify-between overflow-y-auto custom-scrollbar ${
                           !isFlipped ? 'invisible opacity-0 pointer-events-none' : 'visible opacity-100 pointer-events-auto'
@@ -747,9 +747,16 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                       >
                         {/* Back Top Bar */}
                         <div className="flex items-center justify-between pb-2 border-b border-white/15 shrink-0">
-                          <span className="text-[11px] font-black uppercase tracking-widest text-yellow-300">
-                            NGHĨA TIẾNG VIỆT
-                          </span>
+                          {/* Nghĩa tiếng Việt thu gọn thanh lịch */}
+                          <div className="flex items-center gap-2">
+                            <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider px-2.5 py-1 rounded-lg bg-black/30 text-lime-300 border border-lime-400/30">
+                              🇻🇳 NGHĨA TIẾNG VIỆT
+                            </span>
+                            <span className="text-base sm:text-xl lg:text-2xl font-black text-white leading-tight">
+                              {currentCard?.back}
+                            </span>
+                          </div>
+
                           <div className="flex items-center gap-2">
                             <button
                               onClick={(e) => {
@@ -772,19 +779,15 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                         </div>
 
                         {/* Back Content Body */}
-                        <div className="my-auto space-y-4 py-2">
-                          {/* Big Bold Meaning */}
-                          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white leading-tight">
-                            {currentCard?.back}
-                          </h2>
-
-                          {/* English Definition Box */}
+                        <div className="my-auto space-y-3.5 py-2">
+                          
+                          {/* 🇬🇧 English Definition Box (PHÓNG TO VÀ NỔI BẬT LÊN) */}
                           {currentCard?.definitionEn && (
-                            <div className={`p-4 rounded-2xl ${currentTheme.backBoxBg} border ${currentTheme.backBoxBorder} space-y-1`}>
-                              <div className="text-[10px] font-black uppercase tracking-wider text-yellow-300 flex items-center gap-1.5">
-                                <span>🇬🇧 ĐỊNH NGHĨA TIẾNG ANH:</span>
+                            <div className={`p-4 sm:p-5 rounded-2xl ${currentTheme.backBoxBg} border-2 ${currentTheme.backBoxBorder} space-y-1.5 shadow-md`}>
+                              <div className="text-xs sm:text-sm font-black uppercase tracking-wider text-yellow-300 flex items-center gap-2">
+                                <span>🇬🇧 ĐỊNH NGHĨA TIẾNG ANH (ENGLISH DEFINITION):</span>
                               </div>
-                              <p className="text-xs sm:text-sm font-medium text-slate-100 leading-relaxed">
+                              <p className="text-base sm:text-lg lg:text-xl font-bold text-white leading-relaxed tracking-wide">
                                 {currentCard.definitionEn}
                               </p>
                             </div>
@@ -792,11 +795,11 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
 
                           {/* Example Box */}
                           {currentCard?.example && (
-                            <div className={`p-4 rounded-2xl ${currentTheme.backBoxBg} border ${currentTheme.backBoxBorder} space-y-1.5`}>
-                              <div className="text-[10px] font-black uppercase tracking-wider text-yellow-300">
-                                VÍ DỤ:
+                            <div className={`p-3.5 sm:p-4 rounded-2xl ${currentTheme.backBoxBg} border ${currentTheme.backBoxBorder} space-y-1`}>
+                              <div className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-yellow-300">
+                                VÍ DỤ (EXAMPLE):
                               </div>
-                              <p className="text-xs sm:text-sm italic font-semibold text-white">
+                              <p className="text-xs sm:text-sm sm:text-base italic font-semibold text-white">
                                 "{currentCard.example}"
                               </p>
                               {currentCard?.exampleVi && (
@@ -811,12 +814,12 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                           {((currentCard?.collocations && currentCard.collocations.length > 0) || (currentCard?.synonyms && currentCard.synonyms.length > 0)) && (
                             <div className="flex flex-wrap gap-1.5 pt-1">
                               {currentCard.collocations?.slice(0, 4).map((col, idx) => (
-                                <span key={idx} className="px-2.5 py-1 rounded-lg bg-black/40 text-yellow-300 text-[11px] font-black border border-yellow-400/20">
+                                <span key={idx} className="px-2.5 py-1 rounded-lg bg-black/40 text-yellow-300 text-xs font-black border border-yellow-400/20">
                                   🔗 {col}
                                 </span>
                               ))}
                               {currentCard.synonyms?.slice(0, 3).map((syn, idx) => (
-                                <span key={idx} className="px-2.5 py-1 rounded-lg bg-black/40 text-lime-300 text-[11px] font-black border border-lime-400/20">
+                                <span key={idx} className="px-2.5 py-1 rounded-lg bg-black/40 text-lime-300 text-xs font-black border border-lime-400/20">
                                   ✨ {syn}
                                 </span>
                               ))}
@@ -856,9 +859,9 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                       nextCard();
                     }
                   }}
-                  className={`h-14 sm:h-16 rounded-2xl ${currentTheme.btn1Bg} border-2 ${currentTheme.btn1Border} ${currentTheme.btn1Text} flex items-center justify-center gap-2 font-black text-xs sm:text-sm shadow-md transition-all cursor-pointer active:scale-95`}
+                  className={`h-15 sm:h-17 rounded-2xl ${currentTheme.btn1Bg} border-2 ${currentTheme.btn1Border} ${currentTheme.btn1Text} flex items-center justify-center gap-2 font-black text-xs sm:text-base shadow-md transition-all cursor-pointer active:scale-95`}
                 >
-                  <span className="text-sm sm:text-base">❓</span>
+                  <span className="text-sm sm:text-lg">❓</span>
                   <span>Chưa nhớ</span>
                   <span className={`px-2 py-0.5 rounded-lg ${currentTheme.btn1Kbd} text-[10px] font-mono font-bold shadow-xs`}>
                     1
@@ -868,7 +871,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                 {/* 2. Lật thẻ */}
                 <button
                   onClick={flipCard}
-                  className={`h-14 sm:h-16 rounded-2xl ${currentTheme.btnSpaceBg} border-2 ${currentTheme.btnSpaceBorder} ${currentTheme.btnSpaceText} flex items-center justify-center gap-2 font-black text-xs sm:text-sm shadow-md transition-all cursor-pointer active:scale-95`}
+                  className={`h-15 sm:h-17 rounded-2xl ${currentTheme.btnSpaceBg} border-2 ${currentTheme.btnSpaceBorder} ${currentTheme.btnSpaceText} flex items-center justify-center gap-2 font-black text-xs sm:text-base shadow-md transition-all cursor-pointer active:scale-95`}
                 >
                   <RotateCw className="w-4 h-4 sm:w-5 sm:h-5" />
                   <span>Lật thẻ</span>
@@ -887,9 +890,9 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                       nextCard();
                     }
                   }}
-                  className={`h-14 sm:h-16 rounded-2xl ${currentTheme.btn2Bg} border-2 ${currentTheme.btn2Border} ${currentTheme.btn2Text} flex items-center justify-center gap-2 font-black text-xs sm:text-sm shadow-md transition-all cursor-pointer active:scale-95`}
+                  className={`h-15 sm:h-17 rounded-2xl ${currentTheme.btn2Bg} border-2 ${currentTheme.btn2Border} ${currentTheme.btn2Text} flex items-center justify-center gap-2 font-black text-xs sm:text-base shadow-md transition-all cursor-pointer active:scale-95`}
                 >
-                  <span className="text-sm sm:text-base">✓</span>
+                  <span className="text-sm sm:text-lg">✓</span>
                   <span>Đã nhớ</span>
                   <span className={`px-2 py-0.5 rounded-lg ${currentTheme.btn2Kbd} text-[10px] font-mono font-bold shadow-xs`}>
                     2
@@ -1012,7 +1015,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
           </div>
 
           {/* ════════ BOTTOM PROGRESS CONTINUOUS BAR ════════ */}
-          <div className="space-y-2 pt-2">
+          <div className="space-y-1.5 pt-1">
             <div className="flex items-center justify-between text-xs font-black text-slate-700 dark:text-slate-300">
               <span>Thẻ {currentIndex + 1} / {cardsList.length}</span>
               <span className="text-amber-500">
