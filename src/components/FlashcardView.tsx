@@ -897,11 +897,6 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                               <p className="text-xs sm:text-sm italic font-semibold text-white leading-tight">
                                 "{currentCard.example}"
                               </p>
-                              {currentCard?.exampleVi && (
-                                <p className="text-xs sm:text-sm text-lime-200 font-medium leading-tight">
-                                  👉 {currentCard.exampleVi}
-                                </p>
-                              )}
                             </div>
                           )}
 
@@ -965,11 +960,11 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                             </div>
                           )}
 
-                          {/* 🌳 Dedicated Box: WORD FAMILY */}
+                          {/* 🌳 Dedicated Box: WORD FORMS */}
                           {currentCard?.wordFamily && currentCard.wordFamily.length > 0 && (
                             <div className={`p-2.5 sm:p-3 rounded-xl ${currentTheme.backBoxBg} border ${currentTheme.backBoxBorder} space-y-1`}>
                               <div className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-yellow-300">
-                                Word Family
+                                Word Forms
                               </div>
                               <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
                                 {currentCard.wordFamily.map((wf, idx) => (
