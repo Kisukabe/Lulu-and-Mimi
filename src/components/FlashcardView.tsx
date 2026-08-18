@@ -13,8 +13,8 @@ import {
   Link2,
   Filter,
   Clock,
+  ThumbsDown,
   ThumbsUp,
-  RotateCcw,
   Zap,
   SlidersHorizontal,
   X,
@@ -22,7 +22,7 @@ import {
   Plus,
   Wand2,
 } from 'lucide-react';
-import { calculateNextSRS, isCardDue, formatSRSCountdown, getMemoryLevelName } from '../utils/srs';
+import { calculateNextSRS, isCardDue, formatSRSCountdown, getMemoryLevelName, previewNextInterval } from '../utils/srs';
 
 interface FlashcardViewProps {
   flashcards: Flashcard[];
@@ -33,7 +33,7 @@ interface FlashcardViewProps {
   srsRecords?: { [cardId: string]: SRSCardData };
   onToggleMastered: (cardId: string) => void;
   onToggleNeedReview: (cardId: string) => void;
-  onRateCardSRS?: (cardId: string, rating: 1 | 3 | 5) => void;
+  onRateCardSRS?: (cardId: string, rating: 1 | 2 | 3 | 4 | 5) => void;
   onMoveCardToFolder?: (cardId: string, newTopicId: string) => void;
   onDeleteCard?: (cardId: string) => void;
   onOpenQuickAdd?: () => void;
@@ -193,7 +193,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
   };
 
   // 4. Rate SRS Card & automatically jump to next card
-  const handleRateSRS = (rating: 1 | 3 | 5) => {
+  const handleRateSRS = (rating: 1 | 2 | 3 | 4 | 5) => {
     if (!currentCard) return;
     if (onRateCardSRS) {
       onRateCardSRS(currentCard.id, rating);
@@ -220,8 +220,10 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
       } else if (e.key === '1' && isFlipped) {
         handleRateSRS(1);
       } else if (e.key === '2' && isFlipped) {
-        handleRateSRS(3);
+        handleRateSRS(2);
       } else if (e.key === '3' && isFlipped) {
+        handleRateSRS(3);
+      } else if (e.key === '4' && isFlipped) {
         handleRateSRS(5);
       }
     };
@@ -738,57 +740,76 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                     <div className={`font-bold text-center text-blue-100/70 ${
                       backDensity === 'minimal' ? 'text-xs' : 'text-[10px]'
                     }`}>
-                      Đánh giá mức độ ghi nhớ theo thuật toán Spaced Repetition (SM-2):
+                      Đánh giá mức độ ghi nhớ — thuật toán SM-2:
                     </div>
 
-                    <div className="grid grid-cols-3 gap-2">
+                    <div className="grid grid-cols-4 gap-1.5">
+                      {/* 1 — Again */}
                       <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleRateSRS(1);
-                        }}
-                        className={`rounded-xl bg-red-500/30 border border-red-300/40 hover:bg-red-500/50 text-white font-bold transition flex flex-col items-center justify-center cursor-pointer backdrop-blur-sm ${
-                          backDensity === 'minimal' ? 'py-4 px-3 text-sm' : 'py-2 px-2 text-xs'
+                        onClick={(e) => { e.stopPropagation(); handleRateSRS(1); }}
+                        className={`rounded-xl bg-red-500/25 border border-red-300/30 hover:bg-red-500/45 active:scale-95 text-white font-bold transition-all flex flex-col items-center justify-center cursor-pointer backdrop-blur-sm ${
+                          backDensity === 'minimal' ? 'py-3.5 px-2 text-sm gap-1' : 'py-2 px-1.5 text-xs gap-0.5'
                         }`}
-                        title="Phím tắt: 1"
+                        title="Phím tắt: 1 — Quên hoàn toàn, ôn lại ngay"
                       >
-                        <span className="flex items-center gap-1">
-                          <RotateCcw className={backDensity === 'minimal' ? 'w-4 h-4' : 'w-3 h-3'} /> Quên / Khó
+                        <ThumbsDown className={backDensity === 'minimal' ? 'w-4 h-4 text-red-200' : 'w-3 h-3 text-red-200'} />
+                        <span className="font-black">Quên</span>
+                        <span className="text-[9px] text-red-200/80 font-medium">
+                          {previewNextInterval(currentCardSRS, 1)} ngày
                         </span>
-                        <span className="text-[9px] opacity-75">(Ôn lại sau 1 ngày)</span>
                       </button>
 
+                      {/* 2 — Hard */}
                       <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleRateSRS(3);
-                        }}
-                        className={`rounded-xl bg-yellow-400/30 border border-yellow-200/40 hover:bg-yellow-400/50 text-white font-bold transition flex flex-col items-center justify-center cursor-pointer backdrop-blur-sm ${
-                          backDensity === 'minimal' ? 'py-4 px-3 text-sm' : 'py-2 px-2 text-xs'
+                        onClick={(e) => { e.stopPropagation(); handleRateSRS(2); }}
+                        className={`rounded-xl bg-orange-400/25 border border-orange-300/30 hover:bg-orange-400/45 active:scale-95 text-white font-bold transition-all flex flex-col items-center justify-center cursor-pointer backdrop-blur-sm ${
+                          backDensity === 'minimal' ? 'py-3.5 px-2 text-sm gap-1' : 'py-2 px-1.5 text-xs gap-0.5'
                         }`}
-                        title="Phím tắt: 2"
+                        title="Phím tắt: 2 — Nhớ nhưng khó, rút ngắn chu kỳ"
                       >
-                        <span className="flex items-center gap-1">
-                          <ThumbsUp className={backDensity === 'minimal' ? 'w-4 h-4' : 'w-3 h-3'} /> Đã Nhớ
+                        <span className={backDensity === 'minimal' ? 'text-lg' : 'text-sm'}>😓</span>
+                        <span className="font-black">Khó</span>
+                        <span className="text-[9px] text-orange-200/80 font-medium">
+                          {previewNextInterval(currentCardSRS, 2)} ngày
                         </span>
-                        <span className="text-[9px] opacity-75">(Ôn sau 3 - 6 ngày)</span>
                       </button>
 
+                      {/* 3 — Good */}
                       <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleRateSRS(5);
-                        }}
-                        className={`rounded-xl bg-emerald-400/30 border border-emerald-200/40 hover:bg-emerald-400/50 text-white font-bold transition flex flex-col items-center justify-center cursor-pointer backdrop-blur-sm ${
-                          backDensity === 'minimal' ? 'py-4 px-3 text-sm' : 'py-2 px-2 text-xs'
+                        onClick={(e) => { e.stopPropagation(); handleRateSRS(3); }}
+                        className={`rounded-xl bg-blue-400/25 border border-blue-300/30 hover:bg-blue-400/45 active:scale-95 text-white font-bold transition-all flex flex-col items-center justify-center cursor-pointer backdrop-blur-sm ${
+                          backDensity === 'minimal' ? 'py-3.5 px-2 text-sm gap-1' : 'py-2 px-1.5 text-xs gap-0.5'
                         }`}
-                        title="Phím tắt: 3"
+                        title="Phím tắt: 3 — Nhớ bình thường, tăng chu kỳ"
                       >
-                        <span className="flex items-center gap-1">
-                          <Zap className={backDensity === 'minimal' ? 'w-4 h-4' : 'w-3 h-3'} /> Rất Dễ
+                        <ThumbsUp className={backDensity === 'minimal' ? 'w-4 h-4 text-blue-200' : 'w-3 h-3 text-blue-200'} />
+                        <span className="font-black">Nhớ</span>
+                        <span className="text-[9px] text-blue-200/80 font-medium">
+                          {previewNextInterval(currentCardSRS, 3)} ngày
                         </span>
-                        <span className="text-[9px] opacity-75">(Ôn sau 15+ ngày)</span>
                       </button>
+
+                      {/* 4 — Easy */}
+                      <button
+                        onClick={(e) => { e.stopPropagation(); handleRateSRS(5); }}
+                        className={`rounded-xl bg-emerald-400/25 border border-emerald-300/30 hover:bg-emerald-400/45 active:scale-95 text-white font-bold transition-all flex flex-col items-center justify-center cursor-pointer backdrop-blur-sm ${
+                          backDensity === 'minimal' ? 'py-3.5 px-2 text-sm gap-1' : 'py-2 px-1.5 text-xs gap-0.5'
+                        }`}
+                        title="Phím tắt: 4 — Rất dễ, khắc sâu vào trí nhớ"
+                      >
+                        <Zap className={backDensity === 'minimal' ? 'w-4 h-4 text-emerald-200' : 'w-3 h-3 text-emerald-200'} />
+                        <span className="font-black">Dễ</span>
+                        <span className="text-[9px] text-emerald-200/80 font-medium">
+                          {previewNextInterval(currentCardSRS, 5)} ngày
+                        </span>
+                      </button>
+                    </div>
+
+                    <div className="text-[9px] text-blue-100/40 text-center font-medium">
+                      Phím tắt: <kbd className="bg-white/10 px-1 rounded">1</kbd> Quên&nbsp;&nbsp;
+                      <kbd className="bg-white/10 px-1 rounded">2</kbd> Khó&nbsp;&nbsp;
+                      <kbd className="bg-white/10 px-1 rounded">3</kbd> Nhớ&nbsp;&nbsp;
+                      <kbd className="bg-white/10 px-1 rounded">4</kbd> Dễ
                     </div>
                   </div>
                 )}

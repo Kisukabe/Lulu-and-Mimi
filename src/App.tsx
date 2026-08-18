@@ -334,16 +334,18 @@ export default function App() {
     });
   };
 
-  const handleRateCardSRS = (cardId: string, rating: 1 | 3 | 5) => {
+  const handleRateCardSRS = (cardId: string, rating: 1 | 2 | 3 | 4 | 5) => {
     setUserProgress((prev) => {
       const existingSRS = prev.srsRecords?.[cardId];
       const updatedSRS = calculateNextSRS(cardId, existingSRS, rating);
 
+      // Again(1) hoặc Hard(2) → chưa thuộc; Good(3)+ → đánh dấu đã thuộc
       const isMastered = rating >= 3;
       const newMastered = isMastered
         ? Array.from(new Set([...prev.masteredFlashcardIds, cardId]))
         : prev.masteredFlashcardIds.filter((id) => id !== cardId);
 
+      // Again(1) → đánh dấu cần ôn; các rating khác → bỏ cờ cần ôn
       const newNeedReview = rating === 1
         ? Array.from(new Set([...prev.needReviewFlashcardIds, cardId]))
         : prev.needReviewFlashcardIds.filter((id) => id !== cardId);
