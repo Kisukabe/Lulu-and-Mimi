@@ -401,6 +401,15 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
   const masteredPercent = totalInFolder > 0 ? Math.round((masteredTotalInFolder / totalInFolder) * 100) : 0;
   const unmasteredCount = Math.max(0, totalInFolder - masteredTotalInFolder);
 
+  const cardIpa = useMemo(() => {
+    const raw = (currentCard?.pronunciationUs || currentCard?.pronunciationUk || '').trim();
+    if (!raw) return '';
+    if (raw === '//' || raw === '/.../' || raw === '/ /') return '';
+    return raw;
+  }, [currentCard]);
+
+  const hasIpa = Boolean(cardIpa && cardIpa.length > 2);
+
   return (
     <div className="w-full max-w-[1680px] mx-auto px-2 sm:px-6 xl:px-8 py-2 sm:py-4 flex flex-col justify-center min-h-[calc(100vh-70px)] space-y-6 font-sans">
       
@@ -729,22 +738,37 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                             {currentCard?.front}
                           </h1>
 
-                          {/* Phonetic transcription badge */}
-                          <div className="flex items-center justify-center gap-2.5">
-                            <span className="text-lg sm:text-2xl font-mono font-bold tracking-wider text-slate-900/90 dark:text-white/90 bg-black/15 dark:bg-white/15 px-6 py-2 rounded-full border border-black/10 dark:border-white/10 shadow-xs">
-                              {currentCard?.pronunciationUs || currentCard?.pronunciationUk || '/.../'}
-                            </span>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                playPronunciation(preferredAccent);
-                              }}
-                              className="p-2 rounded-full bg-black/20 hover:bg-black/40 text-slate-900 dark:text-white transition cursor-pointer"
-                              title="Nghe phát âm"
-                            >
-                              <Volume2 className="w-5 h-5" />
-                            </button>
-                          </div>
+                          {/* Phonetic transcription badge (Chỉ hiện khi có IPA hợp lệ, không hiện // hoặc /.../) */}
+                          {hasIpa ? (
+                            <div className="flex items-center justify-center gap-2.5">
+                              <span className="text-lg sm:text-2xl font-mono font-bold tracking-wider text-slate-900/90 dark:text-white/90 bg-black/15 dark:bg-white/15 px-6 py-2 rounded-full border border-black/10 dark:border-white/10 shadow-xs">
+                                {cardIpa}
+                              </span>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  playPronunciation(preferredAccent);
+                                }}
+                                className="p-2 rounded-full bg-black/20 hover:bg-black/40 text-slate-900 dark:text-white transition cursor-pointer active:scale-90"
+                                title="Nghe phát âm"
+                              >
+                                <Volume2 className="w-5 h-5" />
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="flex items-center justify-center">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  playPronunciation(preferredAccent);
+                                }}
+                                className="p-2 rounded-full bg-black/20 hover:bg-black/40 text-slate-900 dark:text-white transition cursor-pointer active:scale-90"
+                                title="Nghe phát âm"
+                              >
+                                <Volume2 className="w-5 h-5" />
+                              </button>
+                            </div>
+                          )}
 
                           {/* Topic Hashtag */}
                           <div className="flex items-center justify-center">
@@ -792,20 +816,32 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                           transition: 'opacity 0.2s ease-in-out, visibility 0.2s ease-in-out'
                         }}
                       >
-                        {/* Back Top Bar (Hiển thị loại từ + Nghĩa tiếng Việt) */}
+                        {/* Back Top Bar (Hiển thị loại từ + Từ vựng + IPA + Nghĩa tiếng Việt) */}
                         <div className="flex items-center justify-between pb-2.5 border-b border-white/15 shrink-0">
-                          <div className="flex items-center gap-3">
-                            {/* Part of Speech Pill - HIỂN THỊ CẢ MẶT SAU (TĂNG 3 SIZE) */}
-                            <div className="px-4 py-1.5 rounded-xl bg-black/80 text-white flex items-center justify-center font-black text-xs sm:text-sm tracking-wider shadow-md border-2 border-white/20 uppercase">
+                          <div className="flex flex-wrap items-center gap-2.5">
+                            {/* Part of Speech Pill */}
+                            <div className="px-3.5 py-1.5 rounded-xl bg-black/80 text-white flex items-center justify-center font-black text-xs sm:text-sm tracking-wider shadow-md border-2 border-white/20 uppercase">
                               {currentCard?.wordForm ? currentCard.wordForm : 'word'}
                             </div>
 
+                            {/* Từ vựng + Phiên âm IPA ở mặt sau */}
+                            <div className="flex items-center gap-2 bg-black/35 px-3 py-1 rounded-xl border border-white/15">
+                              <span className="text-sm sm:text-base font-black text-yellow-300">
+                                {currentCard?.front}
+                              </span>
+                              {hasIpa && (
+                                <span className="text-xs sm:text-sm font-mono font-bold text-slate-200">
+                                  {cardIpa}
+                                </span>
+                              )}
+                            </div>
+
                             {/* Nghĩa tiếng Việt */}
-                            <div className="flex items-center gap-2">
-                              <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-md bg-black/30 text-lime-300 border border-lime-400/30">
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-black/30 text-lime-300 border border-lime-400/30">
                                 🇻🇳 NGHĨA
                               </span>
-                              <span className="text-base sm:text-xl font-black text-white leading-tight">
+                              <span className="text-sm sm:text-lg font-black text-white leading-tight">
                                 {currentCard?.back}
                               </span>
                             </div>
