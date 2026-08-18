@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Topic, Flashcard, TopicId, WordForm, VocabType, DictionaryResult } from '../types';
 import {
   X,
@@ -22,6 +22,7 @@ interface QuickAddWordModalProps {
   isOpen: boolean;
   onClose: () => void;
   folders: Topic[];
+  initialTargetFolder?: string;
   selectedTopic: string;
   onAddFlashcard: (card: Flashcard) => void;
   onAddMultipleFlashcards?: (cards: Flashcard[]) => void;
@@ -32,6 +33,7 @@ export const QuickAddWordModal: React.FC<QuickAddWordModalProps> = ({
   isOpen,
   onClose,
   folders,
+  initialTargetFolder,
   selectedTopic,
   onAddFlashcard,
   onAddMultipleFlashcards,
