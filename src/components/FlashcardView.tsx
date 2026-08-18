@@ -808,7 +808,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
             <div className="lg:col-span-8 xl:col-span-9 space-y-4">
               
               {/* WIDE HORIZONTAL CARD CONTAINER (RỘNG VÀ DÀI NHƯ HÌNH 1) */}
-              <div className={`perspective-[1200px] w-full min-h-[380px] sm:min-h-[420px] lg:min-h-[460px] relative select-none ${animClass}`}>
+              <div className={`perspective-[1200px] w-full h-[400px] sm:h-[460px] lg:h-[490px] relative select-none ${animClass}`}>
                 
                 {/* ✏️ IN-CARD EDITOR OVERLAY */}
                 {isEditing ? (

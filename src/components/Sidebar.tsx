@@ -9,8 +9,6 @@ import {
   BarChart2,
   Sun,
   Moon,
-  Monitor,
-  Folder,
   ChevronRight,
   Sparkles,
   Key,
@@ -20,10 +18,8 @@ import {
   Clock,
   PanelLeftClose,
   PanelLeftOpen,
-  Dumbbell,
   Compass,
-  History,
-  FolderPlus
+  History
 } from 'lucide-react';
 import { Topic } from '../types';
 
@@ -64,13 +60,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onSelectFlashcardFilter,
   currentFlashcardFilter = 'all',
 }) => {
-  const SIDEBAR_COLLAPSED_KEY = 'lulu_mimi_sidebar_collapsed_v1';
+  const SIDEBAR_COLLAPSED_KEY = 'lulu_mimi_sidebar_collapsed_v2';
   const [isCollapsed, setIsCollapsed] = useState<boolean>(() => {
     try {
-      return localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === 'true';
-    } catch {
-      return false;
-    }
+      const saved = localStorage.getItem(SIDEBAR_COLLAPSED_KEY);
+      if (saved !== null) return saved === 'true';
+    } catch {}
+    return false; // Default expanded on desktop
   });
 
   const toggleCollapsed = () => {
@@ -95,48 +91,50 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   return (
     <aside
-      className={`h-screen sticky top-0 bg-[#3a4d25] dark:bg-[#1b2612] text-slate-100 flex flex-col justify-between border-r border-black/10 dark:border-white/5 transition-all duration-300 z-40 select-none ${
+      className={`h-screen sticky top-0 bg-[#354622] dark:bg-[#1a2411] text-slate-100 flex flex-col justify-between border-r border-black/10 dark:border-white/5 transition-all duration-300 z-40 select-none ${
         isCollapsed ? 'w-20' : 'w-72 sm:w-80'
       }`}
     >
       {/* ════════ TOP BRAND HEADER ════════ */}
-      <div className="p-4 flex items-center justify-between border-b border-white/10 shrink-0">
-        {!isCollapsed && (
-          <div className="flex items-center gap-3 overflow-hidden">
-            <div className="w-10 h-10 rounded-2xl bg-slate-900/40 border border-white/20 flex items-center justify-center text-xl shadow-md shrink-0">
+      <div className={`p-4 border-b border-white/10 shrink-0 ${isCollapsed ? 'flex flex-col items-center gap-3' : 'flex items-center justify-between'}`}>
+        {!isCollapsed ? (
+          <>
+            <div className="flex items-center gap-3 overflow-hidden">
+              <div className="w-10 h-10 rounded-2xl bg-black/30 border border-white/20 flex items-center justify-center text-xl shadow-md shrink-0">
+                📖
+              </div>
+              <div className="truncate">
+                <h1 className="text-base font-black tracking-tight text-white leading-none">
+                  The IELTS
+                </h1>
+                <span className="text-[10px] font-black tracking-widest uppercase text-yellow-300">
+                  DICTIONARY
+                </span>
+              </div>
+            </div>
+
+            <button
+              onClick={toggleCollapsed}
+              className="p-2 rounded-xl bg-black/20 hover:bg-black/40 text-slate-200 hover:text-white transition cursor-pointer active:scale-95 shrink-0"
+              title="Thu gọn menu"
+            >
+              <PanelLeftClose className="w-4 h-4 text-slate-300" />
+            </button>
+          </>
+        ) : (
+          <>
+            <div className="w-10 h-10 rounded-2xl bg-black/30 border border-white/20 flex items-center justify-center text-xl shadow-md shrink-0">
               📖
             </div>
-            <div className="truncate">
-              <h1 className="text-base font-black tracking-tight text-white leading-none">
-                The IELTS
-              </h1>
-              <span className="text-[10px] font-black tracking-widest uppercase text-yellow-300/90">
-                DICTIONARY
-              </span>
-            </div>
-          </div>
+            <button
+              onClick={toggleCollapsed}
+              className="p-2 rounded-xl bg-black/20 hover:bg-black/40 text-yellow-300 hover:text-white transition cursor-pointer active:scale-95 shrink-0"
+              title="Mở rộng menu"
+            >
+              <PanelLeftOpen className="w-4 h-4" />
+            </button>
+          </>
         )}
-
-        {isCollapsed && (
-          <div className="w-10 h-10 mx-auto rounded-2xl bg-slate-900/40 border border-white/20 flex items-center justify-center text-xl shadow-md shrink-0">
-            📖
-          </div>
-        )}
-
-        {/* Collapse / Expand Toggle Button */}
-        <button
-          onClick={toggleCollapsed}
-          className={`p-2 rounded-xl bg-black/20 hover:bg-black/40 text-slate-200 hover:text-white transition cursor-pointer active:scale-95 ${
-            isCollapsed ? 'mx-auto mt-2' : ''
-          }`}
-          title={isCollapsed ? 'Mở rộng thanh menu' : 'Thu gọn thanh menu'}
-        >
-          {isCollapsed ? (
-            <PanelLeftOpen className="w-4 h-4 text-yellow-300" />
-          ) : (
-            <PanelLeftClose className="w-4 h-4 text-slate-300" />
-          )}
-        </button>
       </div>
 
       {/* ════════ MAIN NAVIGATION LINKS ════════ */}
@@ -153,9 +151,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
           {/* 1. Tổng quan (Overview / Vocabulary Detail) */}
           <button
             onClick={() => setActiveTab('vocabulary')}
-            className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs sm:text-sm font-black transition cursor-pointer group ${
+            className={`w-full flex items-center gap-3 py-2.5 rounded-2xl text-xs sm:text-sm font-black transition cursor-pointer group ${
+              isCollapsed ? 'justify-center px-0' : 'px-3.5'
+            } ${
               activeTab === 'vocabulary'
-                ? 'bg-amber-400 text-slate-950 shadow-md font-black'
+                ? 'bg-[#f5b84c] text-slate-950 shadow-md font-black'
                 : 'text-slate-200 hover:bg-black/20 hover:text-white'
             }`}
             title="Tổng quan từ vựng"
@@ -167,7 +167,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
           {/* 2. Bộ từ (Topics Selector Modal trigger) */}
           <button
             onClick={onOpenFolderManager}
-            className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs sm:text-sm font-black text-slate-200 hover:bg-black/20 hover:text-white transition cursor-pointer group"
+            className={`w-full flex items-center justify-between py-2.5 rounded-2xl text-xs sm:text-sm font-black text-slate-200 hover:bg-black/20 hover:text-white transition cursor-pointer group ${
+              isCollapsed ? 'justify-center px-0' : 'px-3.5'
+            }`}
             title="Chọn bộ từ vựng"
           >
             <div className="flex items-center gap-3 truncate">
@@ -184,11 +186,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {!isCollapsed && <ChevronRight className="w-4 h-4 text-white/40 group-hover:translate-x-0.5 transition-transform" />}
           </button>
 
-          {/* 3. Flashcard (Highlighted Golden Pill as shown in user screenshot!) */}
+          {/* 3. Flashcard (Highlighted Golden Pill as in user screenshots) */}
           <div className="space-y-1">
             <button
               onClick={() => handleFlashcardClick('all')}
-              className={`w-full flex items-center gap-3 px-3.5 py-3 rounded-2xl text-xs sm:text-sm font-black transition cursor-pointer shadow-sm ${
+              className={`w-full flex items-center gap-3 py-3 rounded-2xl text-xs sm:text-sm font-black transition cursor-pointer shadow-sm ${
+                isCollapsed ? 'justify-center px-0' : 'px-3.5'
+              } ${
                 activeTab === 'flashcards' && currentFlashcardFilter === 'all'
                   ? 'bg-[#f5b84c] text-slate-950 shadow-md'
                   : activeTab === 'flashcards'
@@ -273,9 +277,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
           {/* 4. Thống kê */}
           <button
             onClick={() => setActiveTab('stats')}
-            className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs sm:text-sm font-black transition cursor-pointer ${
+            className={`w-full flex items-center gap-3 py-2.5 rounded-2xl text-xs sm:text-sm font-black transition cursor-pointer ${
+              isCollapsed ? 'justify-center px-0' : 'px-3.5'
+            } ${
               activeTab === 'stats'
-                ? 'bg-amber-400 text-slate-950 shadow-md font-black'
+                ? 'bg-[#f5b84c] text-slate-950 shadow-md font-black'
                 : 'text-slate-200 hover:bg-black/20 hover:text-white'
             }`}
             title="Thống kê tiến độ"
@@ -287,9 +293,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
           {/* 5. Lịch sử làm bài */}
           <button
             onClick={() => setActiveTab('practice')}
-            className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs sm:text-sm font-black transition cursor-pointer ${
+            className={`w-full flex items-center gap-3 py-2.5 rounded-2xl text-xs sm:text-sm font-black transition cursor-pointer ${
+              isCollapsed ? 'justify-center px-0' : 'px-3.5'
+            } ${
               activeTab === 'practice'
-                ? 'bg-amber-400 text-slate-950 shadow-md font-black'
+                ? 'bg-[#f5b84c] text-slate-950 shadow-md font-black'
                 : 'text-slate-200 hover:bg-black/20 hover:text-white'
             }`}
             title="Luyện tập & Lịch sử làm bài"
@@ -311,9 +319,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
           {/* Tra từ điển */}
           <button
             onClick={() => setActiveTab('dictionary')}
-            className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs sm:text-sm font-black transition cursor-pointer ${
+            className={`w-full flex items-center gap-3 py-2.5 rounded-2xl text-xs sm:text-sm font-black transition cursor-pointer ${
+              isCollapsed ? 'justify-center px-0' : 'px-3.5'
+            } ${
               activeTab === 'dictionary'
-                ? 'bg-amber-400 text-slate-950 shadow-md font-black'
+                ? 'bg-[#f5b84c] text-slate-950 shadow-md font-black'
                 : 'text-slate-200 hover:bg-black/20 hover:text-white'
             }`}
             title="Tra từ điển Cambridge"
@@ -325,9 +335,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
           {/* Tự tạo thẻ */}
           <button
             onClick={() => setActiveTab('create')}
-            className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs sm:text-sm font-black transition cursor-pointer ${
+            className={`w-full flex items-center gap-3 py-2.5 rounded-2xl text-xs sm:text-sm font-black transition cursor-pointer ${
+              isCollapsed ? 'justify-center px-0' : 'px-3.5'
+            } ${
               activeTab === 'create'
-                ? 'bg-amber-400 text-slate-950 shadow-md font-black'
+                ? 'bg-[#f5b84c] text-slate-950 shadow-md font-black'
                 : 'text-slate-200 hover:bg-black/20 hover:text-white'
             }`}
             title="Tự tạo Flashcard"
@@ -339,9 +351,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
           {/* Trắc nghiệm */}
           <button
             onClick={() => setActiveTab('quiz')}
-            className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs sm:text-sm font-black transition cursor-pointer ${
+            className={`w-full flex items-center gap-3 py-2.5 rounded-2xl text-xs sm:text-sm font-black transition cursor-pointer ${
+              isCollapsed ? 'justify-center px-0' : 'px-3.5'
+            } ${
               activeTab === 'quiz'
-                ? 'bg-amber-400 text-slate-950 shadow-md font-black'
+                ? 'bg-[#f5b84c] text-slate-950 shadow-md font-black'
                 : 'text-slate-200 hover:bg-black/20 hover:text-white'
             }`}
             title="Làm bài trắc nghiệm"
@@ -353,9 +367,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
           {/* Trợ lý AI */}
           <button
             onClick={() => setActiveTab('ai')}
-            className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs sm:text-sm font-black transition cursor-pointer ${
+            className={`w-full flex items-center gap-3 py-2.5 rounded-2xl text-xs sm:text-sm font-black transition cursor-pointer ${
+              isCollapsed ? 'justify-center px-0' : 'px-3.5'
+            } ${
               activeTab === 'ai'
-                ? 'bg-amber-400 text-slate-950 shadow-md font-black'
+                ? 'bg-[#f5b84c] text-slate-950 shadow-md font-black'
                 : 'text-slate-200 hover:bg-black/20 hover:text-white'
             }`}
             title="Trợ lý học AI"
@@ -375,7 +391,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {!isCollapsed ? (
           <div className="bg-black/30 rounded-2xl p-3 flex items-center gap-3 border border-white/10 shadow-xs">
             <div className="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-amber-300 shrink-0">
-              <Flame className="w-5 h-5 fill-amber-400 text-amber-400 animate-pulse" />
+              <Flame className="w-5 h-5 fill-amber-400 text-amber-400" />
             </div>
             <div>
               <div className="text-xs font-black text-white">0 ngày</div>
@@ -389,7 +405,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         )}
 
         {/* Theme & Settings Row */}
-        <div className="flex items-center justify-between gap-1 pt-1">
+        <div className={`flex items-center gap-1 pt-1 ${isCollapsed ? 'flex-col justify-center' : 'justify-between'}`}>
           {/* Theme Toggle */}
           <button
             onClick={() => setThemeMode(themeMode === 'dark' ? 'light' : 'dark')}
