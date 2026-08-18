@@ -519,6 +519,7 @@ export default function App() {
             onRateCardSRS={handleRateCardSRS}
             onMoveCardToFolder={handleMoveCardToFolder}
             onDeleteCard={handleDeleteFlashcard}
+            onEditCard={handleSaveCustomFlashcard}
             onOpenQuickAdd={() => handleOpenQuickAddModal(selectedTopic)}
           />
         )}
