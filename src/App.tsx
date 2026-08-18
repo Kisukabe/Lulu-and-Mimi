@@ -7,11 +7,10 @@ import {
   Topic,
 } from './types';
 import { DEFAULT_TOPICS } from './data/topics';
-import { FLASHCARDS } from './data/flashcards';
-import { QUIZ_QUESTIONS } from './data/quizQuestions';
-import { calculateNextSRS } from './utils/srs';
+import { calculateNextSRS, isCardDue } from './utils/srs';
 
 // Components
+import { Sidebar } from './components/Sidebar';
 import { Header } from './components/Header';
 import { FlashcardView } from './components/FlashcardView';
 import { VocabularyDetailView } from './components/VocabularyDetailView';
@@ -35,6 +34,8 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<
     'flashcards' | 'vocabulary' | 'dictionary' | 'create' | 'quiz' | 'practice' | 'ai' | 'stats'
   >('flashcards');
+
+  const [flashcardStatusFilter, setFlashcardStatusFilter] = useState<'all' | 'due_srs' | 'unmastered' | 'review' | 'mastered'>('all');
 
   // ═══════════════════════════════════════════════════════════════
   // 0. GEMINI API KEY (Per-user, stored in localStorage)
@@ -483,15 +484,21 @@ export default function App() {
     setUserProgress(freshState);
   };
 
+  const dueCardsCount = useMemo(() => {
+    return allFlashcards.filter((c) => isCardDue(userProgress.srsRecords?.[c.id])).length;
+  }, [allFlashcards, userProgress.srsRecords]);
+
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans flex flex-col selection:bg-indigo-500 selection:text-white transition-colors duration-200">
+    <div className="min-h-screen bg-[#fcf9f2] dark:bg-[#0c1017] text-slate-900 dark:text-slate-100 font-sans flex flex-row selection:bg-amber-400 selection:text-slate-950 transition-colors duration-200 overflow-x-hidden">
       
-      {/* Top Sleek Navigation Header with Integrated Folder Switcher */}
-      <Header
+      {/* 🧭 Left Sidebar Navigation (The IELTS Dictionary Style) */}
+      <Sidebar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         masteredCount={userProgress.masteredFlashcardIds.length}
         totalCards={allFlashcards.length}
+        needReviewCount={userProgress.needReviewFlashcardIds.length}
+        dueSRSCount={dueCardsCount}
         themeMode={themeMode}
         setThemeMode={setThemeMode}
         folders={allFolders}
@@ -500,114 +507,137 @@ export default function App() {
         onOpenFolderManager={() => setIsFolderManagerOpen(true)}
         geminiKey={geminiKey}
         onOpenApiKeyModal={() => setIsApiKeyModalOpen(true)}
+        onSelectFlashcardFilter={(filter) => {
+          setFlashcardStatusFilter(filter);
+          setActiveTab('flashcards');
+        }}
+        currentFlashcardFilter={flashcardStatusFilter}
       />
 
-      {/* Main Content Area */}
-      <main className="flex-1 pb-16">
+      {/* 🖥️ Main Workspace Area */}
+      <div className="flex-1 min-w-0 flex flex-col h-screen overflow-y-auto custom-scrollbar">
         
-        {/* Tab 1: 3D Flashcards */}
-        {activeTab === 'flashcards' && (
-          <FlashcardView
-            flashcards={allFlashcards}
-            topics={allFolders}
-            selectedTopic={selectedTopic}
-            masteredIds={userProgress.masteredFlashcardIds}
-            needReviewIds={userProgress.needReviewFlashcardIds}
-            srsRecords={userProgress.srsRecords || {}}
-            onToggleMastered={handleToggleMastered}
-            onToggleNeedReview={handleToggleNeedReview}
-            onRateCardSRS={handleRateCardSRS}
-            onMoveCardToFolder={handleMoveCardToFolder}
-            onDeleteCard={handleDeleteFlashcard}
-            onEditCard={handleSaveCustomFlashcard}
-            onOpenQuickAdd={() => handleOpenQuickAddModal(selectedTopic)}
-          />
-        )}
+        {/* Main Content Viewport */}
+        <main className="flex-1 p-2 sm:p-6 pb-20">
+          
+          {/* Tab 1: 3D Flashcards */}
+          {activeTab === 'flashcards' && (
+            <FlashcardView
+              flashcards={allFlashcards}
+              topics={allFolders}
+              selectedTopic={selectedTopic}
+              masteredIds={userProgress.masteredFlashcardIds}
+              needReviewIds={userProgress.needReviewFlashcardIds}
+              srsRecords={userProgress.srsRecords || {}}
+              initialFilter={flashcardStatusFilter}
+              onToggleMastered={handleToggleMastered}
+              onToggleNeedReview={handleToggleNeedReview}
+              onRateCardSRS={handleRateCardSRS}
+              onMoveCardToFolder={handleMoveCardToFolder}
+              onDeleteCard={handleDeleteFlashcard}
+              onEditCard={handleSaveCustomFlashcard}
+              onOpenQuickAdd={() => handleOpenQuickAddModal(selectedTopic)}
+            />
+          )}
 
-        {/* Tab 2: Vocabulary Detail View (Khung từ vựng chi tiết) */}
-        {activeTab === 'vocabulary' && (
-          <VocabularyDetailView
-            flashcards={allFlashcards}
-            topics={allFolders}
-            selectedTopic={selectedTopic}
-            masteredIds={userProgress.masteredFlashcardIds}
-            needReviewIds={userProgress.needReviewFlashcardIds}
-            srsRecords={userProgress.srsRecords || {}}
-            onToggleMastered={handleToggleMastered}
-            onToggleNeedReview={handleToggleNeedReview}
-            onMoveCardToFolder={handleMoveCardToFolder}
-            onDeleteCard={handleDeleteFlashcard}
-            onOpenQuickAdd={() => handleOpenQuickAddModal(selectedTopic)}
-          />
-        )}
+          {/* Tab 2: Vocabulary Detail View (Khung từ vựng chi tiết) */}
+          {activeTab === 'vocabulary' && (
+            <VocabularyDetailView
+              flashcards={allFlashcards}
+              topics={allFolders}
+              selectedTopic={selectedTopic}
+              masteredIds={userProgress.masteredFlashcardIds}
+              needReviewIds={userProgress.needReviewFlashcardIds}
+              srsRecords={userProgress.srsRecords || {}}
+              onToggleMastered={handleToggleMastered}
+              onToggleNeedReview={handleToggleNeedReview}
+              onMoveCardToFolder={handleMoveCardToFolder}
+              onDeleteCard={handleDeleteFlashcard}
+              onOpenQuickAdd={() => handleOpenQuickAddModal(selectedTopic)}
+            />
+          )}
 
-        {/* Tab 3: Dictionary Lookup (Cambridge & Free Dict) */}
-        {activeTab === 'dictionary' && (
-          <DictionaryLookup
-            topics={allFolders}
-            onAddCustomFlashcard={handleSaveCustomFlashcard}
-            searchHistory={userProgress.searchHistory || []}
-            onUpdateSearchHistory={handleUpdateSearchHistory}
-          />
-        )}
+          {/* Tab 3: Dictionary Lookup (Cambridge & Free Dict) */}
+          {activeTab === 'dictionary' && (
+            <DictionaryLookup
+              topics={allFolders}
+              onAddCustomFlashcard={handleSaveCustomFlashcard}
+              searchHistory={userProgress.searchHistory || []}
+              onUpdateSearchHistory={handleUpdateSearchHistory}
+            />
+          )}
 
-        {/* Tab 4: Flashcard Creator (CRUD) */}
-        {activeTab === 'create' && (
-          <FlashcardCreator
-            topics={allFolders}
-            customFlashcards={userProgress.customFlashcards || []}
-            onSaveFlashcard={handleSaveCustomFlashcard}
-            onDeleteFlashcard={handleDeleteCustomFlashcard}
-            onImportFlashcards={handleImportFlashcards}
-            onOpenFolderManager={() => setIsFolderManagerOpen(true)}
-          />
-        )}
+          {/* Tab 4: Flashcard Creator (CRUD) */}
+          {activeTab === 'create' && (
+            <FlashcardCreator
+              topics={allFolders}
+              customFlashcards={userProgress.customFlashcards || []}
+              onSaveFlashcard={handleSaveCustomFlashcard}
+              onDeleteFlashcard={handleDeleteCustomFlashcard}
+              onImportFlashcards={handleImportFlashcards}
+              onOpenFolderManager={() => setIsFolderManagerOpen(true)}
+            />
+          )}
 
-        {/* Tab 5: Quiz View */}
-        {activeTab === 'quiz' && (
-          <QuizView
-            questions={QUIZ_QUESTIONS}
-            flashcards={allFlashcards}
-            topics={allFolders}
-            selectedTopic={selectedTopic}
-            bookmarkedIds={userProgress.bookmarkedQuestions || []}
-            onToggleBookmark={handleToggleBookmark}
-            onSaveQuizResult={handleSaveQuizResult}
-          />
-        )}
+          {/* Tab 5: Quiz View */}
+          {activeTab === 'quiz' && (
+            <QuizView
+              questions={QUIZ_QUESTIONS}
+              flashcards={allFlashcards}
+              topics={allFolders}
+              selectedTopic={selectedTopic}
+              bookmarkedIds={userProgress.bookmarkedQuestions || []}
+              onToggleBookmark={handleToggleBookmark}
+              onSaveQuizResult={handleSaveQuizResult}
+            />
+          )}
 
-        {/* Tab 6: Practice View (Collocations & Idioms) */}
-        {activeTab === 'practice' && (
-          <PracticeView
-            flashcards={allFlashcards}
-            topics={allFolders}
-            selectedTopic={selectedTopic}
-          />
-        )}
+          {/* Tab 6: Practice View (Collocations & Idioms) */}
+          {activeTab === 'practice' && (
+            <PracticeView
+              flashcards={allFlashcards}
+              topics={allFolders}
+              selectedTopic={selectedTopic}
+            />
+          )}
 
-        {/* Tab 7: AI Assistant */}
-        {activeTab === 'ai' && (
-          <AiAssistant
-            topics={allFolders}
-            selectedTopic={selectedTopic}
-            onAddCustomFlashcard={handleSaveCustomFlashcard}
-            geminiKey={geminiKey}
-            onOpenApiKeyModal={() => setIsApiKeyModalOpen(true)}
-          />
-        )}
+          {/* Tab 7: AI Assistant */}
+          {activeTab === 'ai' && (
+            <AiAssistant
+              topics={allFolders}
+              selectedTopic={selectedTopic}
+              onAddCustomFlashcard={handleSaveCustomFlashcard}
+              geminiKey={geminiKey}
+              onOpenApiKeyModal={() => setIsApiKeyModalOpen(true)}
+            />
+          )}
 
-        {/* Tab 8: Stats View */}
-        {activeTab === 'stats' && (
-          <StatsView
-            progress={userProgress}
-            totalFlashcards={allFlashcards.length}
-            allFlashcards={allFlashcards}
-            topics={allFolders}
-            onResetProgress={handleResetProgress}
-          />
-        )}
+          {/* Tab 8: Stats View */}
+          {activeTab === 'stats' && (
+            <StatsView
+              progress={userProgress}
+              totalFlashcards={allFlashcards.length}
+              allFlashcards={allFlashcards}
+              topics={allFolders}
+              onResetProgress={handleResetProgress}
+            />
+          )}
 
-      </main>
+        </main>
+
+        {/* Footer */}
+        <footer className="bg-white/40 dark:bg-slate-900/40 border-t border-slate-200/60 dark:border-slate-800/60 py-3 text-center text-xs text-slate-500 dark:text-slate-400">
+          <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+            <p className="font-semibold">
+              © 2026 Lulu & Mimi Dictionary — IELTS & TOEIC Smart Spaced Repetition Learning
+            </p>
+            <p className="text-slate-400 dark:text-slate-500 text-[11px]">
+              Tích hợp Cambridge IPA & Google Gemini AI
+            </p>
+          </div>
+        </footer>
+
+      </div>
 
       {/* 🔑 API Key Modal */}
       <ApiKeyModal
@@ -642,18 +672,6 @@ export default function App() {
         onAddMultipleFlashcards={handleQuickAddMultipleCards}
         geminiKey={geminiKey}
       />
-
-      {/* Footer */}
-      <footer className="bg-white/80 dark:bg-slate-900/80 border-t border-slate-200/80 dark:border-slate-800/80 py-4 text-center text-xs text-slate-500 dark:text-slate-400 transition-colors backdrop-blur-md">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <p className="font-semibold">
-            © 2026 Lulu & Mimi — Hệ Thống Quản Lý Thư Mục & Flashcard Từ Vựng Tiếng Anh
-          </p>
-          <p className="text-slate-400 dark:text-slate-500 text-[11px]">
-            Tích hợp phát âm chuẩn IPA từ Cambridge Dictionary & Free Dictionary API
-          </p>
-        </div>
-      </footer>
 
     </div>
   );
