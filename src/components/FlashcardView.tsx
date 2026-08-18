@@ -928,181 +928,205 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                     >
                       
                       {/* 🌌 FRONT SIDE (STARRY DEEP OCEAN AESTHETIC) */}
-                      <div className={`absolute inset-0 w-full h-full ${currentTheme.frontBg} border-2 ${currentTheme.frontBorder} rounded-3xl p-6 sm:p-10 flex flex-col justify-between backface-hidden shadow-2xl overflow-hidden`}>
-                        
-                        {/* Star Sparkle Overlay */}
-                        <div className="absolute inset-0 pointer-events-none opacity-40">
-                          <div className="absolute top-6 left-12 text-white/40 text-xs">✦</div>
-                          <div className="absolute top-16 right-20 text-white/50 text-sm">✨</div>
-                          <div className="absolute bottom-20 left-24 text-white/30 text-xs">✦</div>
-                          <div className="absolute bottom-12 right-16 text-white/40 text-sm">✨</div>
-                          <div className="absolute top-1/2 left-1/3 text-white/20 text-xs">✦</div>
-                        </div>
-
-                        {/* Top Bar on Front */}
-                        <div className="flex items-center justify-between z-10">
-                          {/* Part of Speech Pill */}
-                          <span className={`px-3.5 py-1 rounded-full ${currentTheme.frontTagBg} border ${currentTheme.frontTagText} text-xs font-black backdrop-blur-md`}>
-                            {getWordFormLabel(currentCard.wordForm)}
-                          </span>
-
-                          <div className="flex items-center gap-1.5">
-                            {/* Speaker Button */}
-                            <button
-                              onClick={(e) => playAudio(e, preferredAccent)}
-                              className="p-2.5 rounded-xl bg-black/40 hover:bg-black/60 text-slate-200 border border-white/15 transition cursor-pointer active:scale-95 shadow-xs"
-                              title={`Nghe phát âm chuẩn ${preferredAccent}`}
-                            >
-                              <Volume2 className={`w-4 h-4 ${isPlayingAudio ? 'text-amber-400 scale-110' : ''}`} />
-                            </button>
-
-                            {/* Edit Button */}
-                            <button
-                              onClick={handleOpenEdit}
-                              className="p-2.5 rounded-xl bg-black/40 hover:bg-black/60 text-slate-200 border border-white/15 transition cursor-pointer active:scale-95 shadow-xs"
-                              title="Chỉnh sửa từ vựng (E)"
-                            >
-                              <Edit3 className="w-4 h-4" />
-                            </button>
+                      <div
+                        className={`card-face-front rounded-3xl ${currentTheme.frontBg} border-2 ${currentTheme.frontBorder} shadow-2xl overflow-hidden ${
+                          isFlipped ? 'invisible opacity-0 pointer-events-none' : 'visible opacity-100 pointer-events-auto'
+                        }`}
+                        style={{
+                          backfaceVisibility: 'hidden',
+                          WebkitBackfaceVisibility: 'hidden',
+                          transform: 'rotateY(0deg) translate3d(0, 0, 0)',
+                          transition: 'opacity 0.2s ease-in-out, visibility 0.2s ease-in-out',
+                        }}
+                      >
+                        <div className="w-full h-full p-6 sm:p-10 flex flex-col justify-between relative">
+                          
+                          {/* Star Sparkle Overlay */}
+                          <div className="absolute inset-0 pointer-events-none opacity-40">
+                            <div className="absolute top-6 left-12 text-white/40 text-xs">✦</div>
+                            <div className="absolute top-16 right-20 text-white/50 text-sm">✨</div>
+                            <div className="absolute bottom-20 left-24 text-white/30 text-xs">✦</div>
+                            <div className="absolute bottom-12 right-16 text-white/40 text-sm">✨</div>
+                            <div className="absolute top-1/2 left-1/3 text-white/20 text-xs">✦</div>
                           </div>
-                        </div>
 
-                        {/* Center Stage: Word, Phonetics, Category Tag */}
-                        <div className="my-auto text-center space-y-4 z-10 py-4">
-                          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight drop-shadow-lg leading-tight">
-                            {currentCard.front}
-                          </h1>
+                          {/* Top Bar on Front */}
+                          <div className="flex items-center justify-between z-10 shrink-0">
+                            {/* Part of Speech Pill */}
+                            <span className={`px-3.5 py-1 rounded-full ${currentTheme.frontTagBg} border ${currentTheme.frontTagText} text-xs font-black backdrop-blur-md`}>
+                              {getWordFormLabel(currentCard.wordForm)}
+                            </span>
 
-                          {(currentCard.pronunciation || currentCard.pronunciationUs || currentCard.pronunciationUk) && (
-                            <div className="flex items-center justify-center gap-2">
-                              <span className="font-mono text-base sm:text-xl font-bold text-slate-300">
-                                {currentCard.pronunciationUs || currentCard.pronunciation || currentCard.pronunciationUk}
-                              </span>
+                            <div className="flex items-center gap-1.5">
+                              {/* Speaker Button */}
                               <button
-                                onClick={(e) => playAudio(e, 'US')}
-                                className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-slate-200 transition cursor-pointer"
-                                title="Phát âm"
+                                onClick={(e) => playAudio(e, preferredAccent)}
+                                className="p-2.5 rounded-xl bg-black/40 hover:bg-black/60 text-slate-200 border border-white/15 transition cursor-pointer active:scale-95 shadow-xs"
+                                title={`Nghe phát âm chuẩn ${preferredAccent}`}
                               >
-                                <Volume2 className={`w-4 h-4 ${currentTheme.accentText}`} />
+                                <Volume2 className={`w-4 h-4 ${isPlayingAudio ? 'text-amber-400 scale-110' : ''}`} />
+                              </button>
+
+                              {/* Edit Button */}
+                              <button
+                                onClick={handleOpenEdit}
+                                className="p-2.5 rounded-xl bg-black/40 hover:bg-black/60 text-slate-200 border border-white/15 transition cursor-pointer active:scale-95 shadow-xs"
+                                title="Chỉnh sửa từ vựng (E)"
+                              >
+                                <Edit3 className="w-4 h-4" />
                               </button>
                             </div>
-                          )}
-
-                          {/* Category Hashtag Pill */}
-                          <div className="inline-block pt-1">
-                            <span className="inline-flex items-center px-3.5 py-1 rounded-full bg-white/10 text-xs font-black text-slate-200 border border-white/15">
-                              # {currentTopicObj?.title || 'Từ vựng'}
-                            </span>
                           </div>
+
+                          {/* Center Stage: Word, Phonetics, Category Tag */}
+                          <div className="my-auto text-center space-y-4 z-10 py-4">
+                            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight drop-shadow-lg leading-tight">
+                              {currentCard.front}
+                            </h1>
+
+                            {(currentCard.pronunciation || currentCard.pronunciationUs || currentCard.pronunciationUk) && (
+                              <div className="flex items-center justify-center gap-2">
+                                <span className="font-mono text-base sm:text-xl font-bold text-slate-300">
+                                  {currentCard.pronunciationUs || currentCard.pronunciation || currentCard.pronunciationUk}
+                                </span>
+                                <button
+                                  onClick={(e) => playAudio(e, 'US')}
+                                  className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-slate-200 transition cursor-pointer"
+                                  title="Phát âm"
+                                >
+                                  <Volume2 className={`w-4 h-4 ${currentTheme.accentText}`} />
+                                </button>
+                              </div>
+                            )}
+
+                            {/* Category Hashtag Pill */}
+                            <div className="inline-block pt-1">
+                              <span className="inline-flex items-center px-3.5 py-1 rounded-full bg-white/10 text-xs font-black text-slate-200 border border-white/15">
+                                # {currentTopicObj?.title || 'Từ vựng'}
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Bottom Row on Front */}
+                          <div className="flex items-end justify-between z-10 shrink-0">
+                            {/* Cute Mascot Moon Avatar in Corner */}
+                            <div className="w-12 h-12 rounded-full bg-black/40 border border-white/20 flex items-center justify-center shadow-lg text-amber-300">
+                              <span className="text-xl">🌙</span>
+                            </div>
+
+                            {/* Flip CTA Link */}
+                            <div className="text-xs font-black text-slate-200 flex items-center gap-1 hover:text-white transition">
+                              <span>Nhấn để xem nghĩa</span>
+                              <ChevronRight className="w-4 h-4" />
+                            </div>
+                          </div>
+
                         </div>
-
-                        {/* Bottom Row on Front */}
-                        <div className="flex items-end justify-between z-10">
-                          {/* Cute Mascot Moon Avatar in Corner */}
-                          <div className="w-12 h-12 rounded-full bg-black/40 border border-white/20 flex items-center justify-center shadow-lg text-amber-300">
-                            <span className="text-xl">🌙</span>
-                          </div>
-
-                          {/* Flip CTA Link */}
-                          <div className="text-xs font-black text-slate-200 flex items-center gap-1 hover:text-white transition">
-                            <span>Nhấn để xem nghĩa</span>
-                            <ChevronRight className="w-4 h-4" />
-                          </div>
-                        </div>
-
                       </div>
 
                       {/* 🍃 BACK SIDE (COLOR-COORDINATED & HIGH CONTRAST) */}
-                      <div className={`absolute inset-0 w-full h-full ${currentTheme.backBg} border-2 ${currentTheme.backBorder} rounded-3xl p-6 sm:p-10 flex flex-col justify-between backface-hidden rotate-y-180 shadow-2xl overflow-y-auto custom-scrollbar`}>
-                        
-                        {/* Top Row on Back */}
-                        <div className="flex items-center justify-between shrink-0">
-                          <span className="text-[11px] font-black uppercase tracking-wider text-white/80">
-                            NGHĨA TIẾNG VIỆT
-                          </span>
-                          <div className="flex items-center gap-1.5">
-                            <button
-                              onClick={(e) => playAudio(e, preferredAccent)}
-                              className="p-2.5 rounded-xl bg-black/30 hover:bg-black/50 text-white border border-white/20 transition cursor-pointer active:scale-95"
-                            >
-                              <Volume2 className="w-4 h-4" />
-                            </button>
-                            <button
-                              onClick={handleOpenEdit}
-                              className="p-2.5 rounded-xl bg-black/30 hover:bg-black/50 text-white border border-white/20 transition cursor-pointer active:scale-95"
-                            >
-                              <Edit3 className="w-4 h-4" />
-                            </button>
-                          </div>
-                        </div>
-
-                        {/* Center Stage: Vietnamese Meaning & Example Container */}
-                        <div className="my-auto space-y-4 py-3">
+                      <div
+                        className={`card-face-back rounded-3xl ${currentTheme.backBg} border-2 ${currentTheme.backBorder} shadow-2xl overflow-hidden ${
+                          !isFlipped ? 'invisible opacity-0 pointer-events-none' : 'visible opacity-100 pointer-events-auto'
+                        }`}
+                        style={{
+                          backfaceVisibility: 'hidden',
+                          WebkitBackfaceVisibility: 'hidden',
+                          transform: 'rotateY(180deg) translate3d(0, 0, 0)',
+                          transition: 'opacity 0.2s ease-in-out, visibility 0.2s ease-in-out',
+                        }}
+                      >
+                        <div className="w-full h-full p-6 sm:p-8 flex flex-col justify-between overflow-y-auto custom-scrollbar">
                           
-                          {/* Big Bold Meaning */}
-                          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight">
-                            {currentCard.back}
-                          </h2>
-
-                          {/* English Definition Box */}
-                          {currentCard.definitionEn && (
-                            <div className={`${currentTheme.backBoxBg} rounded-2xl p-4 border ${currentTheme.backBoxBorder} space-y-1 text-left shadow-lg`}>
-                              <span className={`text-[10px] font-black uppercase ${currentTheme.accentText}`}>
-                                🇬🇧 ĐỊNH NGHĨA TIẾNG ANH:
-                              </span>
-                              <p className="text-sm sm:text-base font-bold text-white leading-relaxed">
-                                {currentCard.definitionEn}
-                              </p>
+                          {/* Top Row on Back */}
+                          <div className="flex items-center justify-between shrink-0 pb-2">
+                            <span className="text-[11px] font-black uppercase tracking-wider text-white/80">
+                              NGHĨA TIẾNG VIỆT
+                            </span>
+                            <div className="flex items-center gap-1.5">
+                              <button
+                                onClick={(e) => playAudio(e, preferredAccent)}
+                                className="p-2.5 rounded-xl bg-black/30 hover:bg-black/50 text-white border border-white/20 transition cursor-pointer active:scale-95"
+                              >
+                                <Volume2 className="w-4 h-4" />
+                              </button>
+                              <button
+                                onClick={handleOpenEdit}
+                                className="p-2.5 rounded-xl bg-black/30 hover:bg-black/50 text-white border border-white/20 transition cursor-pointer active:scale-95"
+                              >
+                                <Edit3 className="w-4 h-4" />
+                              </button>
                             </div>
-                          )}
+                          </div>
 
-                          {/* Real Example Box */}
-                          {currentCard.example && (
-                            <div className={`${currentTheme.backBoxBg} rounded-2xl p-4 border-l-4 border-amber-300 border-t border-r border-b ${currentTheme.backBoxBorder} space-y-1.5 text-left shadow-lg`}>
-                              <span className="text-[10px] font-black uppercase text-white/80">
-                                VÍ DỤ
-                              </span>
-                              <p className="text-sm sm:text-base font-bold italic text-white leading-relaxed">
-                                &quot;{currentCard.example}&quot;
-                              </p>
-                              {currentCard.exampleVi && (
-                                <p className="text-xs sm:text-sm text-white/80 font-bold pt-0.5">
-                                  👉 {currentCard.exampleVi}
+                          {/* Center Stage: Vietnamese Meaning & Example Container */}
+                          <div className="my-auto space-y-3.5 py-2">
+                            
+                            {/* Big Bold Meaning */}
+                            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white tracking-tight leading-snug">
+                              {currentCard.back}
+                            </h2>
+
+                            {/* English Definition Box */}
+                            {currentCard.definitionEn && (
+                              <div className={`${currentTheme.backBoxBg} rounded-2xl p-3.5 sm:p-4 border ${currentTheme.backBoxBorder} space-y-1 text-left shadow-lg`}>
+                                <span className={`text-[10px] font-black uppercase ${currentTheme.accentText}`}>
+                                  🇬🇧 ĐỊNH NGHĨA TIẾNG ANH:
+                                </span>
+                                <p className="text-xs sm:text-sm font-bold text-white leading-relaxed">
+                                  {currentCard.definitionEn}
                                 </p>
-                              )}
-                            </div>
-                          )}
+                              </div>
+                            )}
 
-                          {/* Synonyms & Collocations */}
-                          {(currentCard.synonyms?.length || currentCard.collocations?.length) ? (
-                            <div className="flex flex-wrap gap-1.5 pt-1">
-                              {currentCard.synonyms?.map((syn, idx) => (
-                                <span key={idx} className="px-3 py-1 rounded-xl bg-black/30 text-xs font-black text-white border border-white/15">
-                                  🔗 {syn}
+                            {/* Real Example Box */}
+                            {currentCard.example && (
+                              <div className={`${currentTheme.backBoxBg} rounded-2xl p-3.5 sm:p-4 border-l-4 border-amber-300 border-t border-r border-b ${currentTheme.backBoxBorder} space-y-1 text-left shadow-lg`}>
+                                <span className="text-[10px] font-black uppercase text-white/80">
+                                  VÍ DỤ
                                 </span>
-                              ))}
-                              {currentCard.collocations?.map((col, idx) => (
-                                <span key={idx} className={`px-3 py-1 rounded-xl bg-black/30 text-xs font-black ${currentTheme.accentText} border border-white/15`}>
-                                  📌 {col}
-                                </span>
-                              ))}
-                            </div>
-                          ) : null}
+                                <p className="text-xs sm:text-sm font-bold italic text-white leading-relaxed">
+                                  &quot;{currentCard.example}&quot;
+                                </p>
+                                {currentCard.exampleVi && (
+                                  <p className="text-xs text-white/80 font-bold pt-0.5">
+                                    👉 {currentCard.exampleVi}
+                                  </p>
+                                )}
+                              </div>
+                            )}
+
+                            {/* Synonyms & Collocations */}
+                            {(currentCard.synonyms?.length || currentCard.collocations?.length) ? (
+                              <div className="flex flex-wrap gap-1.5 pt-1">
+                                {currentCard.synonyms?.map((syn, idx) => (
+                                  <span key={idx} className="px-2.5 py-1 rounded-xl bg-black/30 text-xs font-black text-white border border-white/15">
+                                    🔗 {syn}
+                                  </span>
+                                ))}
+                                {currentCard.collocations?.map((col, idx) => (
+                                  <span key={idx} className={`px-2.5 py-1 rounded-xl bg-black/30 text-xs font-black ${currentTheme.accentText} border border-white/15`}>
+                                    📌 {col}
+                                  </span>
+                                ))}
+                              </div>
+                            ) : null}
+
+                          </div>
+
+                          {/* Bottom Row on Back */}
+                          <div className="flex items-center justify-between text-xs font-black text-white/80 shrink-0 pt-3 border-t border-white/15">
+                            {currentCardSRS ? (
+                              <span>Ôn tiếp: {formatSRSCountdown(currentCardSRS.nextReviewDate)}</span>
+                            ) : (
+                              <span>Mới học</span>
+                            )}
+                            <span className="ml-auto hover:text-white transition flex items-center gap-1">
+                              <RotateCw className="w-3.5 h-3.5" /> Chạm để lật lại
+                            </span>
+                          </div>
 
                         </div>
-
-                        {/* Bottom Row on Back */}
-                        <div className="flex items-center justify-between text-xs font-black text-white/80 shrink-0 pt-2 border-t border-white/15">
-                          {currentCardSRS ? (
-                            <span>Ôn tiếp: {formatSRSCountdown(currentCardSRS.nextReviewDate)}</span>
-                          ) : (
-                            <span>Mới học</span>
-                          )}
-                          <span className="ml-auto hover:text-white transition flex items-center gap-1">
-                            <RotateCw className="w-3.5 h-3.5" /> Chạm để lật lại
-                          </span>
-                        </div>
-
                       </div>
 
                     </div>
