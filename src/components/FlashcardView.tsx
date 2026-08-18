@@ -880,7 +880,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                           {currentCard?.definitionEn && (
                             <div className={`p-3.5 sm:p-4 rounded-xl ${currentTheme.backBoxBg} border-2 ${currentTheme.backBoxBorder} space-y-1 shadow-sm`}>
                               <div className="text-[11px] sm:text-xs font-black uppercase tracking-wider text-yellow-300 flex items-center gap-1.5">
-                                <span>🇬🇧 ĐỊNH NGHĨA TIẾNG ANH:</span>
+                                <span>Definition</span>
                               </div>
                               <p className="text-sm sm:text-base lg:text-lg font-bold text-white leading-snug tracking-wide">
                                 {currentCard.definitionEn}
@@ -892,7 +892,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                           {currentCard?.example && (
                             <div className={`p-3 sm:p-3.5 rounded-xl ${currentTheme.backBoxBg} border ${currentTheme.backBoxBorder} space-y-0.5`}>
                               <div className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-yellow-300">
-                                VÍ DỤ (EXAMPLE):
+                                Example
                               </div>
                               <p className="text-xs sm:text-sm italic font-semibold text-white leading-tight">
                                 "{currentCard.example}"
@@ -905,11 +905,11 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                             </div>
                           )}
 
-                          {/* 🔗 Dedicated Box: CỤM TỪ THƯỜNG GẶP (COLLOCATIONS) */}
+                          {/* 🔗 Dedicated Box: COLLOCATIONS */}
                           {currentCard?.collocations && currentCard.collocations.length > 0 && (
                             <div className={`p-2.5 sm:p-3 rounded-xl ${currentTheme.backBoxBg} border ${currentTheme.backBoxBorder} space-y-1.5`}>
                               <div className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-yellow-300">
-                                Cụm từ thường gặp (Collocations)
+                                Collocations
                               </div>
                               <div className="flex flex-wrap gap-1.5">
                                 {currentCard.collocations.map((col, idx) => (
@@ -924,13 +924,13 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                             </div>
                           )}
 
-                          {/* ⚖️ Dedicated Box: TỪ ĐỒNG NGHĨA & TRÁI NGHĨA (SYNONYMS & ANTONYMS) */}
+                          {/* ⚖️ Dedicated Box: SYNONYMS & ANTONYMS */}
                           {((currentCard?.synonyms && currentCard.synonyms.length > 0) || (currentCard?.antonyms && currentCard.antonyms.length > 0)) && (
                             <div className={`p-2.5 sm:p-3 rounded-xl ${currentTheme.backBoxBg} border ${currentTheme.backBoxBorder} space-y-1.5`}>
                               {currentCard.synonyms && currentCard.synonyms.length > 0 && (
                                 <div className="flex flex-wrap items-center gap-1.5">
                                   <span className="text-[11px] font-black uppercase text-lime-300 tracking-wider min-w-[80px]">
-                                    Đồng nghĩa:
+                                    Synonyms:
                                   </span>
                                   <div className="flex flex-wrap gap-1 flex-1">
                                     {currentCard.synonyms.map((syn, idx) => (
@@ -948,7 +948,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                               {currentCard.antonyms && currentCard.antonyms.length > 0 && (
                                 <div className="flex flex-wrap items-center gap-1.5 pt-1 border-t border-white/10">
                                   <span className="text-[11px] font-black uppercase text-rose-300 tracking-wider min-w-[80px]">
-                                    Trái nghĩa:
+                                    Antonyms:
                                   </span>
                                   <div className="flex flex-wrap gap-1 flex-1">
                                     {currentCard.antonyms.map((ant, idx) => (
@@ -965,11 +965,11 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                             </div>
                           )}
 
-                          {/* 🌳 Dedicated Box: GIA ĐÌNH TỪ / HỌ TỪ (WORD FAMILY) */}
+                          {/* 🌳 Dedicated Box: WORD FAMILY */}
                           {currentCard?.wordFamily && currentCard.wordFamily.length > 0 && (
                             <div className={`p-2.5 sm:p-3 rounded-xl ${currentTheme.backBoxBg} border ${currentTheme.backBoxBorder} space-y-1`}>
                               <div className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-yellow-300">
-                                Gia đình từ (Word Family)
+                                Word Family
                               </div>
                               <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
                                 {currentCard.wordFamily.map((wf, idx) => (
