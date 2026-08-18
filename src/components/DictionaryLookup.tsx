@@ -111,6 +111,8 @@ export const DictionaryLookup: React.FC<DictionaryLookupProps> = ({
       synonyms: result.synonyms.slice(0, 5),
       antonyms: result.antonyms.slice(0, 5),
       collocations: result.collocations?.slice(0, 4),
+      wordForms: result.wordForms || result.wordFamily,
+      wordFamily: result.wordForms || result.wordFamily,
       isCustom: true,
       createdAt: new Date().toISOString(),
     };

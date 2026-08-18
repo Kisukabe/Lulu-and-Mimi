@@ -121,6 +121,8 @@ export const QuickAddWordModal: React.FC<QuickAddWordModalProps> = ({
         exampleVi: firstDef?.exampleVi,
         synonyms: data.synonyms.slice(0, 5),
         collocations: data.collocations?.slice(0, 4),
+        wordForms: data.wordForms || data.wordFamily,
+        wordFamily: data.wordForms || data.wordFamily,
         isCustom: true,
         createdAt: new Date().toISOString(),
       };
@@ -152,6 +154,8 @@ export const QuickAddWordModal: React.FC<QuickAddWordModalProps> = ({
   const handleSaveCard = () => {
     if (!previewCard || !previewCard.front) return;
 
+    const currentWordForms = previewCard.wordForms || previewCard.wordFamily;
+
     const finalCard: Flashcard = {
       id: previewCard.id || `fc_auto_${Date.now()}`,
       topic: targetFolder,
@@ -169,6 +173,8 @@ export const QuickAddWordModal: React.FC<QuickAddWordModalProps> = ({
       exampleVi: previewCard.exampleVi?.trim(),
       synonyms: previewCard.synonyms,
       collocations: previewCard.collocations,
+      wordForms: currentWordForms,
+      wordFamily: currentWordForms,
       isCustom: true,
       createdAt: new Date().toISOString(),
     };
@@ -232,6 +238,8 @@ export const QuickAddWordModal: React.FC<QuickAddWordModalProps> = ({
           audioUs: usPhonetic?.audio,
           example: firstDef?.example || data.examples[0],
           synonyms: data.synonyms.slice(0, 4),
+          wordForms: data.wordForms || data.wordFamily,
+          wordFamily: data.wordForms || data.wordFamily,
           isCustom: true,
           createdAt: new Date().toISOString(),
         });
@@ -250,72 +258,65 @@ export const QuickAddWordModal: React.FC<QuickAddWordModalProps> = ({
       }
     }
 
-    if (createdCards.length > 0) {
-      if (onAddMultipleFlashcards) {
-        onAddMultipleFlashcards(createdCards);
-      } else {
-        createdCards.forEach((c) => onAddFlashcard(c));
-      }
+    if (onAddMultipleFlashcards && createdCards.length > 0) {
+      onAddMultipleFlashcards(createdCards);
     }
-
-    setBulkProgress({ current: uniqueWords.length, total: uniqueWords.length, successCount: createdCards.length });
     setBulkLoading(false);
     setBulkFinished(true);
   };
 
-  const playAudioPreview = (audioUrl?: string, text?: string) => {
+  const playAudioPreview = (audioUrl?: string, fallbackText?: string) => {
     if (audioUrl) {
-      const a = new Audio(audioUrl);
-      a.play().catch(() => playSpeech(text || ''));
-    } else if (text) {
-      playSpeech(text);
-    }
-  };
-
-  const playSpeech = (text: string) => {
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
-      const u = new SpeechSynthesisUtterance(text);
-      u.lang = 'en-US';
-      window.speechSynthesis.speak(u);
+      const audio = new Audio(audioUrl);
+      audio.play().catch(() => {
+        if ('speechSynthesis' in window && fallbackText) {
+          const utterance = new SpeechSynthesisUtterance(fallbackText);
+          utterance.lang = 'en-US';
+          window.speechSynthesis.speak(utterance);
+        }
+      });
+    } else if ('speechSynthesis' in window && fallbackText) {
+      const utterance = new SpeechSynthesisUtterance(fallbackText);
+      utterance.lang = 'en-US';
+      window.speechSynthesis.speak(utterance);
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-150">
-      {/* Backdrop */}
-      <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-xs" onClick={onClose} />
-
-      {/* Modal Box */}
-      <div className="relative w-full max-w-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl z-10 flex flex-col max-h-[92vh] overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-2xl max-h-[90vh] shadow-2xl flex flex-col overflow-hidden">
         
-        {/* Modal Header */}
-        <div className="p-4 sm:p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-transparent">
-          <div className="flex items-center space-x-2.5">
-            <div className="w-9 h-9 rounded-2xl bg-gradient-to-tr from-indigo-600 to-purple-600 text-white flex items-center justify-center shadow-md shadow-indigo-500/20">
-              <Wand2 className="w-4 h-4" />
+        {/* Header */}
+        <div className="p-4 sm:p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-gradient-to-r from-indigo-50/50 to-purple-50/50 dark:from-slate-900 dark:to-slate-900">
+          <div className="flex items-center gap-2.5">
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-md shadow-indigo-500/20">
+              <Wand2 className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-sm sm:text-base font-black text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
-                Thêm Từ Vựng & Tự Động Tạo Flashcard
+              <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white flex items-center gap-1.5">
+                <span>Tạo Thẻ Nhanh Tự Động</span>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300">
+                  Auto Dict
+                </span>
               </h3>
-              <p className="text-[11px] text-slate-400">
-                Tự động lấy phát âm IPA Cambridge, audio MP3, giải nghĩa & câu ví dụ
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Nhập từ vựng, hệ thống sẽ tự động tìm nghĩa, IPA & ví dụ
               </p>
             </div>
           </div>
 
           <button
+            type="button"
             onClick={onClose}
-            className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+            className="p-2 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
           >
-            <X className="w-4 h-4" />
+            <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Target Folder Selector & Tabs Bar */}
-        <div className="px-4 py-3 bg-slate-50 dark:bg-slate-900/60 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5">
-          {/* Target Folder Picker */}
+        {/* Action Bar (Folder Picker & Mode Switcher) */}
+        <div className="px-4 sm:px-5 py-3 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3">
+          {/* Target Folder Selector */}
           <div className="flex items-center gap-2">
             <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 shrink-0 flex items-center gap-1">
               <Folder className="w-3.5 h-3.5 text-indigo-500" /> Thư mục:
@@ -494,6 +495,26 @@ export const QuickAddWordModal: React.FC<QuickAddWordModalProps> = ({
                       <p className="text-xs italic text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-900 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700/80">
                         &quot;{previewCard.example}&quot;
                       </p>
+                    </div>
+                  )}
+
+                  {/* Word Forms */}
+                  {((previewCard.wordForms && previewCard.wordForms.length > 0) || (previewCard.wordFamily && previewCard.wordFamily.length > 0)) && (
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-wider block">
+                        🌳 Word Forms (Dạng từ):
+                      </label>
+                      <div className="flex flex-wrap gap-1.5 bg-white dark:bg-slate-900 p-2 rounded-xl border border-slate-200 dark:border-slate-700">
+                        {(previewCard.wordForms || previewCard.wordFamily || []).map((wf, idx) => (
+                          <span
+                            key={idx}
+                            className="text-[10px] px-2 py-0.5 rounded-lg bg-amber-50 dark:bg-slate-800 border border-amber-200/60 dark:border-slate-700 text-slate-700 dark:text-slate-300"
+                          >
+                            <strong className="text-amber-600 dark:text-amber-400 uppercase mr-1">{wf.form}:</strong>
+                            {wf.word} {wf.meaningVi ? `(${wf.meaningVi})` : ''}
+                          </span>
+                        ))}
+                      </div>
                     </div>
                   )}
 

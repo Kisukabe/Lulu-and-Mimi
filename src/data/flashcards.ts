@@ -19,7 +19,7 @@ export const FLASHCARDS: Flashcard[] = [
     exampleVi: 'Hợp đồng hiện đang trong quá trình đàm phán căng thẳng giữa hai bên doanh nghiệp.',
     synonyms: ['bargaining', 'discussion', 'mediation', 'deliberation'],
     collocations: ['enter into negotiations', 'successful negotiation', 'contract negotiation'],
-    wordFamily: [
+    wordForms: [
       { form: 'verb', word: 'negotiate', meaningVi: 'thương lượng, đàm phán' },
       { form: 'adjective', word: 'negotiable', meaningVi: 'có thể thương lượng được' },
       { form: 'noun', word: 'negotiator', meaningVi: 'người đàm phán' },
@@ -42,7 +42,7 @@ export const FLASHCARDS: Flashcard[] = [
     exampleVi: 'Công ty sẽ hoàn trả lại chi phí đi lại với điều kiện bạn nộp hóa đơn gốc.',
     synonyms: ['refund', 'compensate', 'repay'],
     collocations: ['reimburse expenses', 'reimburse travel costs', 'fully reimbursed'],
-    wordFamily: [
+    wordForms: [
       { form: 'noun', word: 'reimbursement', meaningVi: 'khoản tiền hoàn trả, sự hoàn phí' },
     ],
     notes: 'Bẫy từ vựng Part 5 & 7 TOEIC: Luôn đi kèm cụm từ "travel expenses" hoặc "receipt".',
@@ -81,7 +81,7 @@ export const FLASHCARDS: Flashcard[] = [
     synonyms: ['compulsory', 'obligatory', 'required', 'imperative'],
     antonyms: ['optional', 'voluntary'],
     collocations: ['mandatory attendance', 'mandatory training', 'mandatory compliance'],
-    wordFamily: [
+    wordForms: [
       { form: 'noun', word: 'mandate', meaningVi: 'ủy nhiệm, lệnh bắt buộc' },
     ],
     difficulty: 'Medium',
@@ -101,7 +101,7 @@ export const FLASHCARDS: Flashcard[] = [
     exampleVi: 'Khách sạn cung cấp dịch vụ xe đưa đón miễn phí đến và đi từ sân bay quốc tế.',
     synonyms: ['free', 'courtesy', 'gratis'],
     collocations: ['complimentary breakfast', 'complimentary beverage', 'complimentary ticket'],
-    wordFamily: [
+    wordForms: [
       { form: 'noun', word: 'compliment', meaningVi: 'lời khen ngợi' },
       { form: 'verb', word: 'compliment', meaningVi: 'khen ngợi ai đó' },
     ],
@@ -141,7 +141,7 @@ export const FLASHCARDS: Flashcard[] = [
     synonyms: ['classified', 'private', 'secret', 'restricted'],
     antonyms: ['public', 'open', 'unrestricted'],
     collocations: ['strictly confidential', 'confidential document', 'confidential information'],
-    wordFamily: [
+    wordForms: [
       { form: 'noun', word: 'confidentiality', meaningVi: 'tính bảo mật' },
       { form: 'adverb', word: 'confidentially', meaningVi: 'một cách bảo mật' },
     ],
@@ -162,7 +162,7 @@ export const FLASHCARDS: Flashcard[] = [
     exampleVi: 'Thiết bị sản xuất mới được chế tạo phù hợp theo đúng các thông số kỹ thuật của khách hàng.',
     synonyms: ['standards', 'dimensions', 'requirements', 'specs'],
     collocations: ['technical specifications', 'meet specifications', 'product specifications'],
-    wordFamily: [
+    wordForms: [
       { form: 'verb', word: 'specify', meaningVi: 'chỉ rõ, ghi rõ' },
       { form: 'adjective', word: 'specific', meaningVi: 'cụ thể, rõ ràng' },
     ],
@@ -201,7 +201,7 @@ export const FLASHCARDS: Flashcard[] = [
     synonyms: ['faulty', 'flawed', 'damaged', 'malfunctioning'],
     antonyms: ['flawless', 'intact', 'perfect'],
     collocations: ['defective product', 'defective parts', 'replace defective goods'],
-    wordFamily: [
+    wordForms: [
       { form: 'noun', word: 'defect', meaningVi: 'nhược điểm, lỗi' },
     ],
     difficulty: 'Easy',
@@ -221,7 +221,7 @@ export const FLASHCARDS: Flashcard[] = [
     exampleVi: 'Một người quản lý dự án hiệu quả là người biết cách giao việc cho các thành viên trong nhóm một cách hợp lý.',
     synonyms: ['assign', 'entrust', 'hand over', 'allocate'],
     collocations: ['delegate authority', 'delegate responsibilities', 'delegate tasks'],
-    wordFamily: [
+    wordForms: [
       { form: 'noun', word: 'delegation', meaningVi: 'sự ủy quyền, đoàn đại biểu' },
       { form: 'noun', word: 'delegate', meaningVi: 'đại biểu' },
     ],
@@ -242,7 +242,7 @@ export const FLASHCARDS: Flashcard[] = [
     exampleVi: 'Phòng kinh doanh đã gửi sách giới thiệu sản phẩm đến các khách hàng doanh nghiệp tiềm năng.',
     synonyms: ['potential', 'possible', 'future', 'probable'],
     collocations: ['prospective clients', 'prospective buyers', 'prospective candidates'],
-    wordFamily: [
+    wordForms: [
       { form: 'noun', word: 'prospect', meaningVi: 'triển vọng, khách hàng tiềm năng' },
     ],
     difficulty: 'Hard',

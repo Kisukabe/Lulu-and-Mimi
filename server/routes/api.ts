@@ -290,7 +290,11 @@ Output ONLY valid JSON with this exact schema:
   "synonyms": ["synonym1", "synonym2"],
   "antonyms": ["antonym1"],
   "examples": ["Example 1", "Example 2"],
-  "collocations": ["collocation 1", "collocation 2"]
+  "collocations": ["collocation 1", "collocation 2"],
+  "wordForms": [
+    {"form": "noun", "word": "exampleNoun", "meaningVi": "nghĩa danh từ"},
+    {"form": "verb", "word": "exampleVerb", "meaningVi": "nghĩa động từ"}
+  ]
 }`;
 
         const response = await aiClientInstance.models.generateContent({
@@ -346,7 +350,7 @@ Vai trò của bạn:
 1. Giải thích nghĩa từ vựng, thành ngữ (idioms), cụm từ (collocations), cụm động từ (phrasal verbs) một cách trực quan, dễ nhớ.
 2. Cung cấp phát âm IPA (cả UK và US), phân tích dạng từ (noun, verb, adjective, adverb).
 3. Đưa ra 2-3 câu ví dụ thực tế kèm bản dịch tiếng Việt chuẩn xác.
-4. Nêu các từ đồng nghĩa (synonyms), trái nghĩa (antonyms) và các collocation thường gặp.
+4. Nêu các từ đồng nghĩa (synonyms), trái nghĩa (antonyms), các collocation và họ từ / các dạng từ (wordForms).
 5. Luôn giữ phong cách thân thiện, khuyến khích học viên, dùng icon sinh động.
 ${topicContext ? `Chủ đề người học đang tập trung: ${topicContext}.` : ''}
 
@@ -361,7 +365,11 @@ Nếu người dùng hỏi giải thích 1 từ/thành ngữ cụ thể, hãy cu
     "vocabType": "word/idiom/collocation/phrasal-verb",
     "example": "English example",
     "exampleVi": "Bản dịch ví dụ tiếng Việt",
-    "synonyms": ["syn1", "syn2"]
+    "synonyms": ["syn1", "syn2"],
+    "wordForms": [
+      {"form": "noun", "word": "...", "meaningVi": "..."},
+      {"form": "verb", "word": "...", "meaningVi": "..."}
+    ]
   }
 }
 \`\`\``;

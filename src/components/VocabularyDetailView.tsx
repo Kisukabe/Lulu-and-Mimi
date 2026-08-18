@@ -561,18 +561,18 @@ export const VocabularyDetailView: React.FC<VocabularyDetailViewProps> = ({
                       )}
                     </div>
 
-                    {/* Word Family */}
-                    {card.wordFamily && card.wordFamily.length > 0 && (
+                    {/* Word Forms */}
+                    {((card.wordForms && card.wordForms.length > 0) || (card.wordFamily && card.wordFamily.length > 0)) && (
                       <div className="p-3 bg-slate-50/70 dark:bg-slate-800/40 rounded-xl border border-slate-200/50 dark:border-slate-700/50 flex flex-wrap items-center gap-2">
-                        <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase">
-                          📦 Gia đình từ (Word Family):
+                        <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase">
+                          🌳 Word Forms (Họ từ / Dạng từ):
                         </span>
-                        {card.wordFamily.map((wf, idx) => (
+                        {(card.wordForms || card.wordFamily || []).map((wf, idx) => (
                           <span
                             key={idx}
                             className="px-2 py-0.5 bg-white dark:bg-slate-800 rounded-md border border-slate-200 dark:border-slate-700 font-medium text-slate-700 dark:text-slate-300"
                           >
-                            <strong className="text-indigo-600 dark:text-indigo-400">{wf.form}:</strong> {wf.word}
+                            <strong className="text-indigo-600 dark:text-indigo-400 uppercase mr-1">{wf.form}:</strong> {wf.word}
                             {wf.meaningVi ? ` (${wf.meaningVi})` : ''}
                           </span>
                         ))}

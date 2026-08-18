@@ -29,12 +29,13 @@ export type TopicId =
   | 'technology'
   | 'custom';
 
-// Dạng từ trong gia đình từ (Word Family)
-export interface WordFamilyItem {
+// Dạng từ / Họ từ (Word Forms)
+export interface WordFormItem {
   form: WordForm;
   word: string;
   meaningVi?: string;
 }
+export type WordFamilyItem = WordFormItem; // Alias tương thích
 
 // Dữ liệu thuật toán lặp lại ngắt quãng (SM-2 Spaced Repetition)
 export interface SRSCardData {
@@ -66,7 +67,8 @@ export interface Flashcard {
   synonyms?: string[];              // Từ đồng nghĩa
   antonyms?: string[];              // Từ trái nghĩa
   collocations?: string[];          // Các cụm từ thường đi kèm
-  wordFamily?: WordFamilyItem[];    // Gia đình từ (Noun, Verb, Adj, Adv)
+  wordForms?: WordFormItem[];       // Họ từ / Các dạng từ (Noun, Verb, Adj, Adv)
+  wordFamily?: WordFormItem[];      // Alias cũ tương thích dữ liệu JSON
   notes?: string;                   // Mẹo ghi nhớ / Lưu ý ngữ cảnh
   isCustom?: boolean;               // Thẻ do người dùng tự tạo
   createdAt?: string;               // Ngày tạo thẻ (ISO string)
@@ -161,7 +163,8 @@ export interface DictionaryResult {
   antonyms: string[];
   examples: string[];
   collocations?: string[];
-  wordFamily?: WordFamilyItem[];
+  wordForms?: WordFormItem[];
+  wordFamily?: WordFormItem[];
   sourceUrls?: string[];
   sources: DictSource[];
   vietnameseMeaning?: string;

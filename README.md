@@ -22,7 +22,7 @@
   - Ví dụ thực tế kèm bản dịch tiếng Việt.
   - Nhóm từ đồng nghĩa (Synonyms) & trái nghĩa (Antonyms).
   - Cụm từ đi kèm thường gặp (Collocations).
-  - Gia đình từ (Word Family): Noun, Verb, Adj, Adv liên quan.
+  - Họ từ / Các dạng từ (Word Forms): Noun, Verb, Adj, Adv liên quan.
 - Thanh tìm kiếm tức thời theo từ tiếng Anh, nghĩa tiếng Việt hoặc phiên âm.
 - Lọc đa tầng: Loại từ vựng, dạng từ, độ khó, trạng thái học tập.
 - Nút sao chép (Copy) nhanh vào clipboard.

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Flashcard, Topic, VocabType, WordForm, TopicId } from '../types';
+import { Flashcard, Topic, VocabType, WordForm, TopicId, WordFormItem } from '../types';
 import {
   PenTool,
   Plus,
@@ -13,6 +13,7 @@ import {
   Check,
   Loader2,
   BookOpen,
+  Layers,
 } from 'lucide-react';
 import axios from 'axios';
 import { API_ENDPOINTS } from '../config/api';
@@ -51,6 +52,7 @@ export const FlashcardCreator: React.FC<FlashcardCreatorProps> = ({
   const [exampleVi, setExampleVi] = useState('');
   const [synonymsInput, setSynonymsInput] = useState('');
   const [collocationsInput, setCollocationsInput] = useState('');
+  const [wordForms, setWordForms] = useState<WordFormItem[]>([]);
   const [notes, setNotes] = useState('');
 
   // Live preview & UI states
@@ -58,6 +60,32 @@ export const FlashcardCreator: React.FC<FlashcardCreatorProps> = ({
   const [isAutoFilling, setIsAutoFilling] = useState(false);
   const [autoFillSuccess, setAutoFillSuccess] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+
+  // Word Forms Helpers
+  const handleAddWordFormItem = (form: WordForm = 'noun') => {
+    setWordForms((prev) => [...prev, { form, word: '', meaningVi: '' }]);
+  };
+
+  const handleUpdateWordFormItem = (index: number, field: keyof WordFormItem, value: string) => {
+    setWordForms((prev) => {
+      const updated = [...prev];
+      updated[index] = { ...updated[index], [field]: value };
+      return updated;
+    });
+  };
+
+  const handleRemoveWordFormItem = (index: number) => {
+    setWordForms((prev) => prev.filter((_, idx) => idx !== index));
+  };
+
+  const handleQuickFill4Forms = () => {
+    setWordForms([
+      { form: 'noun', word: '', meaningVi: '' },
+      { form: 'verb', word: '', meaningVi: '' },
+      { form: 'adjective', word: '', meaningVi: '' },
+      { form: 'adverb', word: '', meaningVi: '' },
+    ]);
+  };
 
   // 🔍 Auto-fill from Dictionary API
   const handleAutoFill = async () => {
@@ -105,6 +133,15 @@ export const FlashcardCreator: React.FC<FlashcardCreatorProps> = ({
         setSynonymsInput(data.synonyms.slice(0, 4).join(', '));
       }
 
+      if (data.collocations && data.collocations.length > 0) {
+        setCollocationsInput(data.collocations.slice(0, 4).join(', '));
+      }
+
+      const fetchedForms = data.wordForms || data.wordFamily;
+      if (fetchedForms && Array.isArray(fetchedForms) && fetchedForms.length > 0) {
+        setWordForms(fetchedForms);
+      }
+
       setAutoFillSuccess(true);
       setTimeout(() => setAutoFillSuccess(false), 2500);
     } catch (err) {
@@ -132,6 +169,7 @@ export const FlashcardCreator: React.FC<FlashcardCreatorProps> = ({
     setExampleVi('');
     setSynonymsInput('');
     setCollocationsInput('');
+    setWordForms([]);
     setNotes('');
     setPreviewFlipped(false);
   };
@@ -154,6 +192,8 @@ export const FlashcardCreator: React.FC<FlashcardCreatorProps> = ({
     setExampleVi(card.exampleVi || '');
     setSynonymsInput(card.synonyms ? card.synonyms.join(', ') : '');
     setCollocationsInput(card.collocations ? card.collocations.join(', ') : '');
+    const currentForms = card.wordForms || card.wordFamily;
+    setWordForms(currentForms ? [...currentForms] : []);
     setNotes(card.notes || '');
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -174,6 +214,14 @@ export const FlashcardCreator: React.FC<FlashcardCreatorProps> = ({
       .map((c) => c.trim())
       .filter(Boolean);
 
+    const cleanWordForms = wordForms
+      .filter((wf) => wf.word && wf.word.trim().length > 0)
+      .map((wf) => ({
+        form: wf.form,
+        word: wf.word.trim(),
+        meaningVi: wf.meaningVi?.trim() || undefined,
+      }));
+
     const flashcard: Flashcard = {
       id: editingId || `fc_custom_${Date.now()}`,
       topic,
@@ -191,6 +239,8 @@ export const FlashcardCreator: React.FC<FlashcardCreatorProps> = ({
       exampleVi: exampleVi.trim() || undefined,
       synonyms: synonyms.length > 0 ? synonyms : undefined,
       collocations: collocations.length > 0 ? collocations : undefined,
+      wordForms: cleanWordForms.length > 0 ? cleanWordForms : undefined,
+      wordFamily: cleanWordForms.length > 0 ? cleanWordForms : undefined,
       notes: notes.trim() || undefined,
       isCustom: true,
       createdAt: new Date().toISOString(),
@@ -476,6 +526,87 @@ export const FlashcardCreator: React.FC<FlashcardCreatorProps> = ({
             </div>
           </div>
 
+          {/* 🌳 Họ từ / Các dạng từ (Word Forms) */}
+          <div className="space-y-3 p-4 rounded-2xl bg-amber-500/5 dark:bg-amber-500/10 border border-amber-500/20">
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <label className="text-xs font-black text-amber-900 dark:text-amber-300 flex items-center gap-1.5">
+                <span>🌳 Họ từ / Các dạng từ (Word Forms)</span>
+                <span className="text-[10px] font-normal text-amber-700/80 dark:text-amber-400">
+                  (Noun, Verb, Adj, Adv...)
+                </span>
+              </label>
+              <div className="flex items-center gap-1.5">
+                {wordForms.length === 0 && (
+                  <button
+                    type="button"
+                    onClick={handleQuickFill4Forms}
+                    className="text-[11px] font-bold text-amber-700 dark:text-amber-300 hover:text-amber-900 dark:hover:text-amber-100 bg-amber-100 dark:bg-amber-900/50 px-2.5 py-1 rounded-lg transition flex items-center gap-1 cursor-pointer"
+                  >
+                    <Sparkles className="w-3 h-3" /> Mẫu 4 dạng
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => handleAddWordFormItem('noun')}
+                  className="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/60 px-2.5 py-1 rounded-lg transition flex items-center gap-1 cursor-pointer"
+                >
+                  <Plus className="w-3 h-3" /> Thêm dạng từ
+                </button>
+              </div>
+            </div>
+
+            {wordForms.length === 0 ? (
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 italic">
+                Chưa có dạng từ nào. Nhấn <strong>&quot;Mẫu 4 dạng&quot;</strong> hoặc <strong>&quot;+ Thêm dạng từ&quot;</strong> để nhập danh từ, động từ, tính từ, trạng từ liên quan.
+              </p>
+            ) : (
+              <div className="space-y-2">
+                {wordForms.map((wf, idx) => (
+                  <div
+                    key={idx}
+                    className="flex items-center gap-2 bg-white dark:bg-slate-800/90 p-2 rounded-xl border border-slate-200 dark:border-slate-700 shadow-2xs"
+                  >
+                    <select
+                      value={wf.form}
+                      onChange={(e) => handleUpdateWordFormItem(idx, 'form', e.target.value as WordForm)}
+                      aria-label="Loại dạng từ"
+                      className="px-2 py-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold text-amber-700 dark:text-amber-400 uppercase outline-none cursor-pointer w-28 shrink-0"
+                    >
+                      <option value="noun">Noun (N)</option>
+                      <option value="verb">Verb (V)</option>
+                      <option value="adjective">Adj (A)</option>
+                      <option value="adverb">Adv (Adv)</option>
+                      <option value="phrase">Phrase</option>
+                      <option value="idiom">Idiom</option>
+                    </select>
+                    <input
+                      type="text"
+                      value={wf.word}
+                      onChange={(e) => handleUpdateWordFormItem(idx, 'word', e.target.value)}
+                      placeholder="Từ tiếng Anh (vd: resilience)"
+                      className="flex-1 min-w-[100px] px-2.5 py-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold text-slate-800 dark:text-slate-100 placeholder-slate-400 outline-none"
+                    />
+                    <input
+                      type="text"
+                      value={wf.meaningVi || ''}
+                      onChange={(e) => handleUpdateWordFormItem(idx, 'meaningVi', e.target.value)}
+                      placeholder="Nghĩa TV (vd: sự kiên cường)"
+                      className="flex-1 min-w-[100px] px-2.5 py-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs text-slate-800 dark:text-slate-100 placeholder-slate-400 outline-none"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveWordFormItem(idx)}
+                      className="p-1.5 text-slate-400 hover:text-rose-500 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/40 transition cursor-pointer"
+                      title="Xóa dạng từ này"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
           {/* Submit Buttons */}
           <div className="flex items-center gap-3 pt-2">
             <button
@@ -520,11 +651,11 @@ export const FlashcardCreator: React.FC<FlashcardCreatorProps> = ({
             </div>
 
             <div
-              className="perspective-1000 w-full h-[330px] cursor-pointer select-none relative"
+              className="perspective-1000 w-full min-h-[350px] cursor-pointer select-none relative"
               onClick={() => setPreviewFlipped(!previewFlipped)}
             >
               <div
-                className={`relative w-full h-full duration-500 transform-style-3d transition-transform ${
+                className={`relative w-full h-full min-h-[350px] duration-500 transform-style-3d transition-transform ${
                   previewFlipped ? 'rotate-y-180' : ''
                 }`}
               >
@@ -552,13 +683,13 @@ export const FlashcardCreator: React.FC<FlashcardCreatorProps> = ({
                 </div>
 
                 {/* Back Side Preview */}
-                <div className="absolute inset-0 w-full h-full bg-slate-900 text-white border-2 border-amber-500/60 rounded-3xl p-6 flex flex-col justify-between shadow-md backface-hidden rotate-y-180">
+                <div className="absolute inset-0 w-full h-full bg-slate-900 text-white border-2 border-amber-500/60 rounded-3xl p-5 flex flex-col justify-between shadow-md backface-hidden rotate-y-180 overflow-y-auto custom-scrollbar">
                   <div className="flex items-center justify-between text-[11px] font-black text-amber-400">
                     <span>MẶT SAU (NGHĨA & ĐỊNH NGHĨA)</span>
-                    <span className="text-slate-400">{front}</span>
+                    <span className="text-slate-400 truncate max-w-[120px]">{front}</span>
                   </div>
 
-                  <div className="text-center my-auto space-y-2">
+                  <div className="text-center my-auto space-y-2 py-2">
                     {definitionEn && (
                       <p className="text-xs text-indigo-300 font-medium italic bg-indigo-950/60 p-2 rounded-xl border border-indigo-900 text-left line-clamp-2">
                         🇬🇧 {definitionEn}
@@ -571,6 +702,31 @@ export const FlashcardCreator: React.FC<FlashcardCreatorProps> = ({
                       <p className="text-xs text-slate-300 italic bg-slate-800/80 p-2 rounded-xl border border-slate-700 text-left line-clamp-2">
                         &quot;{example}&quot;
                       </p>
+                    )}
+
+                    {/* Word Forms in Preview */}
+                    {wordForms.some((wf) => wf.word && wf.word.trim().length > 0) && (
+                      <div className="pt-2 border-t border-slate-800 text-left">
+                        <span className="text-[10px] font-black text-amber-400 uppercase tracking-wider block mb-1">
+                          🌳 Word Forms (Dạng từ):
+                        </span>
+                        <div className="grid grid-cols-2 gap-1.5">
+                          {wordForms
+                            .filter((wf) => wf.word && wf.word.trim().length > 0)
+                            .map((wf, idx) => (
+                              <div
+                                key={idx}
+                                className="bg-slate-800/90 border border-slate-700/80 p-1.5 rounded-lg text-[10px]"
+                              >
+                                <span className="text-amber-400 uppercase font-black mr-1">{wf.form}:</span>
+                                <span className="font-bold text-white">{wf.word}</span>
+                                {wf.meaningVi && (
+                                  <span className="text-slate-400 block truncate text-[9px]">{wf.meaningVi}</span>
+                                )}
+                              </div>
+                            ))}
+                        </div>
+                      </div>
                     )}
                   </div>
 
@@ -631,67 +787,90 @@ export const FlashcardCreator: React.FC<FlashcardCreatorProps> = ({
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {customFlashcards.map((card) => (
-              <div
-                key={card.id}
-                className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 flex flex-col justify-between gap-3 shadow-xs hover:border-amber-300 transition"
-              >
-                <div className="space-y-1.5">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
-                      {card.vocabType} • {card.wordForm}
-                    </span>
-                    <span className="text-[11px] text-slate-400">
-                      {topics.find((t) => t.id === card.topic)?.title || card.topic}
-                    </span>
+            {customFlashcards.map((card) => {
+              const forms = card.wordForms || card.wordFamily;
+              return (
+                <div
+                  key={card.id}
+                  className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 flex flex-col justify-between gap-3 shadow-xs hover:border-amber-300 transition"
+                >
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
+                        {card.vocabType} • {card.wordForm}
+                      </span>
+                      <span className="text-[11px] text-slate-400">
+                        {topics.find((t) => t.id === card.topic)?.title || card.topic}
+                      </span>
+                    </div>
+
+                    <h4 className="text-lg font-black text-slate-900 dark:text-white">
+                      {card.front}
+                    </h4>
+                    {card.pronunciation && (
+                      <span className="text-xs font-mono text-indigo-600 dark:text-indigo-400">
+                        {card.pronunciation}
+                      </span>
+                    )}
+                    {card.definitionEn && (
+                      <p className="text-xs text-indigo-600 dark:text-indigo-300 italic pt-0.5 line-clamp-2">
+                        🇬🇧 {card.definitionEn}
+                      </p>
+                    )}
+                    <p className="text-xs font-bold text-slate-700 dark:text-slate-200 pt-0.5">
+                      👉 {card.back}
+                    </p>
+                    {card.example && (
+                      <p className="text-xs text-slate-500 dark:text-slate-400 italic pt-0.5 line-clamp-2">
+                        &quot;{card.example}&quot;
+                      </p>
+                    )}
+
+                    {/* Word Forms pills in card list */}
+                    {forms && forms.length > 0 && (
+                      <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
+                        <p className="text-[10px] font-bold text-amber-600 dark:text-amber-400 mb-1">
+                          🌳 Word Forms:
+                        </p>
+                        <div className="flex flex-wrap gap-1">
+                          {forms.map((wf, idx) => (
+                            <span
+                              key={idx}
+                              className="text-[10px] px-2 py-0.5 rounded-lg bg-amber-50 dark:bg-slate-800 border border-amber-200/60 dark:border-slate-700 text-slate-700 dark:text-slate-300"
+                            >
+                              <strong className="text-amber-600 dark:text-amber-400 uppercase mr-1">{wf.form}:</strong>
+                              {wf.word} {wf.meaningVi ? `(${wf.meaningVi})` : ''}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
 
-                  <h4 className="text-lg font-black text-slate-900 dark:text-white">
-                    {card.front}
-                  </h4>
-                  {card.pronunciation && (
-                    <span className="text-xs font-mono text-indigo-600 dark:text-indigo-400">
-                      {card.pronunciation}
-                    </span>
-                  )}
-                  {card.definitionEn && (
-                    <p className="text-xs text-indigo-600 dark:text-indigo-300 italic pt-0.5 line-clamp-2">
-                      🇬🇧 {card.definitionEn}
-                    </p>
-                  )}
-                  <p className="text-xs font-bold text-slate-700 dark:text-slate-200 pt-0.5">
-                    👉 {card.back}
-                  </p>
-                  {card.example && (
-                    <p className="text-xs text-slate-500 dark:text-slate-400 italic pt-0.5 line-clamp-2">
-                      &quot;{card.example}&quot;
-                    </p>
-                  )}
-                </div>
+                  <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+                    <button
+                      onClick={() => handleEdit(card)}
+                      className="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                      title="Chỉnh sửa thẻ"
+                    >
+                      <Edit className="w-4 h-4" />
+                    </button>
 
-                <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
-                  <button
-                    onClick={() => handleEdit(card)}
-                    className="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
-                    title="Chỉnh sửa thẻ"
-                  >
-                    <Edit className="w-4 h-4" />
-                  </button>
-
-                  <button
-                    onClick={() => {
-                      if (confirm(`Bạn có chắc chắn muốn xóa thẻ "${card.front}" không?`)) {
-                        onDeleteFlashcard(card.id);
-                      }
-                    }}
-                    className="p-2 rounded-xl text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/60 transition cursor-pointer"
-                    title="Xóa thẻ"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                    <button
+                      onClick={() => {
+                        if (confirm(`Bạn có chắc chắn muốn xóa thẻ "${card.front}" không?`)) {
+                          onDeleteFlashcard(card.id);
+                        }
+                      }}
+                      className="p-2 rounded-xl text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/60 transition cursor-pointer"
+                      title="Xóa thẻ"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
