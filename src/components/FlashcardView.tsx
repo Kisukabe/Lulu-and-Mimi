@@ -49,6 +49,7 @@ interface FlashcardViewProps {
   onOpenQuickAdd?: () => void;
   themeVibe?: ThemeVibe;
   onSelectThemeVibe?: (vibe: ThemeVibe) => void;
+  onSelectStatusFilter?: (filter: 'all' | 'due_srs' | 'unmastered' | 'review' | 'mastered') => void;
 }
 
 export const FlashcardView: React.FC<FlashcardViewProps> = ({
@@ -68,6 +69,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
   onOpenQuickAdd,
   themeVibe: controlledThemeVibe,
   onSelectThemeVibe,
+  onSelectStatusFilter,
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
@@ -533,7 +535,10 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
             {statusFilter === 'due_srs' ? '🎉 Bạn đã ôn tập xong các từ đến hạn hôm nay!' : 'Không có từ nào trong bộ lọc này'}
           </h3>
           <button
-            onClick={() => setStatusFilter('all')}
+            onClick={() => {
+              setStatusFilter('all');
+              if (onSelectStatusFilter) onSelectStatusFilter('all');
+            }}
             className={`px-5 py-2.5 ${currentTheme.nextBtnBg} text-xs font-black rounded-xl transition cursor-pointer shadow-md`}
           >
             Xem Tất Cả Flashcards
@@ -553,16 +558,16 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                 
                 {/* ✏️ IN-CARD EDITOR OVERLAY */}
                 {isEditing ? (
-                  <div className={`w-full h-full ${currentTheme.frontBg} border-2 ${currentTheme.frontBorder} rounded-3xl p-6 sm:p-8 shadow-2xl overflow-y-auto custom-scrollbar flex flex-col justify-between animate-in zoom-in-95 duration-150 z-30`}>
-                    <form onSubmit={handleSaveEdit} className="space-y-3 my-auto text-slate-900 dark:text-slate-100">
-                      <div className="flex items-center justify-between pb-2 border-b border-black/15 dark:border-white/15">
-                        <span className="text-xs font-black uppercase text-slate-900 dark:text-white flex items-center gap-1.5">
+                  <div className="w-full h-full bg-slate-900/95 border-2 border-white/20 rounded-3xl p-6 sm:p-8 shadow-2xl overflow-y-auto custom-scrollbar flex flex-col justify-between text-white animate-in zoom-in-95 duration-150 z-30">
+                    <form onSubmit={handleSaveEdit} className="space-y-3 my-auto text-white">
+                      <div className="flex items-center justify-between pb-2 border-b border-white/15">
+                        <span className="text-xs font-black uppercase text-yellow-300 flex items-center gap-1.5">
                           <Edit3 className="w-4 h-4" /> Sửa Từ Vựng Trực Tiếp
                         </span>
                         <button
                           type="button"
                           onClick={() => setIsEditing(false)}
-                          className="text-slate-700 dark:text-slate-300 hover:opacity-100 cursor-pointer"
+                          className="text-slate-300 hover:text-white cursor-pointer"
                         >
                           <X className="w-4 h-4" />
                         </button>
@@ -570,32 +575,32 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
-                          <label className="block text-[10px] font-black uppercase text-slate-800 dark:text-slate-200 mb-1">Từ vựng *</label>
+                          <label className="block text-[10px] font-black uppercase text-slate-300 mb-1">Từ vựng *</label>
                           <input
                             type="text"
                             value={editForm.front || ''}
                             onChange={(e) => setEditForm({ ...editForm, front: e.target.value })}
                             required
-                            className="w-full px-3 py-2 bg-white/80 dark:bg-black/40 border border-black/20 dark:border-white/20 rounded-xl text-sm font-black text-slate-900 dark:text-white outline-none"
+                            className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-sm font-black text-white outline-none focus:border-amber-400"
                           />
                         </div>
 
                         <div>
-                          <label className="block text-[10px] font-black uppercase text-slate-800 dark:text-slate-200 mb-1">Phiên âm IPA</label>
+                          <label className="block text-[10px] font-black uppercase text-slate-300 mb-1">Phiên âm IPA</label>
                           <input
                             type="text"
                             value={editForm.pronunciationUs || ''}
                             onChange={(e) => setEditForm({ ...editForm, pronunciationUs: e.target.value })}
-                            className="w-full px-3 py-2 bg-white/80 dark:bg-black/40 border border-black/20 dark:border-white/20 rounded-xl text-sm font-mono font-bold text-slate-900 dark:text-white outline-none"
+                            className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-sm font-mono font-bold text-white outline-none focus:border-amber-400"
                           />
                         </div>
 
                         <div>
-                          <label className="block text-[10px] font-black uppercase text-slate-800 dark:text-slate-200 mb-1">Loại từ</label>
+                          <label className="block text-[10px] font-black uppercase text-slate-300 mb-1">Loại từ</label>
                           <select
                             value={editForm.wordForm || 'noun'}
                             onChange={(e) => setEditForm({ ...editForm, wordForm: e.target.value as WordForm })}
-                            className="w-full px-2 py-2 bg-white/80 dark:bg-black/40 border border-black/20 dark:border-white/20 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none"
+                            className="w-full px-2 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs font-bold text-white outline-none focus:border-amber-400"
                           >
                             <option value="noun">Danh từ (Noun)</option>
                             <option value="verb">Động từ (Verb)</option>
@@ -607,44 +612,44 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                         </div>
 
                         <div>
-                          <label className="block text-[10px] font-black uppercase text-slate-800 dark:text-slate-200 mb-1">Nghĩa tiếng Việt *</label>
+                          <label className="block text-[10px] font-black uppercase text-slate-300 mb-1">Nghĩa tiếng Việt *</label>
                           <input
                             type="text"
                             value={editForm.back || ''}
                             onChange={(e) => setEditForm({ ...editForm, back: e.target.value })}
                             required
-                            className="w-full px-3 py-2 bg-white/80 dark:bg-black/40 border border-black/20 dark:border-white/20 rounded-xl text-sm font-bold text-slate-900 dark:text-white outline-none"
+                            className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-sm font-bold text-white outline-none focus:border-amber-400"
                           />
                         </div>
                       </div>
 
                       <div>
-                        <label className="block text-[10px] font-black uppercase text-slate-800 dark:text-slate-200 mb-1">Định nghĩa tiếng Anh</label>
+                        <label className="block text-[10px] font-black uppercase text-slate-300 mb-1">Định nghĩa tiếng Anh</label>
                         <textarea
                           rows={2}
                           value={editForm.definitionEn || ''}
                           onChange={(e) => setEditForm({ ...editForm, definitionEn: e.target.value })}
-                          className="w-full px-3 py-2 bg-white/80 dark:bg-black/40 border border-black/20 dark:border-white/20 rounded-xl text-xs text-slate-900 dark:text-white outline-none"
+                          className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white outline-none focus:border-amber-400"
                         />
                       </div>
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
-                          <label className="block text-[10px] font-black uppercase text-slate-800 dark:text-slate-200 mb-1">Câu ví dụ (English)</label>
+                          <label className="block text-[10px] font-black uppercase text-slate-300 mb-1">Câu ví dụ (English)</label>
                           <input
                             type="text"
                             value={editForm.example || ''}
                             onChange={(e) => setEditForm({ ...editForm, example: e.target.value })}
-                            className="w-full px-3 py-2 bg-white/80 dark:bg-black/40 border border-black/20 dark:border-white/20 rounded-xl text-xs text-slate-900 dark:text-white outline-none"
+                            className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white outline-none focus:border-amber-400"
                           />
                         </div>
                         <div>
-                          <label className="block text-[10px] font-black uppercase text-slate-800 dark:text-slate-200 mb-1">Dịch ví dụ (Tiếng Việt)</label>
+                          <label className="block text-[10px] font-black uppercase text-slate-300 mb-1">Dịch ví dụ (Tiếng Việt)</label>
                           <input
                             type="text"
                             value={editForm.exampleVi || ''}
                             onChange={(e) => setEditForm({ ...editForm, exampleVi: e.target.value })}
-                            className="w-full px-3 py-2 bg-white/80 dark:bg-black/40 border border-black/20 dark:border-white/20 rounded-xl text-xs text-slate-900 dark:text-white outline-none"
+                            className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white outline-none focus:border-amber-400"
                           />
                         </div>
                       </div>
@@ -653,13 +658,13 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                         <button
                           type="button"
                           onClick={() => setIsEditing(false)}
-                          className="px-4 py-2 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-black/10 rounded-xl cursor-pointer"
+                          className="px-4 py-2 text-xs font-bold text-slate-300 hover:bg-white/10 rounded-xl cursor-pointer"
                         >
                           Hủy
                         </button>
                         <button
                           type="submit"
-                          className="px-5 py-2 bg-slate-950 text-white dark:bg-white dark:text-slate-950 text-xs font-black rounded-xl shadow-md cursor-pointer hover:opacity-90"
+                          className="px-5 py-2 bg-amber-400 text-slate-950 text-xs font-black rounded-xl shadow-md cursor-pointer hover:bg-amber-300"
                         >
                           Lưu Thay Đổi
                         </button>
@@ -703,7 +708,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                                 e.stopPropagation();
                                 playPronunciation(preferredAccent);
                               }}
-                              className="w-11 h-11 rounded-2xl bg-black/20 hover:bg-black/40 text-slate-950 dark:text-white flex items-center justify-center transition cursor-pointer active:scale-90"
+                              className={`w-11 h-11 rounded-2xl ${currentTheme.frontControlBtn} flex items-center justify-center transition cursor-pointer active:scale-90`}
                               title="Phát âm từ vựng"
                             >
                               <Volume2 className="w-5 h-5" />
@@ -715,7 +720,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                                 if (currentCard) onToggleNeedReview(currentCard.id);
                               }}
                               className={`w-11 h-11 rounded-2xl flex items-center justify-center transition cursor-pointer active:scale-90 ${
-                                isCurrentNeedReview ? 'bg-amber-400 text-slate-950 shadow-md' : 'bg-black/20 text-slate-950 dark:text-white hover:bg-black/40'
+                                isCurrentNeedReview ? 'bg-amber-400 text-slate-950 shadow-md' : currentTheme.frontControlBtn
                               }`}
                               title={isCurrentNeedReview ? 'Đã đánh dấu cần ôn tập' : 'Đánh dấu cần ôn tập'}
                             >
@@ -724,7 +729,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
 
                             <button
                               onClick={handleStartEdit}
-                              className="w-11 h-11 rounded-2xl bg-black/20 hover:bg-black/40 text-slate-950 dark:text-white flex items-center justify-center transition cursor-pointer active:scale-90"
+                              className={`w-11 h-11 rounded-2xl ${currentTheme.frontControlBtn} flex items-center justify-center transition cursor-pointer active:scale-90`}
                               title="Chỉnh sửa từ vựng này"
                             >
                               <Edit3 className="w-4 h-4" />
@@ -741,7 +746,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                           {/* Phonetic transcription badge (Chỉ hiện khi có IPA hợp lệ, không hiện // hoặc /.../) */}
                           {hasIpa ? (
                             <div className="flex items-center justify-center gap-2.5">
-                              <span className="text-lg sm:text-2xl font-mono font-bold tracking-wider text-slate-900/90 dark:text-white/90 bg-black/15 dark:bg-white/15 px-6 py-2 rounded-full border border-black/10 dark:border-white/10 shadow-xs">
+                              <span className={`text-lg sm:text-2xl font-mono font-bold tracking-wider ${currentTheme.frontIpaBg} px-6 py-2 rounded-full shadow-xs`}>
                                 {cardIpa}
                               </span>
                               <button
@@ -749,7 +754,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                                   e.stopPropagation();
                                   playPronunciation(preferredAccent);
                                 }}
-                                className="p-2 rounded-full bg-black/20 hover:bg-black/40 text-slate-900 dark:text-white transition cursor-pointer active:scale-90"
+                                className={`p-2 rounded-full ${currentTheme.frontControlBtn} transition cursor-pointer active:scale-90`}
                                 title="Nghe phát âm"
                               >
                                 <Volume2 className="w-5 h-5" />
@@ -762,7 +767,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                                   e.stopPropagation();
                                   playPronunciation(preferredAccent);
                                 }}
-                                className="p-2 rounded-full bg-black/20 hover:bg-black/40 text-slate-900 dark:text-white transition cursor-pointer active:scale-90"
+                                className={`p-2 rounded-full ${currentTheme.frontControlBtn} transition cursor-pointer active:scale-90`}
                                 title="Nghe phát âm"
                               >
                                 <Volume2 className="w-5 h-5" />
@@ -796,7 +801,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                             )}
                           </div>
 
-                          <div className="flex items-center gap-1.5 text-xs sm:text-sm font-black text-slate-900/80 dark:text-white/80 group">
+                          <div className={`flex items-center gap-1.5 text-xs sm:text-sm font-black ${currentTheme.frontHintText} group`}>
                             <span>Nhấn để xem nghĩa</span>
                             <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                           </div>

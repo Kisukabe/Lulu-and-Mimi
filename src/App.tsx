@@ -14,7 +14,6 @@ import { ThemeVibe, THEME_CONFIGS } from './config/themes';
 
 // Components
 import { Sidebar } from './components/Sidebar';
-import { Header } from './components/Header';
 import { FlashcardView } from './components/FlashcardView';
 import { VocabularyDetailView } from './components/VocabularyDetailView';
 import { DictionaryLookup } from './components/DictionaryLookup';
@@ -430,12 +429,15 @@ export default function App() {
   const handleDeleteFlashcard = (id: string) => {
     setUserProgress((prev) => {
       const updatedDeleted = Array.from(new Set([...(prev.deletedCardIds || []), id]));
+      const updatedSrs = { ...(prev.srsRecords || {}) };
+      delete updatedSrs[id];
       return {
         ...prev,
         deletedCardIds: updatedDeleted,
         customFlashcards: (prev.customFlashcards || []).filter((c) => c.id !== id),
         masteredFlashcardIds: (prev.masteredFlashcardIds || []).filter((cid) => cid !== id),
         needReviewFlashcardIds: (prev.needReviewFlashcardIds || []).filter((cid) => cid !== id),
+        srsRecords: updatedSrs,
       };
     });
   };
@@ -503,9 +505,22 @@ export default function App() {
     setUserProgress(freshState);
   };
 
-  const dueCardsCount = useMemo(() => {
-    return allFlashcards.filter((c) => isCardDue(userProgress.srsRecords?.[c.id])).length;
-  }, [allFlashcards, userProgress.srsRecords]);
+  // Folder/Topic-aware counts for Sidebar indicator badges
+  const currentTopicCards = useMemo(() => {
+    return allFlashcards.filter((c) => selectedTopic === 'all' || c.topic === selectedTopic);
+  }, [allFlashcards, selectedTopic]);
+
+  const currentTopicMasteredCount = useMemo(() => {
+    return currentTopicCards.filter((c) => userProgress.masteredFlashcardIds.includes(c.id)).length;
+  }, [currentTopicCards, userProgress.masteredFlashcardIds]);
+
+  const currentTopicNeedReviewCount = useMemo(() => {
+    return currentTopicCards.filter((c) => userProgress.needReviewFlashcardIds.includes(c.id)).length;
+  }, [currentTopicCards, userProgress.needReviewFlashcardIds]);
+
+  const currentTopicDueSRSCount = useMemo(() => {
+    return currentTopicCards.filter((c) => isCardDue(userProgress.srsRecords?.[c.id])).length;
+  }, [currentTopicCards, userProgress.srsRecords]);
 
   const currentTheme = THEME_CONFIGS[themeVibe] || THEME_CONFIGS['amber-gold'];
 
@@ -516,10 +531,10 @@ export default function App() {
       <Sidebar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
-        masteredCount={userProgress.masteredFlashcardIds.length}
-        totalCards={allFlashcards.length}
-        needReviewCount={userProgress.needReviewFlashcardIds.length}
-        dueSRSCount={dueCardsCount}
+        masteredCount={currentTopicMasteredCount}
+        totalCards={currentTopicCards.length}
+        needReviewCount={currentTopicNeedReviewCount}
+        dueSRSCount={currentTopicDueSRSCount}
         themeMode={themeMode}
         setThemeMode={setThemeMode}
         folders={allFolders}
@@ -552,6 +567,7 @@ export default function App() {
               needReviewIds={userProgress.needReviewFlashcardIds}
               srsRecords={userProgress.srsRecords || {}}
               initialFilter={flashcardStatusFilter}
+              onSelectStatusFilter={setFlashcardStatusFilter}
               onToggleMastered={handleToggleMastered}
               onToggleNeedReview={handleToggleNeedReview}
               onRateCardSRS={handleRateCardSRS}
