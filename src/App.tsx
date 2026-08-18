@@ -10,6 +10,7 @@ import { DEFAULT_TOPICS } from './data/topics';
 import { FLASHCARDS } from './data/flashcards';
 import { QUIZ_QUESTIONS } from './data/quizQuestions';
 import { calculateNextSRS, isCardDue } from './utils/srs';
+import { ThemeVibe, THEME_CONFIGS } from './config/themes';
 
 // Components
 import { Sidebar } from './components/Sidebar';
@@ -38,6 +39,22 @@ export default function App() {
   >('flashcards');
 
   const [flashcardStatusFilter, setFlashcardStatusFilter] = useState<'all' | 'due_srs' | 'unmastered' | 'review' | 'mastered'>('all');
+
+  const THEME_VIBE_KEY = 'lulu_mimi_card_theme_vibe_v5';
+  const [themeVibe, setThemeVibe] = useState<ThemeVibe>(() => {
+    try {
+      const saved = localStorage.getItem(THEME_VIBE_KEY) as ThemeVibe;
+      if (saved && THEME_CONFIGS[saved]) return saved;
+    } catch {}
+    return 'amber-gold';
+  });
+
+  const handleSelectThemeVibe = (newVibe: ThemeVibe) => {
+    setThemeVibe(newVibe);
+    try {
+      localStorage.setItem(THEME_VIBE_KEY, newVibe);
+    } catch {}
+  };
 
   // ═══════════════════════════════════════════════════════════════
   // 0. GEMINI API KEY (Per-user, stored in localStorage)
@@ -490,10 +507,12 @@ export default function App() {
     return allFlashcards.filter((c) => isCardDue(userProgress.srsRecords?.[c.id])).length;
   }, [allFlashcards, userProgress.srsRecords]);
 
+  const currentTheme = THEME_CONFIGS[themeVibe] || THEME_CONFIGS['amber-gold'];
+
   return (
-    <div className="min-h-screen bg-[#fcf9f2] dark:bg-[#0c1017] text-slate-900 dark:text-slate-100 font-sans flex flex-row selection:bg-amber-400 selection:text-slate-950 transition-colors duration-200 overflow-x-hidden">
+    <div className={`min-h-screen ${currentTheme.pageBg} text-slate-900 dark:text-slate-100 font-sans flex flex-row selection:bg-amber-400 selection:text-slate-950 transition-colors duration-300 overflow-x-hidden`}>
       
-      {/* 🧭 Left Sidebar Navigation (The IELTS Dictionary Style) */}
+      {/* 🧭 Left Sidebar Navigation (Lulu & Mimi Dictionary) */}
       <Sidebar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
@@ -514,13 +533,14 @@ export default function App() {
           setActiveTab('flashcards');
         }}
         currentFlashcardFilter={flashcardStatusFilter}
+        themeVibe={themeVibe}
       />
 
       {/* 🖥️ Main Workspace Area */}
       <div className="flex-1 min-w-0 flex flex-col h-screen overflow-y-auto custom-scrollbar">
         
         {/* Main Content Viewport */}
-        <main className="flex-1 p-2 sm:p-6 pb-20">
+        <main className="flex-1 p-2 sm:p-6 pb-20 flex flex-col items-center">
           
           {/* Tab 1: 3D Flashcards */}
           {activeTab === 'flashcards' && (
@@ -539,6 +559,8 @@ export default function App() {
               onDeleteCard={handleDeleteFlashcard}
               onEditCard={handleSaveCustomFlashcard}
               onOpenQuickAdd={() => handleOpenQuickAddModal(selectedTopic)}
+              themeVibe={themeVibe}
+              onSelectThemeVibe={handleSelectThemeVibe}
             />
           )}
 

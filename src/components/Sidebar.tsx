@@ -22,6 +22,7 @@ import {
   History
 } from 'lucide-react';
 import { Topic } from '../types';
+import { ThemeVibe, THEME_CONFIGS } from '../config/themes';
 
 interface SidebarProps {
   activeTab: 'flashcards' | 'vocabulary' | 'dictionary' | 'create' | 'quiz' | 'practice' | 'ai' | 'stats';
@@ -40,6 +41,7 @@ interface SidebarProps {
   onOpenApiKeyModal: () => void;
   onSelectFlashcardFilter?: (filter: 'all' | 'mastered' | 'unmastered' | 'due_srs') => void;
   currentFlashcardFilter?: string;
+  themeVibe?: ThemeVibe;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -59,14 +61,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onOpenApiKeyModal,
   onSelectFlashcardFilter,
   currentFlashcardFilter = 'all',
+  themeVibe = 'amber-gold',
 }) => {
-  const SIDEBAR_COLLAPSED_KEY = 'lulu_mimi_sidebar_collapsed_v2';
+  const SIDEBAR_COLLAPSED_KEY = 'lulu_mimi_sidebar_collapsed_v3';
   const [isCollapsed, setIsCollapsed] = useState<boolean>(() => {
     try {
       const saved = localStorage.getItem(SIDEBAR_COLLAPSED_KEY);
       if (saved !== null) return saved === 'true';
     } catch {}
-    return false; // Default expanded on desktop
+    return false; // Default expanded
   });
 
   const toggleCollapsed = () => {
@@ -81,6 +84,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   const currentFolder = folders.find((f) => f.id === selectedTopic) || folders[0];
   const unmasteredCount = Math.max(0, totalCards - masteredCount);
+  const currentTheme = THEME_CONFIGS[themeVibe] || THEME_CONFIGS['amber-gold'];
 
   const handleFlashcardClick = (filter: 'all' | 'mastered' | 'unmastered' | 'due_srs' = 'all') => {
     setActiveTab('flashcards');
@@ -91,7 +95,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   return (
     <aside
-      className={`h-screen sticky top-0 bg-[#354622] dark:bg-[#1a2411] text-slate-100 flex flex-col justify-between border-r border-black/10 dark:border-white/5 transition-all duration-300 z-40 select-none ${
+      className={`h-screen sticky top-0 ${currentTheme.sidebarBg} text-slate-100 flex flex-col justify-between border-r border-black/10 dark:border-white/5 transition-all duration-300 z-40 select-none ${
         isCollapsed ? 'w-20' : 'w-72 sm:w-80'
       }`}
     >
@@ -101,14 +105,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <>
             <div className="flex items-center gap-3 overflow-hidden">
               <div className="w-10 h-10 rounded-2xl bg-black/30 border border-white/20 flex items-center justify-center text-xl shadow-md shrink-0">
-                📖
+                ✨
               </div>
               <div className="truncate">
                 <h1 className="text-base font-black tracking-tight text-white leading-none">
-                  The IELTS
+                  Lulu & Mimi
                 </h1>
                 <span className="text-[10px] font-black tracking-widest uppercase text-yellow-300">
-                  DICTIONARY
+                  DICTIONARY & FLASHCARD
                 </span>
               </div>
             </div>
@@ -124,7 +128,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         ) : (
           <>
             <div className="w-10 h-10 rounded-2xl bg-black/30 border border-white/20 flex items-center justify-center text-xl shadow-md shrink-0">
-              📖
+              ✨
             </div>
             <button
               onClick={toggleCollapsed}
@@ -155,12 +159,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
               isCollapsed ? 'justify-center px-0' : 'px-3.5'
             } ${
               activeTab === 'vocabulary'
-                ? 'bg-[#f5b84c] text-slate-950 shadow-md font-black'
+                ? `${currentTheme.sidebarActivePill} shadow-md font-black`
                 : 'text-slate-200 hover:bg-black/20 hover:text-white'
             }`}
             title="Tổng quan từ vựng"
           >
-            <BarChart2 className={`w-5 h-5 shrink-0 ${activeTab === 'vocabulary' ? 'text-slate-950' : 'text-slate-300'}`} />
+            <BarChart2 className={`w-5 h-5 shrink-0 ${activeTab === 'vocabulary' ? currentTheme.sidebarActiveText : 'text-slate-300'}`} />
             {!isCollapsed && <span>Tổng quan</span>}
           </button>
 
@@ -178,7 +182,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <div className="flex items-center gap-2 truncate">
                   <span>Bộ từ</span>
                   <span className="text-[11px] font-bold px-2 py-0.5 rounded-lg bg-black/30 text-white/90 truncate max-w-[120px]">
-                    {currentFolder?.title || 'IELTS'}
+                    {currentFolder?.title || 'Từ vựng'}
                   </span>
                 </div>
               )}
@@ -186,7 +190,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {!isCollapsed && <ChevronRight className="w-4 h-4 text-white/40 group-hover:translate-x-0.5 transition-transform" />}
           </button>
 
-          {/* 3. Flashcard (Highlighted Golden Pill as in user screenshots) */}
+          {/* 3. Flashcard (Highlighted Pill matching theme) */}
           <div className="space-y-1">
             <button
               onClick={() => handleFlashcardClick('all')}
@@ -194,18 +198,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 isCollapsed ? 'justify-center px-0' : 'px-3.5'
               } ${
                 activeTab === 'flashcards' && currentFlashcardFilter === 'all'
-                  ? 'bg-[#f5b84c] text-slate-950 shadow-md'
+                  ? `${currentTheme.sidebarActivePill} shadow-md`
                   : activeTab === 'flashcards'
-                  ? 'bg-[#f5b84c]/90 text-slate-950'
+                  ? `${currentTheme.sidebarActivePill} opacity-90`
                   : 'text-slate-200 hover:bg-black/20 hover:text-white'
               }`}
               title="Luyện Flashcard"
             >
-              <Layers className={`w-5 h-5 shrink-0 ${activeTab === 'flashcards' ? 'text-slate-950' : 'text-slate-300'}`} />
+              <Layers className={`w-5 h-5 shrink-0 ${activeTab === 'flashcards' ? currentTheme.sidebarActiveText : 'text-slate-300'}`} />
               {!isCollapsed && (
                 <div className="text-left leading-tight truncate">
                   <div className="font-black text-sm">Flashcard</div>
-                  <div className="text-[10px] text-slate-800/80 font-bold truncate">
+                  <div className="text-[10px] opacity-80 font-bold truncate">
                     {currentFolder?.title || 'Chủ đề từ vựng'}
                   </div>
                 </div>
@@ -281,12 +285,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
               isCollapsed ? 'justify-center px-0' : 'px-3.5'
             } ${
               activeTab === 'stats'
-                ? 'bg-[#f5b84c] text-slate-950 shadow-md font-black'
+                ? `${currentTheme.sidebarActivePill} shadow-md font-black`
                 : 'text-slate-200 hover:bg-black/20 hover:text-white'
             }`}
             title="Thống kê tiến độ"
           >
-            <Compass className={`w-5 h-5 shrink-0 ${activeTab === 'stats' ? 'text-slate-950' : 'text-slate-300'}`} />
+            <Compass className={`w-5 h-5 shrink-0 ${activeTab === 'stats' ? currentTheme.sidebarActiveText : 'text-slate-300'}`} />
             {!isCollapsed && <span>Thống kê</span>}
           </button>
 
@@ -297,12 +301,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
               isCollapsed ? 'justify-center px-0' : 'px-3.5'
             } ${
               activeTab === 'practice'
-                ? 'bg-[#f5b84c] text-slate-950 shadow-md font-black'
+                ? `${currentTheme.sidebarActivePill} shadow-md font-black`
                 : 'text-slate-200 hover:bg-black/20 hover:text-white'
             }`}
             title="Luyện tập & Lịch sử làm bài"
           >
-            <History className={`w-5 h-5 shrink-0 ${activeTab === 'practice' ? 'text-slate-950' : 'text-slate-300'}`} />
+            <History className={`w-5 h-5 shrink-0 ${activeTab === 'practice' ? currentTheme.sidebarActiveText : 'text-slate-300'}`} />
             {!isCollapsed && <span>Lịch sử làm bài</span>}
           </button>
 
@@ -323,7 +327,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               isCollapsed ? 'justify-center px-0' : 'px-3.5'
             } ${
               activeTab === 'dictionary'
-                ? 'bg-[#f5b84c] text-slate-950 shadow-md font-black'
+                ? `${currentTheme.sidebarActivePill} shadow-md font-black`
                 : 'text-slate-200 hover:bg-black/20 hover:text-white'
             }`}
             title="Tra từ điển Cambridge"
@@ -339,7 +343,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               isCollapsed ? 'justify-center px-0' : 'px-3.5'
             } ${
               activeTab === 'create'
-                ? 'bg-[#f5b84c] text-slate-950 shadow-md font-black'
+                ? `${currentTheme.sidebarActivePill} shadow-md font-black`
                 : 'text-slate-200 hover:bg-black/20 hover:text-white'
             }`}
             title="Tự tạo Flashcard"
@@ -355,7 +359,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               isCollapsed ? 'justify-center px-0' : 'px-3.5'
             } ${
               activeTab === 'quiz'
-                ? 'bg-[#f5b84c] text-slate-950 shadow-md font-black'
+                ? `${currentTheme.sidebarActivePill} shadow-md font-black`
                 : 'text-slate-200 hover:bg-black/20 hover:text-white'
             }`}
             title="Làm bài trắc nghiệm"
@@ -371,7 +375,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               isCollapsed ? 'justify-center px-0' : 'px-3.5'
             } ${
               activeTab === 'ai'
-                ? 'bg-[#f5b84c] text-slate-950 shadow-md font-black'
+                ? `${currentTheme.sidebarActivePill} shadow-md font-black`
                 : 'text-slate-200 hover:bg-black/20 hover:text-white'
             }`}
             title="Trợ lý học AI"

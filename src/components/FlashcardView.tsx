@@ -30,321 +30,7 @@ import {
   Bookmark
 } from 'lucide-react';
 import { calculateNextSRS, isCardDue, formatSRSCountdown, getMemoryLevelName } from '../utils/srs';
-
-export type ThemeVibe = 'amber-gold' | 'dark-space' | 'blue' | 'rose' | 'emerald' | 'purple';
-
-interface ThemeConfig {
-  id: ThemeVibe;
-  label: string;
-  emoji: string;
-  dotClass: string;
-  
-  // Page / Container
-  topBarBg: string;
-  topBarBorder: string;
-  
-  // Front card
-  frontBg: string;
-  frontBorder: string;
-  frontTextColor: string;
-  frontAccent: string;
-  frontTagBg: string;
-  frontTagText: string;
-  
-  // Back card
-  backBg: string;
-  backBorder: string;
-  backTextColor: string;
-  backBoxBg: string;
-  backBoxBorder: string;
-  
-  // Action Buttons
-  btn1Bg: string;
-  btn1Border: string;
-  btn1Text: string;
-  btn1Kbd: string;
-  
-  btnSpaceBg: string;
-  btnSpaceBorder: string;
-  btnSpaceText: string;
-  btnSpaceKbd: string;
-  
-  btn2Bg: string;
-  btn2Border: string;
-  btn2Text: string;
-  btn2Kbd: string;
-  
-  // Companion Widgets
-  companion1Bg: string;
-  companion1Border: string;
-  companion1TagBg: string;
-  companion1TagText: string;
-  
-  companion2Bg: string;
-  companion2Border: string;
-  
-  // Accent & Highlights
-  accentColor: string;
-  accentBg: string;
-  accentText: string;
-  progressBarColor: string;
-  nextBtnBg: string;
-}
-
-const THEME_CONFIGS: Record<ThemeVibe, ThemeConfig> = {
-  'amber-gold': {
-    id: 'amber-gold',
-    label: 'IELTS Vàng Ấm (Gốc)',
-    emoji: '☀️',
-    dotClass: 'bg-amber-400 border border-amber-600',
-    topBarBg: 'bg-[#1a1f16] dark:bg-[#12170f]',
-    topBarBorder: 'border-slate-800/80',
-    frontBg: 'bg-gradient-to-br from-[#f5b945] via-[#e5a832] to-[#d69620]',
-    frontBorder: 'border-amber-400/50 shadow-[0_10px_40px_rgba(245,185,69,0.35)]',
-    frontTextColor: 'text-slate-950',
-    frontAccent: 'text-slate-900',
-    frontTagBg: 'bg-black/20 border-black/10',
-    frontTagText: 'text-slate-900 font-black',
-    backBg: 'bg-gradient-to-br from-[#3b4e24] via-[#4d632f] to-[#31421e]',
-    backBorder: 'border-lime-500/40 shadow-[0_10px_40px_rgba(59,78,36,0.5)]',
-    backTextColor: 'text-white',
-    backBoxBg: 'bg-black/30 backdrop-blur-md',
-    backBoxBorder: 'border-lime-400/20',
-    btn1Bg: 'bg-rose-950/60 hover:bg-rose-900/70',
-    btn1Border: 'border-rose-800/50',
-    btn1Text: 'text-rose-200',
-    btn1Kbd: 'bg-rose-950 text-rose-300 border-rose-700/60',
-    btnSpaceBg: 'bg-[#4d632f] hover:bg-[#597337]',
-    btnSpaceBorder: 'border-lime-600/60',
-    btnSpaceText: 'text-white',
-    btnSpaceKbd: 'bg-lime-950 text-lime-300 border-lime-700/60',
-    btn2Bg: 'bg-emerald-950/60 hover:bg-emerald-900/70',
-    btn2Border: 'border-emerald-800/50',
-    btn2Text: 'text-emerald-200',
-    btn2Kbd: 'bg-emerald-950 text-emerald-300 border-emerald-600/60',
-    companion1Bg: 'bg-[#3b4e24]',
-    companion1Border: 'border-lime-600/30 shadow-lg',
-    companion1TagBg: 'bg-black/30 border-lime-400/30',
-    companion1TagText: 'text-yellow-300',
-    companion2Bg: 'bg-[#182215] dark:bg-[#121a0f]',
-    companion2Border: 'border-slate-800 shadow-lg',
-    accentColor: '#f5b84c',
-    accentBg: 'bg-[#f5b84c] hover:bg-amber-400',
-    accentText: 'text-amber-400',
-    progressBarColor: 'bg-amber-400',
-    nextBtnBg: 'bg-[#f5b84c] hover:bg-amber-400 text-slate-950',
-  },
-  'dark-space': {
-    id: 'dark-space',
-    label: 'IELTS Đêm Sao',
-    emoji: '🌌',
-    dotClass: 'bg-indigo-900 border border-amber-400',
-    topBarBg: 'bg-[#111722]',
-    topBarBorder: 'border-slate-800/80',
-    frontBg: 'bg-gradient-to-b from-[#132743] via-[#0f1d33] to-[#0a1526]',
-    frontBorder: 'border-blue-500/40 shadow-[0_0_50px_rgba(15,29,51,0.8)]',
-    frontTextColor: 'text-white',
-    frontAccent: 'text-amber-400',
-    frontTagBg: 'bg-slate-900/70 border-white/10',
-    frontTagText: 'text-slate-200',
-    backBg: 'bg-gradient-to-b from-[#203a43] via-[#0f2027] to-[#2c5364]',
-    backBorder: 'border-cyan-500/40 shadow-[0_0_50px_rgba(32,58,67,0.8)]',
-    backTextColor: 'text-white',
-    backBoxBg: 'bg-black/35 backdrop-blur-md',
-    backBoxBorder: 'border-cyan-500/20',
-    btn1Bg: 'bg-rose-950/70 hover:bg-rose-900/80',
-    btn1Border: 'border-rose-700/60',
-    btn1Text: 'text-rose-200',
-    btn1Kbd: 'bg-rose-950 text-rose-300 border-rose-700/60',
-    btnSpaceBg: 'bg-cyan-950/70 hover:bg-cyan-900/80',
-    btnSpaceBorder: 'border-cyan-600/60',
-    btnSpaceText: 'text-cyan-100',
-    btnSpaceKbd: 'bg-cyan-950 text-cyan-300 border-cyan-700/60',
-    btn2Bg: 'bg-emerald-950/70 hover:bg-emerald-900/80',
-    btn2Border: 'border-emerald-600/60',
-    btn2Text: 'text-emerald-200',
-    btn2Kbd: 'bg-emerald-950 text-emerald-300 border-emerald-600/60',
-    companion1Bg: 'bg-gradient-to-b from-[#132743] to-[#0a1526]',
-    companion1Border: 'border-blue-500/30',
-    companion1TagBg: 'bg-blue-950/80 border-blue-400/30',
-    companion1TagText: 'text-blue-300',
-    companion2Bg: 'bg-[#111722]',
-    companion2Border: 'border-slate-800',
-    accentColor: '#f59e0b',
-    accentBg: 'bg-amber-500 hover:bg-amber-400',
-    accentText: 'text-amber-400',
-    progressBarColor: 'bg-amber-400',
-    nextBtnBg: 'bg-amber-500 hover:bg-amber-400 text-slate-950',
-  },
-  blue: {
-    id: 'blue',
-    label: 'Xanh Đại Dương',
-    emoji: '🌊',
-    dotClass: 'bg-blue-500',
-    topBarBg: 'bg-[#091b35]',
-    topBarBorder: 'border-blue-900/60',
-    frontBg: 'bg-gradient-to-b from-[#0f2c59] via-[#091e3d] to-[#06142a]',
-    frontBorder: 'border-cyan-500/40 shadow-[0_0_50px_rgba(15,44,89,0.8)]',
-    frontTextColor: 'text-white',
-    frontAccent: 'text-cyan-300',
-    frontTagBg: 'bg-blue-950/80 border-cyan-400/20',
-    frontTagText: 'text-cyan-200',
-    backBg: 'bg-gradient-to-b from-[#1e3a8a] via-[#172554] to-[#0f172a]',
-    backBorder: 'border-blue-400/50 shadow-[0_0_50px_rgba(30,58,138,0.8)]',
-    backTextColor: 'text-white',
-    backBoxBg: 'bg-blue-950/50 backdrop-blur-md',
-    backBoxBorder: 'border-blue-400/30',
-    btn1Bg: 'bg-rose-950/80 hover:bg-rose-900',
-    btn1Border: 'border-rose-700/60',
-    btn1Text: 'text-rose-200',
-    btn1Kbd: 'bg-rose-950 text-rose-300 border-rose-700/60',
-    btnSpaceBg: 'bg-blue-900/80 hover:bg-blue-800',
-    btnSpaceBorder: 'border-blue-500/60',
-    btnSpaceText: 'text-blue-100',
-    btnSpaceKbd: 'bg-blue-950 text-blue-300 border-blue-600/60',
-    btn2Bg: 'bg-emerald-950/80 hover:bg-emerald-900',
-    btn2Border: 'border-emerald-600/60',
-    btn2Text: 'text-emerald-200',
-    btn2Kbd: 'bg-emerald-950 text-emerald-300 border-emerald-600/60',
-    companion1Bg: 'bg-gradient-to-b from-[#0f2c59] to-[#07172f]',
-    companion1Border: 'border-cyan-500/30',
-    companion1TagBg: 'bg-blue-950/90 border-cyan-400/30',
-    companion1TagText: 'text-cyan-300',
-    companion2Bg: 'bg-[#091b35]',
-    companion2Border: 'border-blue-900/60',
-    accentColor: '#38bdf8',
-    accentBg: 'bg-cyan-500 hover:bg-cyan-400',
-    accentText: 'text-cyan-300',
-    progressBarColor: 'bg-cyan-400',
-    nextBtnBg: 'bg-cyan-500 hover:bg-cyan-400 text-slate-950',
-  },
-  rose: {
-    id: 'rose',
-    label: 'Đỏ Ruby',
-    emoji: '🔥',
-    dotClass: 'bg-rose-500',
-    topBarBg: 'bg-[#220712]',
-    topBarBorder: 'border-rose-950/80',
-    frontBg: 'bg-gradient-to-b from-[#3d0f1e] via-[#2a0914] to-[#1a050c]',
-    frontBorder: 'border-rose-500/40 shadow-[0_0_50px_rgba(61,15,30,0.8)]',
-    frontTextColor: 'text-white',
-    frontAccent: 'text-rose-300',
-    frontTagBg: 'bg-rose-950/80 border-rose-400/20',
-    frontTagText: 'text-rose-200',
-    backBg: 'bg-gradient-to-b from-[#881337] via-[#4c0519] to-[#1f020a]',
-    backBorder: 'border-rose-400/50 shadow-[0_0_50px_rgba(136,19,55,0.8)]',
-    backTextColor: 'text-white',
-    backBoxBg: 'bg-rose-950/50 backdrop-blur-md',
-    backBoxBorder: 'border-rose-400/30',
-    btn1Bg: 'bg-rose-950/90 hover:bg-rose-900',
-    btn1Border: 'border-rose-700/60',
-    btn1Text: 'text-rose-200',
-    btn1Kbd: 'bg-rose-950 text-rose-300 border-rose-700/60',
-    btnSpaceBg: 'bg-rose-900/80 hover:bg-rose-800',
-    btnSpaceBorder: 'border-rose-500/60',
-    btnSpaceText: 'text-rose-100',
-    btnSpaceKbd: 'bg-rose-950 text-rose-300 border-rose-600/60',
-    btn2Bg: 'bg-emerald-950/80 hover:bg-emerald-900',
-    btn2Border: 'border-emerald-600/60',
-    btn2Text: 'text-emerald-200',
-    btn2Kbd: 'bg-emerald-950 text-emerald-300 border-emerald-600/60',
-    companion1Bg: 'bg-gradient-to-b from-[#380e1c] to-[#1f050e]',
-    companion1Border: 'border-rose-500/30',
-    companion1TagBg: 'bg-rose-950/90 border-rose-400/30',
-    companion1TagText: 'text-rose-300',
-    companion2Bg: 'bg-[#220712]',
-    companion2Border: 'border-rose-950/80',
-    accentColor: '#fb7185',
-    accentBg: 'bg-rose-500 hover:bg-rose-400',
-    accentText: 'text-rose-300',
-    progressBarColor: 'bg-rose-400',
-    nextBtnBg: 'bg-rose-500 hover:bg-rose-400 text-white',
-  },
-  emerald: {
-    id: 'emerald',
-    label: 'Xanh Rừng Rậm',
-    emoji: '🌿',
-    dotClass: 'bg-emerald-500',
-    topBarBg: 'bg-[#082016]',
-    topBarBorder: 'border-emerald-950/80',
-    frontBg: 'bg-gradient-to-b from-[#0a2f1d] via-[#062013] to-[#03130b]',
-    frontBorder: 'border-emerald-500/40 shadow-[0_0_50px_rgba(10,47,29,0.8)]',
-    frontTextColor: 'text-white',
-    frontAccent: 'text-emerald-300',
-    frontTagBg: 'bg-emerald-950/80 border-emerald-400/20',
-    frontTagText: 'text-emerald-200',
-    backBg: 'bg-gradient-to-b from-[#065f46] via-[#064e3b] to-[#022c22]',
-    backBorder: 'border-emerald-400/50 shadow-[0_0_50px_rgba(6,95,70,0.8)]',
-    backTextColor: 'text-white',
-    backBoxBg: 'bg-emerald-950/50 backdrop-blur-md',
-    backBoxBorder: 'border-emerald-400/30',
-    btn1Bg: 'bg-rose-950/80 hover:bg-rose-900',
-    btn1Border: 'border-rose-700/60',
-    btn1Text: 'text-rose-200',
-    btn1Kbd: 'bg-rose-950 text-rose-300 border-rose-700/60',
-    btnSpaceBg: 'bg-emerald-900/80 hover:bg-emerald-800',
-    btnSpaceBorder: 'border-emerald-500/60',
-    btnSpaceText: 'text-emerald-100',
-    btnSpaceKbd: 'bg-emerald-950 text-emerald-300 border-emerald-600/60',
-    btn2Bg: 'bg-emerald-950/80 hover:bg-emerald-900',
-    btn2Border: 'border-emerald-600/60',
-    btn2Text: 'text-emerald-200',
-    btn2Kbd: 'bg-emerald-950 text-emerald-300 border-emerald-600/60',
-    companion1Bg: 'bg-gradient-to-b from-[#0a2e1d] to-[#04170e]',
-    companion1Border: 'border-emerald-500/30',
-    companion1TagBg: 'bg-emerald-950/90 border-emerald-400/30',
-    companion1TagText: 'text-emerald-300',
-    companion2Bg: 'bg-[#082016]',
-    companion2Border: 'border-emerald-950/80',
-    accentColor: '#34d399',
-    accentBg: 'bg-emerald-500 hover:bg-emerald-400',
-    accentText: 'text-emerald-300',
-    progressBarColor: 'bg-emerald-400',
-    nextBtnBg: 'bg-emerald-500 hover:bg-emerald-400 text-slate-950',
-  },
-  purple: {
-    id: 'purple',
-    label: 'Tím Huyền Bí',
-    emoji: '🔮',
-    dotClass: 'bg-purple-500',
-    topBarBg: 'bg-[#1a0a2b]',
-    topBarBorder: 'border-purple-950/80',
-    frontBg: 'bg-gradient-to-b from-[#24133b] via-[#190c29] to-[#0e0618]',
-    frontBorder: 'border-purple-500/40 shadow-[0_0_50px_rgba(36,19,59,0.8)]',
-    frontTextColor: 'text-white',
-    frontAccent: 'text-purple-300',
-    frontTagBg: 'bg-purple-950/80 border-purple-400/20',
-    frontTagText: 'text-purple-200',
-    backBg: 'bg-gradient-to-b from-[#581c87] via-[#3b0764] to-[#1c0332]',
-    backBorder: 'border-purple-400/50 shadow-[0_0_50px_rgba(88,28,135,0.8)]',
-    backTextColor: 'text-white',
-    backBoxBg: 'bg-purple-950/50 backdrop-blur-md',
-    backBoxBorder: 'border-purple-400/30',
-    btn1Bg: 'bg-rose-950/80 hover:bg-rose-900',
-    btn1Border: 'border-rose-700/60',
-    btn1Text: 'text-rose-200',
-    btn1Kbd: 'bg-rose-950 text-rose-300 border-rose-700/60',
-    btnSpaceBg: 'bg-purple-900/80 hover:bg-purple-800',
-    btnSpaceBorder: 'border-purple-500/60',
-    btnSpaceText: 'text-purple-100',
-    btnSpaceKbd: 'bg-purple-950 text-purple-300 border-purple-600/60',
-    btn2Bg: 'bg-emerald-950/80 hover:bg-emerald-900',
-    btn2Border: 'border-emerald-600/60',
-    btn2Text: 'text-emerald-200',
-    btn2Kbd: 'bg-emerald-950 text-emerald-300 border-emerald-600/60',
-    companion1Bg: 'bg-gradient-to-b from-[#25103d] to-[#120520]',
-    companion1Border: 'border-purple-500/30',
-    companion1TagBg: 'bg-purple-950/90 border-purple-400/30',
-    companion1TagText: 'text-purple-300',
-    companion2Bg: 'bg-[#1a0a2b]',
-    companion2Border: 'border-purple-950/80',
-    accentColor: '#c084fc',
-    accentBg: 'bg-purple-500 hover:bg-purple-400',
-    accentText: 'text-purple-300',
-    progressBarColor: 'bg-purple-400',
-    nextBtnBg: 'bg-purple-500 hover:bg-purple-400 text-white',
-  },
-};
+import { ThemeVibe, THEME_CONFIGS } from '../config/themes';
 
 interface FlashcardViewProps {
   flashcards: Flashcard[];
@@ -361,6 +47,8 @@ interface FlashcardViewProps {
   onDeleteCard?: (cardId: string) => void;
   onEditCard?: (updatedCard: Flashcard) => void;
   onOpenQuickAdd?: () => void;
+  themeVibe?: ThemeVibe;
+  onSelectThemeVibe?: (vibe: ThemeVibe) => void;
 }
 
 export const FlashcardView: React.FC<FlashcardViewProps> = ({
@@ -378,6 +66,8 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
   onDeleteCard,
   onEditCard,
   onOpenQuickAdd,
+  themeVibe: controlledThemeVibe,
+  onSelectThemeVibe,
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
@@ -409,343 +99,349 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
     });
   };
 
-  // Theme Vibe
-  const THEME_VIBE_KEY = 'lulu_mimi_card_theme_vibe_v4';
-  const [themeVibe, setThemeVibe] = useState<ThemeVibe>(() => {
+  // Theme Vibe state
+  const THEME_VIBE_KEY = 'lulu_mimi_card_theme_vibe_v5';
+  const [localThemeVibe, setLocalThemeVibe] = useState<ThemeVibe>(() => {
     try {
       const saved = localStorage.getItem(THEME_VIBE_KEY) as ThemeVibe;
       if (saved && THEME_CONFIGS[saved]) return saved;
     } catch {}
-    return 'amber-gold'; // Default matching user's reference image!
+    return 'amber-gold';
   });
 
+  const activeThemeVibe = controlledThemeVibe || localThemeVibe;
+  const currentTheme = THEME_CONFIGS[activeThemeVibe] || THEME_CONFIGS['amber-gold'];
+
   const changeThemeVibe = (newVibe: ThemeVibe) => {
-    setThemeVibe(newVibe);
+    setLocalThemeVibe(newVibe);
     try { localStorage.setItem(THEME_VIBE_KEY, newVibe); } catch {}
+    if (onSelectThemeVibe) {
+      onSelectThemeVibe(newVibe);
+    }
   };
 
-  const currentTheme = THEME_CONFIGS[themeVibe] || THEME_CONFIGS['amber-gold'];
+  // Sound Engine
+  const playNativeSound = useCallback((type: 'flip' | 'master' | 'again' | 'swoosh') => {
+    try {
+      const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+      if (!AudioContextClass) return;
+      const ctx = new AudioContextClass();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      const now = ctx.currentTime;
 
-  // Card animation
-  const [animClass, setAnimClass] = useState<string>('animate-card-pop');
-  const [isPlayingAudio, setIsPlayingAudio] = useState<'US' | 'UK' | null>(null);
+      if (type === 'flip') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(440, now);
+        osc.frequency.exponentialRampToValueAtTime(880, now + 0.08);
+        gain.gain.setValueAtTime(0.06, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+        osc.start(now);
+        osc.stop(now + 0.08);
+      } else if (type === 'master') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(523.25, now);
+        osc.frequency.setValueAtTime(659.25, now + 0.06);
+        osc.frequency.setValueAtTime(783.99, now + 0.12);
+        gain.gain.setValueAtTime(0.08, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+        osc.start(now);
+        osc.stop(now + 0.25);
+      } else if (type === 'again') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(320, now);
+        osc.frequency.linearRampToValueAtTime(240, now + 0.12);
+        gain.gain.setValueAtTime(0.06, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+        osc.start(now);
+        osc.stop(now + 0.12);
+      } else {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(300, now);
+        osc.frequency.exponentialRampToValueAtTime(600, now + 0.05);
+        gain.gain.setValueAtTime(0.04, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+        osc.start(now);
+        osc.stop(now + 0.05);
+      }
+    } catch {
+      // AudioContext muted or not allowed
+    }
+  }, []);
 
-  // In-Card Editor State
-  const [isEditing, setIsEditing] = useState(false);
-  const [editForm, setEditForm] = useState<Partial<Flashcard>>({});
-
-  // Filter cards
-  const filteredCards = useMemo(() => {
-    return flashcards.filter((card) => {
-      if (selectedTopic !== 'all' && card.topic !== selectedTopic) {
-        return false;
-      }
-      if (selectedVocabType !== 'all' && card.vocabType !== selectedVocabType) {
-        return false;
-      }
-      if (statusFilter === 'due_srs') {
-        return isCardDue(srsRecords[card.id]);
-      }
-      if (statusFilter === 'mastered') {
-        return masteredIds.includes(card.id);
-      }
-      if (statusFilter === 'review') {
-        return needReviewIds.includes(card.id);
-      }
-      if (statusFilter === 'unmastered') {
-        return !masteredIds.includes(card.id);
-      }
-      return true;
-    });
-  }, [flashcards, selectedTopic, selectedVocabType, statusFilter, masteredIds, needReviewIds, srsRecords]);
-
+  // Filter Cards
   useEffect(() => {
-    setCardsList(filteredCards);
+    let filtered = flashcards;
+
+    if (selectedTopic !== 'all') {
+      filtered = filtered.filter((card) => card.topic === selectedTopic);
+    }
+
+    if (selectedVocabType !== 'all') {
+      filtered = filtered.filter((card) => card.vocabType === selectedVocabType);
+    }
+
+    if (statusFilter === 'due_srs') {
+      filtered = filtered.filter((card) => isCardDue(srsRecords[card.id]));
+    } else if (statusFilter === 'unmastered') {
+      filtered = filtered.filter((card) => !masteredIds.includes(card.id));
+    } else if (statusFilter === 'review') {
+      filtered = filtered.filter((card) => needReviewIds.includes(card.id));
+    } else if (statusFilter === 'mastered') {
+      filtered = filtered.filter((card) => masteredIds.includes(card.id));
+    }
+
+    setCardsList(filtered);
     setCurrentIndex(0);
     setIsFlipped(false);
-    setIsEditing(false);
-  }, [filteredCards]);
+  }, [flashcards, selectedTopic, selectedVocabType, statusFilter, masteredIds, needReviewIds, srsRecords]);
 
-  const currentCard = cardsList[currentIndex];
-  const currentCardSRS = currentCard ? srsRecords[currentCard.id] : undefined;
+  // Current Card
+  const currentCard = cardsList[currentIndex] || null;
 
-  // Mastered & Progress Stats for current set
-  const currentTopicObj = topics.find((t) => t.id === selectedTopic);
-  const totalCardsInSet = cardsList.length;
-  const masteredCardsInSet = useMemo(() => {
-    return cardsList.filter((c) => masteredIds.includes(c.id)).length;
-  }, [cardsList, masteredIds]);
-  const unmasteredCardsInSet = totalCardsInSet - masteredCardsInSet;
-  const masteryPercentage = totalCardsInSet > 0 ? Math.round((masteredCardsInSet / totalCardsInSet) * 100) : 0;
-  const masteryLevel = masteryPercentage >= 80 ? 5 : masteryPercentage >= 60 ? 4 : masteryPercentage >= 40 ? 3 : masteryPercentage >= 20 ? 2 : 1;
-
-  // Play Audio
-  const playAudio = useCallback((e?: React.MouseEvent, accent: 'UK' | 'US' = preferredAccent) => {
-    if (e) e.stopPropagation();
-    if (!currentCard) return;
-
-    setIsPlayingAudio(accent);
-    setTimeout(() => setIsPlayingAudio(null), 1000);
-
-    const audioUrl = accent === 'UK' ? currentCard.audioUk : currentCard.audioUs;
-    if (audioUrl) {
-      const audio = new Audio(audioUrl);
-      audio.play().catch(() => playSpeechFallback(currentCard.front, accent));
-    } else {
-      playSpeechFallback(currentCard.front, accent);
-    }
-  }, [currentCard, preferredAccent]);
-
-  const playSpeechFallback = (text: string, accent: 'UK' | 'US') => {
-    if ('speechSynthesis' in window) {
+  // Speak word
+  const speakText = useCallback(
+    (text: string, accent: 'US' | 'UK' = preferredAccent) => {
+      if (!window.speechSynthesis) return;
       window.speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = accent === 'UK' ? 'en-GB' : 'en-US';
       utterance.rate = 0.9;
+      utterance.pitch = 1.0;
       window.speechSynthesis.speak(utterance);
-    }
-  };
+    },
+    [preferredAccent]
+  );
 
-  // Auto-play audio on card change
+  // Play pronunciation from audio URL or fallback
+  const playPronunciation = useCallback(
+    (accent: 'US' | 'UK' = preferredAccent) => {
+      if (!currentCard) return;
+      const audioUrl = accent === 'UK' ? currentCard.audioUk : currentCard.audioUs;
+      if (audioUrl) {
+        const audio = new Audio(audioUrl);
+        audio.play().catch(() => speakText(currentCard.front, accent));
+      } else {
+        speakText(currentCard.front, accent);
+      }
+    },
+    [currentCard, preferredAccent, speakText]
+  );
+
+  // Auto-play pronunciation when card changes
   useEffect(() => {
-    if (autoPlayAudio && currentCard && !isFlipped && !isEditing) {
-      const timeout = setTimeout(() => {
-        playAudio(undefined, preferredAccent);
-      }, 250);
-      return () => clearTimeout(timeout);
+    if (autoPlayAudio && currentCard && !isFlipped) {
+      const timer = setTimeout(() => {
+        playPronunciation(preferredAccent);
+      }, 200);
+      return () => clearTimeout(timer);
     }
-  }, [currentIndex, autoPlayAudio, preferredAccent]);
+  }, [currentIndex, autoPlayAudio, currentCard, preferredAccent, playPronunciation, isFlipped]);
 
-  // Navigation
-  const handleNext = useCallback(() => {
-    if (cardsList.length === 0) return;
-    setIsFlipped(false);
-    setIsEditing(false);
-    setAnimClass('');
-    requestAnimationFrame(() => {
-      setAnimClass('animate-slide-right');
+  // Card Animation state
+  const [animDirection, setAnimDirection] = useState<'next' | 'prev' | null>(null);
+
+  const nextCard = useCallback(() => {
+    if (cardsList.length <= 1) return;
+    setAnimDirection('next');
+    playNativeSound('swoosh');
+    setTimeout(() => {
+      setIsFlipped(false);
       setCurrentIndex((prev) => (prev + 1) % cardsList.length);
-    });
-  }, [cardsList.length]);
+      setAnimDirection(null);
+    }, 120);
+  }, [cardsList.length, playNativeSound]);
 
-  const handlePrev = useCallback(() => {
-    if (cardsList.length === 0) return;
-    setIsFlipped(false);
-    setIsEditing(false);
-    setAnimClass('');
-    requestAnimationFrame(() => {
-      setAnimClass('animate-slide-left');
+  const prevCard = useCallback(() => {
+    if (cardsList.length <= 1) return;
+    setAnimDirection('prev');
+    playNativeSound('swoosh');
+    setTimeout(() => {
+      setIsFlipped(false);
       setCurrentIndex((prev) => (prev - 1 + cardsList.length) % cardsList.length);
-    });
-  }, [cardsList.length]);
+      setAnimDirection(null);
+    }, 120);
+  }, [cardsList.length, playNativeSound]);
 
-  const handleShuffle = () => {
+  const flipCard = useCallback(() => {
+    playNativeSound('flip');
+    setIsFlipped((prev) => !prev);
+  }, [playNativeSound]);
+
+  const shuffleCards = () => {
+    playNativeSound('swoosh');
     const shuffled = [...cardsList].sort(() => Math.random() - 0.5);
     setCardsList(shuffled);
     setCurrentIndex(0);
     setIsFlipped(false);
-    setIsEditing(false);
-    setAnimClass('');
-    requestAnimationFrame(() => {
-      setAnimClass('animate-card-pop');
-    });
   };
 
-  // Quick Action Buttons
-  const handleMarkNotRemembered = (e?: React.MouseEvent) => {
-    if (e) e.stopPropagation();
-    if (!currentCard) return;
-    if (onToggleNeedReview && !needReviewIds.includes(currentCard.id)) {
-      onToggleNeedReview(currentCard.id);
-    }
-    if (onRateCardSRS) {
-      onRateCardSRS(currentCard.id, 1);
-    }
-    handleNext();
-  };
-
-  const handleMarkRemembered = (e?: React.MouseEvent) => {
-    if (e) e.stopPropagation();
-    if (!currentCard) return;
-    if (onToggleMastered && !masteredIds.includes(currentCard.id)) {
-      onToggleMastered(currentCard.id);
-    }
-    if (onRateCardSRS) {
-      onRateCardSRS(currentCard.id, 3);
-    }
-    handleNext();
-  };
-
-  // Edit handler
-  const handleOpenEdit = (e?: React.MouseEvent) => {
-    if (e) e.stopPropagation();
-    if (!currentCard) return;
-    setEditForm({
-      id: currentCard.id,
-      front: currentCard.front,
-      back: currentCard.back,
-      definitionEn: currentCard.definitionEn || currentCard.back,
-      pronunciationUs: currentCard.pronunciationUs || currentCard.pronunciation || '',
-      pronunciationUk: currentCard.pronunciationUk || '',
-      wordForm: currentCard.wordForm || 'noun',
-      vocabType: currentCard.vocabType || 'word',
-      topic: currentCard.topic,
-      example: currentCard.example || '',
-      exampleVi: currentCard.exampleVi || '',
-      synonyms: currentCard.synonyms ? [...currentCard.synonyms] : [],
-      collocations: currentCard.collocations ? [...currentCard.collocations] : [],
-    });
-    setIsEditing(true);
-  };
-
-  const handleSaveEdit = (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    if (!currentCard || !editForm.front?.trim()) return;
-
-    const updated: Flashcard = {
-      ...currentCard,
-      ...editForm,
-      front: editForm.front.trim(),
-      back: editForm.back?.trim() || currentCard.back,
-      definitionEn: editForm.definitionEn?.trim() || currentCard.definitionEn,
-      pronunciationUs: editForm.pronunciationUs?.trim(),
-      pronunciationUk: editForm.pronunciationUk?.trim(),
-      pronunciation: editForm.pronunciationUs?.trim() || editForm.pronunciationUk?.trim() || currentCard.pronunciation,
-      example: editForm.example?.trim(),
-      exampleVi: editForm.exampleVi?.trim(),
-    };
-
-    setCardsList((prev) => prev.map((c) => (c.id === updated.id ? updated : c)));
-    if (onEditCard) {
-      onEditCard(updated);
-    }
-    setIsEditing(false);
-  };
-
-  // Keyboard Navigation
+  // Keyboard Shortcuts (Space: flip, 1: unmastered, 2: mastered, Left/Right: nav)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (['input', 'textarea', 'select'].includes((e.target as HTMLElement)?.tagName?.toLowerCase())) {
+      if (['INPUT', 'TEXTAREA', 'SELECT'].includes((e.target as HTMLElement).tagName)) {
         return;
       }
 
       if (e.code === 'Space') {
         e.preventDefault();
-        if (!isEditing) {
-          setIsFlipped((prev) => !prev);
-        }
-      } else if (e.code === 'ArrowRight') {
-        e.preventDefault();
-        handleNext();
-      } else if (e.code === 'ArrowLeft') {
-        e.preventDefault();
-        handlePrev();
+        flipCard();
       } else if (e.key === '1') {
         e.preventDefault();
-        handleMarkNotRemembered();
+        if (currentCard) {
+          playNativeSound('again');
+          if (onRateCardSRS) onRateCardSRS(currentCard.id, 1);
+          if (masteredIds.includes(currentCard.id)) onToggleMastered(currentCard.id);
+          nextCard();
+        }
       } else if (e.key === '2') {
         e.preventDefault();
-        handleMarkRemembered();
-      } else if (e.key === 'e' || e.key === 'E') {
+        if (currentCard) {
+          playNativeSound('master');
+          if (onRateCardSRS) onRateCardSRS(currentCard.id, 4);
+          if (!masteredIds.includes(currentCard.id)) onToggleMastered(currentCard.id);
+          nextCard();
+        }
+      } else if (e.key === 'ArrowRight') {
         e.preventDefault();
-        if (!isEditing) handleOpenEdit();
+        nextCard();
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        prevCard();
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handleNext, handlePrev, isFlipped, isEditing, currentCard]);
+  }, [flipCard, nextCard, prevCard, currentCard, onRateCardSRS, masteredIds, onToggleMastered, playNativeSound]);
 
-  const getWordFormLabel = (form?: string) => {
-    if (!form) return 'v/n';
-    const map: Record<string, string> = {
-      noun: 'n',
-      verb: 'v',
-      adjective: 'adj',
-      adverb: 'adv',
-      phrase: 'phrase',
-      idiom: 'idiom',
-    };
-    return map[form.toLowerCase()] || form;
+  // Direct In-Card Edit state
+  const [isEditing, setIsEditing] = useState(false);
+  const [editForm, setEditForm] = useState<Partial<Flashcard>>({});
+
+  const handleStartEdit = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!currentCard) return;
+    setEditForm({ ...currentCard });
+    setIsEditing(true);
   };
 
+  const handleSaveEdit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!currentCard || !onEditCard) return;
+    const updated: Flashcard = {
+      ...currentCard,
+      ...editForm,
+      front: editForm.front?.trim() || currentCard.front,
+      back: editForm.back?.trim() || currentCard.back,
+    };
+    onEditCard(updated);
+    setIsEditing(false);
+  };
+
+  const currentTopic = topics.find((t) => t.id === selectedTopic);
+  const isCurrentMastered = currentCard ? masteredIds.includes(currentCard.id) : false;
+  const isCurrentNeedReview = currentCard ? needReviewIds.includes(currentCard.id) : false;
+  const currentCardSRS = currentCard ? srsRecords[currentCard.id] : undefined;
+
+  // Animation CSS class
+  const animClass =
+    animDirection === 'next'
+      ? 'opacity-0 translate-x-12 scale-95 duration-150'
+      : animDirection === 'prev'
+      ? 'opacity-0 -translate-x-12 scale-95 duration-150'
+      : 'opacity-100 translate-x-0 scale-100 duration-200';
+
+  const masteredTotalInFolder = useMemo(() => {
+    return flashcards.filter(c => (selectedTopic === 'all' || c.topic === selectedTopic) && masteredIds.includes(c.id)).length;
+  }, [flashcards, selectedTopic, masteredIds]);
+
+  const totalInFolder = useMemo(() => {
+    return flashcards.filter(c => (selectedTopic === 'all' || c.topic === selectedTopic)).length;
+  }, [flashcards, selectedTopic]);
+
+  const masteredPercent = totalInFolder > 0 ? Math.round((masteredTotalInFolder / totalInFolder) * 100) : 0;
+  const unmasteredCount = Math.max(0, totalInFolder - masteredTotalInFolder);
+
   return (
-    <div className="w-full max-w-7xl mx-auto px-2 sm:px-6 py-4 space-y-5 font-sans">
+    <div className="w-full max-w-6xl xl:max-w-7xl mx-auto px-4 sm:px-6 py-2 sm:py-4 flex flex-col justify-center min-h-[calc(100vh-80px)] space-y-6 font-sans">
       
-      {/* ════════ TOP BREADCRUMB & CONTROLS BAR (EXACT IELTS DICTIONARY STYLE) ════════ */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 bg-transparent">
+      {/* ════════ TOP BREADCRUMB & TOOLBAR (THEME-COORDINATED) ════════ */}
+      <div className={`flex flex-wrap items-center justify-between gap-4 pb-3 border-b ${currentTheme.topBarBorder}`}>
         
-        {/* Left: Breadcrumbs */}
-        <div className="space-y-0.5">
-          <div className="text-[11px] font-black uppercase tracking-wider text-slate-400">
-            ĐANG HỌC • BỘ THẺ
-          </div>
-          <div className="flex items-center gap-2.5 flex-wrap">
-            <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-              {currentTopicObj?.title || 'IELTS'} • Chủ đề {currentTopicObj?.title || 'Môi trường & Sinh thái'}
-            </h2>
-            <span className="text-xs font-black px-2.5 py-0.5 rounded-lg bg-black/10 dark:bg-white/10 text-slate-700 dark:text-slate-300">
-              {currentCard?.vocabType || 'Academic'}
-            </span>
+        {/* Left: Breadcrumbs & Topic Name */}
+        <div className="flex items-center gap-3">
+          <div className="space-y-0.5">
+            <div className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+              <span>ĐANG HỌC</span>
+              <span>•</span>
+              <span>BỘ THẺ</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <h2 className="text-xl sm:text-2xl font-black tracking-tight text-slate-900 dark:text-white">
+                {currentTopic?.title || 'Tất Cả Thư Mục'}
+              </h2>
+              <span className="px-2 py-0.5 rounded-md bg-black/10 dark:bg-white/10 text-slate-700 dark:text-slate-300 text-[11px] font-bold">
+                {currentCard?.vocabType || 'word'}
+              </span>
+            </div>
           </div>
         </div>
 
-        {/* Right: Controls Strip */}
-        <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+        {/* Right: Controls & Preferences */}
+        <div className="flex flex-wrap items-center gap-2.5">
           
           {/* Trộn thẻ */}
           <button
-            onClick={handleShuffle}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-black text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition cursor-pointer active:scale-95 shadow-xs"
-            title="Xáo trộn ngẫu nhiên bộ thẻ"
+            onClick={shuffleCards}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs font-black text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer active:scale-95 shadow-2xs"
+            title="Trộn ngẫu nhiên danh sách thẻ"
           >
             <Shuffle className="w-3.5 h-3.5" />
-            <span>Trộn thẻ</span>
+            <span className="hidden sm:inline">Trộn thẻ</span>
           </button>
 
-          {/* Tự động phát âm Toggle */}
-          <button
-            onClick={toggleAutoPlayAudio}
-            className={`flex items-center gap-2 px-3.5 py-2 rounded-2xl border text-xs font-black transition cursor-pointer active:scale-95 shadow-xs ${
-              autoPlayAudio
-                ? 'bg-white dark:bg-slate-800 border-amber-400 text-amber-600 dark:text-amber-400'
-                : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300'
-            }`}
-            title="Bật/Tắt tự động phát âm khi chuyển thẻ"
-          >
+          {/* Tự động phát âm toggle */}
+          <label className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs font-black text-slate-700 dark:text-slate-300 cursor-pointer shadow-2xs">
             <Volume2 className="w-3.5 h-3.5" />
-            <span className="hidden md:inline">Tự động phát âm</span>
-            <div className={`w-8 h-4 rounded-full transition-colors relative flex items-center p-0.5 ${autoPlayAudio ? 'bg-amber-400' : 'bg-slate-300 dark:bg-slate-600'}`}>
-              <div className={`w-3 h-3 rounded-full bg-white transition-transform ${autoPlayAudio ? 'translate-x-4' : 'translate-x-0'}`} />
-            </div>
-          </button>
+            <span className="hidden sm:inline">Tự động phát âm</span>
+            <input
+              type="checkbox"
+              checked={autoPlayAudio}
+              onChange={toggleAutoPlayAudio}
+              className="w-3.5 h-3.5 accent-amber-500 rounded cursor-pointer"
+            />
+          </label>
 
-          {/* Giọng phát âm Dropdown */}
+          {/* Giọng phát âm dropdown */}
           <select
             value={preferredAccent}
             onChange={(e) => setPreferredAccent(e.target.value as 'US' | 'UK')}
-            className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-black rounded-2xl px-3 py-2 outline-none cursor-pointer shadow-xs"
+            className="px-2.5 py-1.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs font-black text-slate-700 dark:text-slate-300 outline-none cursor-pointer shadow-2xs"
           >
             <option value="US">🎙️ Giọng: US (Mỹ)</option>
             <option value="UK">🎙️ Giọng: UK (Anh)</option>
           </select>
 
-          {/* 🎨 Theme Vibe Selector */}
+          {/* 🎨 Theme Picker Dropdown */}
           <div className="relative">
             <button
-              onClick={() => setShowThemePicker((v) => !v)}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-black transition cursor-pointer active:scale-95 shadow-xs"
-              title="Đổi phong cách màu thẻ"
+              onClick={() => setShowThemePicker(!showThemePicker)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs font-black text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer shadow-2xs"
+              title="Đổi Vibe Giao Diện"
             >
-              <Palette className="w-4 h-4 text-amber-500" />
+              <Palette className="w-3.5 h-3.5 text-amber-500" />
+              <span className="hidden sm:inline">{currentTheme.emoji}</span>
             </button>
 
             {showThemePicker && (
-              <div className="absolute right-0 top-full mt-2 z-50 bg-slate-900 border border-slate-700 rounded-2xl p-2 shadow-2xl w-48 space-y-1 animate-in fade-in zoom-in-95 duration-100">
+              <div className="absolute right-0 top-full mt-2 w-56 p-2 rounded-2xl bg-slate-900/95 border border-white/20 shadow-2xl backdrop-blur-xl z-50 space-y-1 animate-in fade-in zoom-in-95 duration-150">
                 <div className="text-[10px] font-black uppercase text-slate-400 px-2 py-1">
-                  Chọn Vibe Màu
+                  Chọn Vibe Màu Toàn Bộ
                 </div>
-                {(Object.values(THEME_CONFIGS) as ThemeConfig[]).map((theme) => (
+                {Object.values(THEME_CONFIGS).map((theme) => (
                   <button
                     key={theme.id}
                     onClick={() => {
@@ -753,7 +449,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                       setShowThemePicker(false);
                     }}
                     className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-xl text-xs font-black transition cursor-pointer ${
-                      themeVibe === theme.id
+                      activeThemeVibe === theme.id
                         ? 'bg-white/20 text-white'
                         : 'text-slate-400 hover:bg-white/10'
                     }`}
@@ -762,7 +458,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                       <span className={`w-3 h-3 rounded-full ${theme.dotClass}`} />
                       <span>{theme.emoji} {theme.label}</span>
                     </span>
-                    {themeVibe === theme.id && <Check className="w-3.5 h-3.5 text-white" />}
+                    {activeThemeVibe === theme.id && <Check className="w-3.5 h-3.5 text-white" />}
                   </button>
                 ))}
               </div>
@@ -773,7 +469,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
           {onOpenQuickAdd && (
             <button
               onClick={onOpenQuickAdd}
-              className="flex items-center gap-1 px-3.5 py-2 bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-black rounded-2xl shadow-md transition cursor-pointer active:scale-95"
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 ${currentTheme.nextBtnBg} text-xs font-black rounded-xl shadow-md transition cursor-pointer active:scale-95`}
             >
               <Plus className="w-3.5 h-3.5" />
               <span>Thêm từ</span>
@@ -793,7 +489,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
           </h3>
           <button
             onClick={() => setStatusFilter('all')}
-            className="px-5 py-2.5 bg-amber-400 text-slate-950 text-xs font-black rounded-xl transition cursor-pointer shadow-md"
+            className={`px-5 py-2.5 ${currentTheme.nextBtnBg} text-xs font-black rounded-xl transition cursor-pointer shadow-md`}
           >
             Xem Tất Cả Flashcards
           </button>
@@ -801,14 +497,14 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
       ) : (
         <div className="space-y-6">
           
-          {/* ════════ MAIN GRID: WIDE FLASHCARD (LEFT 75%) + COMPANION WIDGETS (RIGHT 25%) ════════ */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          {/* ════════ MAIN GRID: WIDE FLASHCARD (LEFT 67%) + COMPANION WIDGETS (RIGHT 33%) ════════ */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
             
-            {/* 🎴 WIDE FLASHCARD CENTER STAGE (8.5 COLS) */}
-            <div className="lg:col-span-8 xl:col-span-9 space-y-4">
+            {/* 🎴 WIDE FLASHCARD CENTER STAGE (8 COLS) */}
+            <div className="lg:col-span-8 space-y-4 flex flex-col">
               
-              {/* WIDE HORIZONTAL CARD CONTAINER (RỘNG VÀ DÀI NHƯ HÌNH 1) */}
-              <div className={`perspective-[1200px] w-full h-[400px] sm:h-[460px] lg:h-[490px] relative select-none ${animClass}`}>
+              {/* WIDE HORIZONTAL CARD CONTAINER (RỘNG VÀ DÀI CÂN ĐỐI) */}
+              <div className={`perspective-[1200px] w-full h-[460px] sm:h-[500px] lg:h-[530px] relative select-none ${animClass}`}>
                 
                 {/* ✏️ IN-CARD EDITOR OVERLAY */}
                 {isEditing ? (
@@ -872,42 +568,53 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                             value={editForm.back || ''}
                             onChange={(e) => setEditForm({ ...editForm, back: e.target.value })}
                             required
-                            className="w-full px-3 py-2 bg-white/80 dark:bg-black/40 border border-black/20 dark:border-white/20 rounded-xl text-sm font-black text-slate-900 dark:text-white outline-none"
-                          />
-                        </div>
-
-                        <div className="sm:col-span-2">
-                          <label className="block text-[10px] font-black uppercase text-slate-800 dark:text-slate-200 mb-1">Định nghĩa tiếng Anh</label>
-                          <textarea
-                            rows={2}
-                            value={editForm.definitionEn || ''}
-                            onChange={(e) => setEditForm({ ...editForm, definitionEn: e.target.value })}
-                            className="w-full px-3 py-2 bg-white/80 dark:bg-black/40 border border-black/20 dark:border-white/20 rounded-xl text-xs font-bold text-slate-900 dark:text-white outline-none"
-                          />
-                        </div>
-
-                        <div className="sm:col-span-2">
-                          <label className="block text-[10px] font-black uppercase text-slate-800 dark:text-slate-200 mb-1">Câu ví dụ tiếng Anh</label>
-                          <input
-                            type="text"
-                            value={editForm.example || ''}
-                            onChange={(e) => setEditForm({ ...editForm, example: e.target.value })}
-                            className="w-full px-3 py-2 bg-white/80 dark:bg-black/40 border border-black/20 dark:border-white/20 rounded-xl text-xs font-medium text-slate-900 dark:text-white outline-none"
+                            className="w-full px-3 py-2 bg-white/80 dark:bg-black/40 border border-black/20 dark:border-white/20 rounded-xl text-sm font-bold text-slate-900 dark:text-white outline-none"
                           />
                         </div>
                       </div>
 
-                      <div className="flex items-center justify-end gap-2 pt-2 border-t border-black/15 dark:border-white/15">
+                      <div>
+                        <label className="block text-[10px] font-black uppercase text-slate-800 dark:text-slate-200 mb-1">Định nghĩa tiếng Anh</label>
+                        <textarea
+                          rows={2}
+                          value={editForm.definitionEn || ''}
+                          onChange={(e) => setEditForm({ ...editForm, definitionEn: e.target.value })}
+                          className="w-full px-3 py-2 bg-white/80 dark:bg-black/40 border border-black/20 dark:border-white/20 rounded-xl text-xs text-slate-900 dark:text-white outline-none"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-[10px] font-black uppercase text-slate-800 dark:text-slate-200 mb-1">Câu ví dụ (English)</label>
+                          <input
+                            type="text"
+                            value={editForm.example || ''}
+                            onChange={(e) => setEditForm({ ...editForm, example: e.target.value })}
+                            className="w-full px-3 py-2 bg-white/80 dark:bg-black/40 border border-black/20 dark:border-white/20 rounded-xl text-xs text-slate-900 dark:text-white outline-none"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[10px] font-black uppercase text-slate-800 dark:text-slate-200 mb-1">Dịch ví dụ (Tiếng Việt)</label>
+                          <input
+                            type="text"
+                            value={editForm.exampleVi || ''}
+                            onChange={(e) => setEditForm({ ...editForm, exampleVi: e.target.value })}
+                            className="w-full px-3 py-2 bg-white/80 dark:bg-black/40 border border-black/20 dark:border-white/20 rounded-xl text-xs text-slate-900 dark:text-white outline-none"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-end gap-2 pt-2">
                         <button
                           type="button"
                           onClick={() => setIsEditing(false)}
-                          className="px-4 py-2 bg-black/20 dark:bg-white/10 text-slate-900 dark:text-slate-200 text-xs font-black rounded-xl cursor-pointer"
+                          className="px-4 py-2 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-black/10 rounded-xl cursor-pointer"
                         >
                           Hủy
                         </button>
                         <button
                           type="submit"
-                          className="px-5 py-2 bg-slate-900 text-white dark:bg-amber-400 dark:text-slate-950 text-xs font-black rounded-xl cursor-pointer shadow-md"
+                          className="px-5 py-2 bg-slate-950 text-white dark:bg-white dark:text-slate-950 text-xs font-black rounded-xl shadow-md cursor-pointer hover:opacity-90"
                         >
                           Lưu Thay Đổi
                         </button>
@@ -915,10 +622,9 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                     </form>
                   </div>
                 ) : (
-                  /* ════════ 3D WIDE FLIP CARD BODY ════════ */
                   <div
                     className="w-full h-full cursor-pointer select-none"
-                    onClick={() => setIsFlipped(!isFlipped)}
+                    onClick={flipCard}
                   >
                     <div
                       className={`relative w-full h-full duration-500 transform-style-3d transition-transform ${
@@ -926,197 +632,209 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                       }`}
                     >
                       
-                      {/* ☀️ FRONT SIDE (WIDE HORIZONTAL WARM GOLDEN THEME) */}
+                      {/* ──────────────── FRONT FACE (MẶT TRƯỚC: TỪ VỰNG TO ĐẬM HOÀNG GIA) ──────────────── */}
                       <div
-                        className={`card-face-front rounded-3xl ${currentTheme.frontBg} border-2 ${currentTheme.frontBorder} shadow-2xl overflow-hidden ${
+                        className={`card-face-front rounded-3xl ${currentTheme.frontBg} border-2 ${currentTheme.frontBorder} p-6 sm:p-10 flex flex-col justify-between overflow-hidden ${
                           isFlipped ? 'invisible opacity-0 pointer-events-none' : 'visible opacity-100 pointer-events-auto'
                         }`}
                         style={{
                           backfaceVisibility: 'hidden',
                           WebkitBackfaceVisibility: 'hidden',
                           transform: 'rotateY(0deg) translate3d(0, 0, 0)',
-                          transition: 'opacity 0.2s ease-in-out, visibility 0.2s ease-in-out',
+                          transition: 'opacity 0.2s ease-in-out, visibility 0.2s ease-in-out'
                         }}
                       >
-                        <div className="w-full h-full p-6 sm:p-10 flex flex-col justify-between relative">
-                          
-                          {/* Top Bar on Front */}
-                          <div className="flex items-center justify-between z-10 shrink-0">
-                            {/* Part of Speech Badge (v/n rounded pill) */}
-                            <span className="w-10 h-10 rounded-full bg-slate-950/80 text-white text-xs font-black flex items-center justify-center shadow-md">
-                              {getWordFormLabel(currentCard.wordForm)}
-                            </span>
-
-                            <div className="flex items-center gap-2">
-                              {/* Speaker Button */}
-                              <button
-                                onClick={(e) => playAudio(e, preferredAccent)}
-                                className="w-10 h-10 rounded-2xl bg-white/80 hover:bg-white text-slate-900 border border-black/10 flex items-center justify-center transition cursor-pointer active:scale-95 shadow-sm"
-                                title={`Nghe phát âm chuẩn ${preferredAccent}`}
-                              >
-                                <Volume2 className={`w-5 h-5 ${isPlayingAudio ? 'text-amber-600 scale-110' : ''}`} />
-                              </button>
-
-                              {/* Bookmark / Edit Button */}
-                              <button
-                                onClick={handleOpenEdit}
-                                className="w-10 h-10 rounded-2xl bg-white/80 hover:bg-white text-slate-900 border border-black/10 flex items-center justify-center transition cursor-pointer active:scale-95 shadow-sm"
-                                title="Chỉnh sửa từ vựng (E)"
-                              >
-                                <Star className="w-5 h-5" />
-                              </button>
-                            </div>
+                        {/* Front Top Bar */}
+                        <div className="flex items-center justify-between">
+                          {/* Part of Speech Pill */}
+                          <div className="w-11 h-11 rounded-2xl bg-black/85 text-white flex items-center justify-center font-black text-sm tracking-tight shadow-md border border-white/20">
+                            {currentCard?.wordForm ? currentCard.wordForm.substring(0, 4) : 'word'}
                           </div>
 
-                          {/* Center Stage: Word, Phonetics, Category Tag */}
-                          <div className="my-auto text-center space-y-3 z-10 py-6">
-                            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black text-slate-950 dark:text-white tracking-tight drop-shadow-sm font-sans leading-none">
-                              {currentCard.front}
-                            </h1>
+                          {/* Controls (Speaker, Bookmark, Edit) */}
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                playPronunciation(preferredAccent);
+                              }}
+                              className="w-10 h-10 rounded-2xl bg-black/20 hover:bg-black/40 text-slate-950 dark:text-white flex items-center justify-center transition cursor-pointer active:scale-90"
+                              title="Phát âm từ vựng"
+                            >
+                              <Volume2 className="w-5 h-5" />
+                            </button>
 
-                            {(currentCard.pronunciation || currentCard.pronunciationUs || currentCard.pronunciationUk) && (
-                              <div className="flex items-center justify-center gap-2">
-                                <span className="font-mono text-lg sm:text-2xl font-bold text-slate-800 dark:text-slate-200">
-                                  {currentCard.pronunciationUs || currentCard.pronunciation || currentCard.pronunciationUk}
-                                </span>
-                                <button
-                                  onClick={(e) => playAudio(e, 'US')}
-                                  className="p-1.5 rounded-lg bg-black/10 hover:bg-black/20 dark:bg-white/10 dark:hover:bg-white/20 text-slate-900 dark:text-white transition cursor-pointer"
-                                  title="Phát âm"
-                                >
-                                  <Volume2 className="w-4 h-4" />
-                                </button>
-                              </div>
-                            )}
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (currentCard) onToggleNeedReview(currentCard.id);
+                              }}
+                              className={`w-10 h-10 rounded-2xl flex items-center justify-center transition cursor-pointer active:scale-90 ${
+                                isCurrentNeedReview ? 'bg-amber-400 text-slate-950 shadow-md' : 'bg-black/20 text-slate-950 dark:text-white hover:bg-black/40'
+                              }`}
+                              title={isCurrentNeedReview ? 'Đã đánh dấu cần ôn tập' : 'Đánh dấu cần ôn tập'}
+                            >
+                              <Star className="w-5 h-5 fill-current" />
+                            </button>
 
-                            {/* Category Hashtag Pill */}
-                            <div className="inline-block pt-1">
-                              <span className="inline-flex items-center px-4 py-1.5 rounded-full bg-black/10 dark:bg-white/15 text-xs font-black text-slate-900 dark:text-white">
-                                # {currentTopicObj?.title || 'Từ vựng'}
-                              </span>
-                            </div>
+                            <button
+                              onClick={handleStartEdit}
+                              className="w-10 h-10 rounded-2xl bg-black/20 hover:bg-black/40 text-slate-950 dark:text-white flex items-center justify-center transition cursor-pointer active:scale-90"
+                              title="Chỉnh sửa từ vựng này"
+                            >
+                              <Edit3 className="w-4 h-4" />
+                            </button>
                           </div>
-
-                          {/* Bottom Row on Front */}
-                          <div className="flex items-end justify-between z-10 shrink-0">
-                            {/* Cute Smiling Mascot Sun in Corner */}
-                            <div className="w-16 h-16 rounded-full bg-amber-300 border-4 border-amber-400 shadow-xl flex items-center justify-center text-2xl animate-bounce-subtle">
-                              ☀️
-                            </div>
-
-                            {/* Flip CTA Link */}
-                            <div className="text-sm font-black text-slate-900 dark:text-slate-200 flex items-center gap-1 hover:opacity-80 transition">
-                              <span>Nhấn để xem nghĩa</span>
-                              <ChevronRight className="w-4 h-4" />
-                            </div>
-                          </div>
-
                         </div>
+
+                        {/* Front Center: BIG BOLD WORD + IPA PHONETICS */}
+                        <div className="my-auto text-center space-y-4">
+                          <h1 className={`text-5xl sm:text-6xl lg:text-7xl font-black tracking-tight ${currentTheme.frontTextColor} drop-shadow-xs leading-none`}>
+                            {currentCard?.front}
+                          </h1>
+
+                          {/* Phonetic transcription badge */}
+                          <div className="flex items-center justify-center gap-2">
+                            <span className="text-base sm:text-xl font-mono font-bold tracking-wider text-slate-900/90 dark:text-white/90 bg-black/15 dark:bg-white/15 px-4 py-1.5 rounded-full border border-black/10 dark:border-white/10">
+                              {currentCard?.pronunciationUs || currentCard?.pronunciationUk || '/.../'}
+                            </span>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                playPronunciation(preferredAccent);
+                              }}
+                              className="p-1.5 rounded-full bg-black/20 hover:bg-black/40 text-slate-900 dark:text-white transition cursor-pointer"
+                              title="Nghe phát âm"
+                            >
+                              <Volume2 className="w-4 h-4" />
+                            </button>
+                          </div>
+
+                          {/* Topic Hashtag */}
+                          <div className="flex items-center justify-center">
+                            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black ${currentTheme.frontTagBg} ${currentTheme.frontTagText}`}>
+                              <span>#</span>
+                              <span>{currentTopic?.title || 'Từ vựng'}</span>
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Front Bottom Bar: Mascot on left, Flip hint on right */}
+                        <div className="flex items-center justify-between pt-2">
+                          <div className={`w-14 h-14 rounded-2xl ${currentTheme.mascotBg} flex items-center justify-center text-3xl shadow-lg transform -rotate-6 hover:rotate-0 transition-transform`}>
+                            {currentTheme.mascotEmoji}
+                          </div>
+
+                          <div className="flex items-center gap-1.5 text-xs sm:text-sm font-black text-slate-900/80 dark:text-white/80 group">
+                            <span>Nhấn để xem nghĩa</span>
+                            <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                          </div>
+                        </div>
+
                       </div>
 
-                      {/* 🍃 BACK SIDE (COLOR-COORDINATED & HIGH CONTRAST) */}
+                      {/* ──────────────── BACK FACE (MẶT SAU: NGHĨA & VÍ DỤ ĐỒNG BỘ MÀU) ──────────────── */}
                       <div
-                        className={`card-face-back rounded-3xl ${currentTheme.backBg} border-2 ${currentTheme.backBorder} shadow-2xl overflow-hidden ${
+                        className={`card-face-back rounded-3xl ${currentTheme.backBg} border-2 ${currentTheme.backBorder} p-6 sm:p-8 flex flex-col justify-between overflow-y-auto custom-scrollbar ${
                           !isFlipped ? 'invisible opacity-0 pointer-events-none' : 'visible opacity-100 pointer-events-auto'
                         }`}
                         style={{
                           backfaceVisibility: 'hidden',
                           WebkitBackfaceVisibility: 'hidden',
                           transform: 'rotateY(180deg) translate3d(0, 0, 0)',
-                          transition: 'opacity 0.2s ease-in-out, visibility 0.2s ease-in-out',
+                          transition: 'opacity 0.2s ease-in-out, visibility 0.2s ease-in-out'
                         }}
                       >
-                        <div className="w-full h-full p-6 sm:p-8 flex flex-col justify-between overflow-y-auto custom-scrollbar">
-                          
-                          {/* Top Row on Back */}
-                          <div className="flex items-center justify-between shrink-0 pb-2">
-                            <span className="text-[11px] font-black uppercase tracking-wider text-white/80">
-                              NGHĨA TIẾNG VIỆT
-                            </span>
-                            <div className="flex items-center gap-2">
-                              <button
-                                onClick={(e) => playAudio(e, preferredAccent)}
-                                className="w-9 h-9 rounded-xl bg-black/30 hover:bg-black/50 text-white border border-white/20 flex items-center justify-center transition cursor-pointer active:scale-95"
-                              >
-                                <Volume2 className="w-4 h-4" />
-                              </button>
-                              <button
-                                onClick={handleOpenEdit}
-                                className="w-9 h-9 rounded-xl bg-black/30 hover:bg-black/50 text-white border border-white/20 flex items-center justify-center transition cursor-pointer active:scale-95"
-                              >
-                                <Edit3 className="w-4 h-4" />
-                              </button>
-                            </div>
+                        {/* Back Top Bar */}
+                        <div className="flex items-center justify-between pb-2 border-b border-white/15 shrink-0">
+                          <span className="text-[11px] font-black uppercase tracking-widest text-yellow-300">
+                            NGHĨA TIẾNG VIỆT
+                          </span>
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                playPronunciation(preferredAccent);
+                              }}
+                              className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition cursor-pointer"
+                              title="Nghe phát âm"
+                            >
+                              <Volume2 className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={handleStartEdit}
+                              className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition cursor-pointer"
+                              title="Sửa từ này"
+                            >
+                              <Edit3 className="w-4 h-4" />
+                            </button>
                           </div>
-
-                          {/* Center Stage: Vietnamese Meaning & Example Container */}
-                          <div className="my-auto space-y-3 py-2">
-                            
-                            {/* Big Bold Meaning */}
-                            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white tracking-tight leading-snug">
-                              {currentCard.back}
-                            </h2>
-
-                            {/* English Definition Box */}
-                            {currentCard.definitionEn && (
-                              <div className={`${currentTheme.backBoxBg} rounded-2xl p-3.5 sm:p-4 border ${currentTheme.backBoxBorder} space-y-1 text-left shadow-lg`}>
-                                <span className={`text-[10px] font-black uppercase ${currentTheme.accentText}`}>
-                                  🇬🇧 ĐỊNH NGHĨA TIẾNG ANH:
-                                </span>
-                                <p className="text-xs sm:text-sm font-bold text-white leading-relaxed">
-                                  {currentCard.definitionEn}
-                                </p>
-                              </div>
-                            )}
-
-                            {/* Real Example Box */}
-                            {currentCard.example && (
-                              <div className={`${currentTheme.backBoxBg} rounded-2xl p-3.5 sm:p-4 border-l-4 border-amber-300 border-t border-r border-b ${currentTheme.backBoxBorder} space-y-1 text-left shadow-lg`}>
-                                <span className="text-[10px] font-black uppercase text-white/80">
-                                  VÍ DỤ
-                                </span>
-                                <p className="text-xs sm:text-sm font-bold italic text-white leading-relaxed">
-                                  &quot;{currentCard.example}&quot;
-                                </p>
-                                {currentCard.exampleVi && (
-                                  <p className="text-xs sm:text-sm text-white/80 font-bold pt-0.5">
-                                    👉 {currentCard.exampleVi}
-                                  </p>
-                                )}
-                              </div>
-                            )}
-
-                            {/* Synonyms & Collocations */}
-                            {(currentCard.synonyms?.length || currentCard.collocations?.length) ? (
-                              <div className="flex flex-wrap gap-1.5 pt-1">
-                                {currentCard.synonyms?.map((syn, idx) => (
-                                  <span key={idx} className="px-3 py-1 rounded-xl bg-black/30 text-xs font-black text-white border border-white/15">
-                                    🔗 {syn}
-                                  </span>
-                                ))}
-                                {currentCard.collocations?.map((col, idx) => (
-                                  <span key={idx} className="px-3 py-1 rounded-xl bg-black/30 text-xs font-black text-yellow-300 border border-white/15">
-                                    📌 {col}
-                                  </span>
-                                ))}
-                              </div>
-                            ) : null}
-
-                          </div>
-
-                          {/* Bottom Row on Back */}
-                          <div className="flex items-center justify-between text-xs font-black text-white/80 shrink-0 pt-2 border-t border-white/15">
-                            {currentCardSRS ? (
-                              <span>Ôn tiếp: {formatSRSCountdown(currentCardSRS.nextReviewDate)}</span>
-                            ) : (
-                              <span>Mới học</span>
-                            )}
-                            <span className="ml-auto hover:text-white transition flex items-center gap-1">
-                              <RotateCw className="w-3.5 h-3.5" /> Chạm để lật lại
-                            </span>
-                          </div>
-
                         </div>
+
+                        {/* Back Content Body */}
+                        <div className="my-auto space-y-4 py-2">
+                          {/* Big Bold Meaning */}
+                          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white leading-tight">
+                            {currentCard?.back}
+                          </h2>
+
+                          {/* English Definition Box */}
+                          {currentCard?.definitionEn && (
+                            <div className={`p-4 rounded-2xl ${currentTheme.backBoxBg} border ${currentTheme.backBoxBorder} space-y-1`}>
+                              <div className="text-[10px] font-black uppercase tracking-wider text-yellow-300 flex items-center gap-1.5">
+                                <span>🇬🇧 ĐỊNH NGHĨA TIẾNG ANH:</span>
+                              </div>
+                              <p className="text-xs sm:text-sm font-medium text-slate-100 leading-relaxed">
+                                {currentCard.definitionEn}
+                              </p>
+                            </div>
+                          )}
+
+                          {/* Example Box */}
+                          {currentCard?.example && (
+                            <div className={`p-4 rounded-2xl ${currentTheme.backBoxBg} border ${currentTheme.backBoxBorder} space-y-1.5`}>
+                              <div className="text-[10px] font-black uppercase tracking-wider text-yellow-300">
+                                VÍ DỤ:
+                              </div>
+                              <p className="text-xs sm:text-sm italic font-semibold text-white">
+                                "{currentCard.example}"
+                              </p>
+                              {currentCard?.exampleVi && (
+                                <p className="text-xs sm:text-sm text-lime-200 font-medium">
+                                  👉 {currentCard.exampleVi}
+                                </p>
+                              )}
+                            </div>
+                          )}
+
+                          {/* Collocations & Synonyms Badges */}
+                          {((currentCard?.collocations && currentCard.collocations.length > 0) || (currentCard?.synonyms && currentCard.synonyms.length > 0)) && (
+                            <div className="flex flex-wrap gap-1.5 pt-1">
+                              {currentCard.collocations?.slice(0, 4).map((col, idx) => (
+                                <span key={idx} className="px-2.5 py-1 rounded-lg bg-black/40 text-yellow-300 text-[11px] font-black border border-yellow-400/20">
+                                  🔗 {col}
+                                </span>
+                              ))}
+                              {currentCard.synonyms?.slice(0, 3).map((syn, idx) => (
+                                <span key={idx} className="px-2.5 py-1 rounded-lg bg-black/40 text-lime-300 text-[11px] font-black border border-lime-400/20">
+                                  ✨ {syn}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Back Bottom Bar */}
+                        <div className="flex items-center justify-between pt-2 border-t border-white/15 text-xs text-white/80 font-bold shrink-0">
+                          <span>
+                            {currentCardSRS ? `Ôn tiếp: ${formatSRSCountdown(currentCardSRS.nextReviewDate)}` : 'Trạng thái: Mới học'}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <RotateCw className="w-3.5 h-3.5" />
+                            <span>Chạm để lật lại</span>
+                          </span>
+                        </div>
+
                       </div>
 
                     </div>
@@ -1125,172 +843,189 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
 
               </div>
 
-              {/* ════════ 3 BIG ROUNDED ACTION BUTTONS (IELTS DICTIONARY STYLE) ════════ */}
+              {/* ════════ 3 LARGE PILL ACTION BUTTONS (CHƯA NHỚ 1 | LẬT THẺ SPACE | ĐÃ NHỚ 2) ════════ */}
               <div className="grid grid-cols-3 gap-3 pt-2">
                 
-                {/* 🔴 Button 1: Chưa nhớ [1] */}
+                {/* 1. Chưa nhớ */}
                 <button
-                  onClick={handleMarkNotRemembered}
-                  className="py-3.5 px-3 rounded-2xl bg-[#edd9d6] dark:bg-[#3d1818] hover:opacity-90 border border-rose-300 dark:border-rose-800 text-[#84231e] dark:text-rose-200 text-xs sm:text-sm font-black transition cursor-pointer active:scale-95 flex items-center justify-center gap-2 shadow-xs"
-                  title="Phím tắt: 1"
+                  onClick={() => {
+                    if (currentCard) {
+                      playNativeSound('again');
+                      if (onRateCardSRS) onRateCardSRS(currentCard.id, 1);
+                      if (masteredIds.includes(currentCard.id)) onToggleMastered(currentCard.id);
+                      nextCard();
+                    }
+                  }}
+                  className={`h-14 sm:h-16 rounded-2xl ${currentTheme.btn1Bg} border-2 ${currentTheme.btn1Border} ${currentTheme.btn1Text} flex items-center justify-center gap-2 font-black text-xs sm:text-sm shadow-md transition-all cursor-pointer active:scale-95`}
                 >
-                  <span className="text-rose-600 dark:text-rose-400">❓</span>
+                  <span className="text-sm sm:text-base">❓</span>
                   <span>Chưa nhớ</span>
-                  <kbd className="px-1.5 py-0.5 rounded-md text-[10px] font-black bg-white/60 dark:bg-rose-950 border border-rose-300 dark:border-rose-700">1</kbd>
+                  <span className={`px-2 py-0.5 rounded-lg ${currentTheme.btn1Kbd} text-[10px] font-mono font-bold shadow-xs`}>
+                    1
+                  </span>
                 </button>
 
-                {/* 🟢 Button 2: Lật thẻ [Space] */}
+                {/* 2. Lật thẻ */}
                 <button
-                  onClick={() => setIsFlipped((prev) => !prev)}
-                  className="py-3.5 px-3 rounded-2xl bg-[#4a5f28] hover:bg-[#597332] text-white text-xs sm:text-sm font-black transition cursor-pointer active:scale-95 flex items-center justify-center gap-2 shadow-md"
-                  title="Phím tắt: Space"
+                  onClick={flipCard}
+                  className={`h-14 sm:h-16 rounded-2xl ${currentTheme.btnSpaceBg} border-2 ${currentTheme.btnSpaceBorder} ${currentTheme.btnSpaceText} flex items-center justify-center gap-2 font-black text-xs sm:text-sm shadow-md transition-all cursor-pointer active:scale-95`}
                 >
-                  <RotateCw className="w-4 h-4 text-lime-200" />
+                  <RotateCw className="w-4 h-4 sm:w-5 sm:h-5" />
                   <span>Lật thẻ</span>
-                  <kbd className="px-2 py-0.5 rounded-md text-[10px] font-black bg-black/30 border border-white/20">Space</kbd>
+                  <span className={`px-2 py-0.5 rounded-lg ${currentTheme.btnSpaceKbd} text-[10px] font-mono font-bold shadow-xs`}>
+                    Space
+                  </span>
                 </button>
 
-                {/* 🟢 Button 3: Đã nhớ [2] */}
+                {/* 3. Đã nhớ */}
                 <button
-                  onClick={handleMarkRemembered}
-                  className="py-3.5 px-3 rounded-2xl bg-[#dceddb] dark:bg-[#1a3821] hover:opacity-90 border border-emerald-300 dark:border-emerald-800 text-[#1b5e28] dark:text-emerald-200 text-xs sm:text-sm font-black transition cursor-pointer active:scale-95 flex items-center justify-center gap-2 shadow-xs"
-                  title="Phím tắt: 2"
+                  onClick={() => {
+                    if (currentCard) {
+                      playNativeSound('master');
+                      if (onRateCardSRS) onRateCardSRS(currentCard.id, 4);
+                      if (!masteredIds.includes(currentCard.id)) onToggleMastered(currentCard.id);
+                      nextCard();
+                    }
+                  }}
+                  className={`h-14 sm:h-16 rounded-2xl ${currentTheme.btn2Bg} border-2 ${currentTheme.btn2Border} ${currentTheme.btn2Text} flex items-center justify-center gap-2 font-black text-xs sm:text-sm shadow-md transition-all cursor-pointer active:scale-95`}
                 >
-                  <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                  <span className="text-sm sm:text-base">✓</span>
                   <span>Đã nhớ</span>
-                  <kbd className="px-1.5 py-0.5 rounded-md text-[10px] font-black bg-white/60 dark:bg-emerald-950 border border-emerald-300 dark:border-emerald-700">2</kbd>
+                  <span className={`px-2 py-0.5 rounded-lg ${currentTheme.btn2Kbd} text-[10px] font-mono font-bold shadow-xs`}>
+                    2
+                  </span>
                 </button>
 
               </div>
 
-              {/* ⌨️ KEYBOARD SHORTCUTS HINT BAR */}
-              <div className="flex items-center justify-center gap-3 text-[10px] font-black text-slate-400 py-1 flex-wrap">
-                <span><kbd className="bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-1.5 py-0.5 rounded font-bold">SPACE</kbd> LẬT THẺ</span>
+              {/* Keyboard Shortcuts Bar */}
+              <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-[10px] sm:text-[11px] font-black uppercase text-slate-500 dark:text-slate-400 py-1">
+                <span><strong className="text-slate-700 dark:text-slate-200">SPACE:</strong> LẬT THẺ</span>
                 <span>•</span>
-                <span><kbd className="bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-1.5 py-0.5 rounded font-bold">1</kbd> CHƯA NHỚ</span>
+                <span><strong className="text-slate-700 dark:text-slate-200">1:</strong> CHƯA NHỚ</span>
                 <span>•</span>
-                <span><kbd className="bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-1.5 py-0.5 rounded font-bold">2</kbd> ĐÃ NHỚ</span>
+                <span><strong className="text-slate-700 dark:text-slate-200">2:</strong> ĐÃ NHỚ</span>
                 <span>•</span>
-                <span><kbd className="bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-1.5 py-0.5 rounded font-bold">← / →</kbd> ĐIỀU HƯỚNG</span>
-              </div>
-
-              {/* 📊 CONTINUOUS PROGRESS BAR */}
-              <div className="space-y-1.5 pt-1">
-                <div className="flex items-center justify-between text-xs font-black text-slate-500 dark:text-slate-400">
-                  <span>Thẻ <strong className="text-slate-900 dark:text-white">{currentIndex + 1}</strong> / {totalCardsInSet}</span>
-                  <span>{Math.round(((currentIndex + 1) / (totalCardsInSet || 1)) * 100)}%</span>
-                </div>
-                <div className="w-full bg-slate-200 dark:bg-slate-800 h-2.5 rounded-full overflow-hidden">
-                  <div
-                    className="bg-amber-400 h-full rounded-full transition-all duration-300"
-                    style={{ width: `${((currentIndex + 1) / (totalCardsInSet || 1)) * 100}%` }}
-                  />
-                </div>
+                <span><strong className="text-slate-700 dark:text-slate-200">← / →:</strong> ĐIỀU HƯỚNG</span>
               </div>
 
             </div>
 
-            {/* 🌟 RIGHT SIDE COMPANION PANELS (3.5 COLS) */}
-            <div className="lg:col-span-4 xl:col-span-3 space-y-4">
+            {/* ════════ RIGHT COLUMN: COMPANION WIDGETS (4 COLS) ════════ */}
+            <div className="lg:col-span-4 space-y-5 flex flex-col justify-between">
               
-              {/* 1. TID / LULU & MIMI ĐỒNG HÀNH WIDGET (MATCHING IMAGE 1) */}
-              <div className="bg-[#3b4e24] text-white border border-lime-600/30 rounded-3xl p-5 shadow-xl relative overflow-hidden space-y-3">
-                {/* Sun mascot in top right corner */}
-                <div className="absolute -top-3 -right-3 w-16 h-16 rounded-full bg-amber-400 border-4 border-amber-300 flex items-center justify-center text-xl shadow-md">
-                  😊
+              {/* 1. LULU & MIMI ĐỒNG HÀNH WIDGET */}
+              <div className={`rounded-3xl ${currentTheme.companion1Bg} border-2 ${currentTheme.companion1Border} p-6 sm:p-7 text-white space-y-4`}>
+                <div className="flex items-center justify-between">
+                  <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${currentTheme.companion1TagBg} ${currentTheme.companion1TagText}`}>
+                    LULU & MIMI ĐỒNG HÀNH
+                  </span>
+                  <div className="w-10 h-10 rounded-2xl bg-amber-400 flex items-center justify-center text-xl shadow-md">
+                    {currentTheme.companion1Mascot}
+                  </div>
                 </div>
 
-                <div className="text-[10px] font-black uppercase tracking-wider text-lime-300 flex items-center gap-1.5">
-                  TID ĐỒNG HÀNH
-                </div>
-
-                <div>
-                  <h4 className="text-sm font-black text-white leading-snug pr-8">
+                <div className="space-y-1.5">
+                  <h3 className="text-lg font-black tracking-tight leading-snug">
                     Cố lên, chinh phục cả bộ từ nào! 🌱
-                  </h4>
-                </div>
-
-                <div className="inline-block px-3.5 py-1.5 rounded-xl bg-black/30 border border-white/10 text-xs font-black text-yellow-300">
-                  Còn lại <strong>{unmasteredCardsInSet}</strong> từ chưa thuộc
+                  </h3>
+                  <div className="inline-block px-3 py-1.5 rounded-xl bg-black/40 text-xs font-black text-yellow-300">
+                    Còn lại {unmasteredCount} từ chưa thuộc
+                  </div>
                 </div>
               </div>
 
-              {/* 2. MỨC ĐỘ THÀNH THẠO (WHITE CARD WITH RING PROGRESS) */}
-              <div className="bg-white dark:bg-[#151c12] border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xl space-y-3.5">
+              {/* 2. MỨC ĐỘ THÀNH THẠO WIDGET */}
+              <div className={`rounded-3xl ${currentTheme.companion2Bg} border-2 ${currentTheme.companion2Border} p-6 sm:p-7 space-y-5`}>
+                
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-300">
-                    Mức độ thành thạo
-                  </span>
-                  <span className="text-[10px] font-black px-2.5 py-0.5 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
-                    Cấp {masteryLevel}
+                  <h4 className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-200">
+                    MỨC ĐỘ THÀNH THẠO
+                  </h4>
+                  <span className="px-2.5 py-0.5 rounded-md bg-amber-500/20 text-amber-500 text-[10px] font-black">
+                    Cấp {Math.min(5, Math.floor(masteredPercent / 20) + 1)}
                   </span>
                 </div>
 
                 <div className="flex items-center gap-4">
-                  {/* Radial Progress Ring */}
-                  <div className="relative w-14 h-14 shrink-0 flex items-center justify-center">
-                    <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                  {/* Percent Circle */}
+                  <div className="relative w-16 h-16 rounded-full border-4 border-slate-200 dark:border-slate-800 flex items-center justify-center shrink-0">
+                    <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 36 36">
                       <path
-                        className="text-slate-200 dark:text-slate-800"
-                        strokeWidth="3.5"
-                        stroke="currentColor"
-                        fill="none"
-                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                      />
-                      <path
-                        className="text-amber-400 transition-all duration-500"
-                        strokeDasharray={`${masteryPercentage}, 100`}
-                        strokeWidth="3.5"
+                        className="text-amber-400 stroke-current transition-all duration-500"
+                        strokeWidth="4"
+                        strokeDasharray={`${masteredPercent}, 100`}
                         strokeLinecap="round"
-                        stroke="currentColor"
                         fill="none"
                         d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                       />
                     </svg>
-                    <span className="absolute text-xs font-black text-slate-900 dark:text-white">
-                      {masteryPercentage}%
+                    <span className="text-sm font-black text-slate-900 dark:text-white">
+                      {masteredPercent}%
                     </span>
                   </div>
 
-                  <div className="space-y-1">
-                    <div className="text-xs font-bold text-slate-700 dark:text-slate-300">
-                      Bạn đã thuộc <strong className="text-amber-500">{masteredCardsInSet}/{totalCardsInSet}</strong> từ trong bộ này.
-                    </div>
-                    <div className="flex items-center gap-1 pt-1">
+                  {/* Level text */}
+                  <div className="space-y-1 flex-1">
+                    <p className="text-xs font-bold text-slate-600 dark:text-slate-300 leading-snug">
+                      Bạn đã thuộc <strong className="text-amber-500">{masteredTotalInFolder}</strong>/{totalInFolder} từ trong bộ này.
+                    </p>
+                    {/* 5 progress bars */}
+                    <div className="grid grid-cols-5 gap-1 pt-1">
                       {[1, 2, 3, 4, 5].map((lvl) => (
                         <div
                           key={lvl}
-                          className={`h-1.5 flex-1 rounded-full ${
-                            lvl <= masteryLevel ? 'bg-amber-400' : 'bg-slate-200 dark:bg-slate-800'
+                          className={`h-1.5 rounded-full transition-colors ${
+                            masteredPercent >= lvl * 20 ? 'bg-amber-400' : 'bg-slate-200 dark:bg-slate-800'
                           }`}
                         />
                       ))}
                     </div>
                   </div>
                 </div>
-              </div>
 
-              {/* 3. BỘ ĐIỀU HƯỚNG TRƯỚC / SAU */}
-              <div className="flex items-center justify-between gap-2 pt-1">
-                <button
-                  onClick={handlePrev}
-                  className="flex-1 flex items-center justify-center gap-1.5 py-3 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs font-black text-slate-700 dark:text-slate-200 transition cursor-pointer active:scale-95 shadow-sm"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                  <span>Trước</span>
-                </button>
+                {/* Bottom Navigation Buttons (‹ Trước | Tiếp theo ›) */}
+                <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                  <button
+                    onClick={prevCard}
+                    className="flex items-center justify-center gap-1.5 py-3 rounded-2xl bg-slate-100 dark:bg-slate-800/80 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-black transition cursor-pointer active:scale-95"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                    <span>Trước</span>
+                  </button>
 
-                <button
-                  onClick={handleNext}
-                  className="flex-1 flex items-center justify-center gap-1.5 py-3 bg-amber-400 hover:bg-amber-300 text-slate-950 rounded-2xl text-xs font-black transition shadow-md cursor-pointer active:scale-95"
-                >
-                  <span>Tiếp theo</span>
-                  <ChevronRight className="w-4 h-4" />
-                </button>
+                  <button
+                    onClick={nextCard}
+                    className={`flex items-center justify-center gap-1.5 py-3 rounded-2xl ${currentTheme.nextBtnBg} text-xs font-black transition cursor-pointer active:scale-95 shadow-md`}
+                  >
+                    <span>Tiếp theo</span>
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
+
               </div>
 
             </div>
 
+          </div>
+
+          {/* ════════ BOTTOM PROGRESS CONTINUOUS BAR ════════ */}
+          <div className="space-y-2 pt-2">
+            <div className="flex items-center justify-between text-xs font-black text-slate-700 dark:text-slate-300">
+              <span>Thẻ {currentIndex + 1} / {cardsList.length}</span>
+              <span className="text-amber-500">
+                {cardsList.length > 0 ? Math.round(((currentIndex + 1) / cardsList.length) * 100) : 0}%
+              </span>
+            </div>
+
+            <div className="w-full h-2 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden shadow-inner">
+              <div
+                className={`h-full ${currentTheme.progressBarColor} transition-all duration-300 rounded-full`}
+                style={{
+                  width: `${cardsList.length > 0 ? ((currentIndex + 1) / cardsList.length) * 100 : 0}%`
+                }}
+              />
+            </div>
           </div>
 
         </div>
