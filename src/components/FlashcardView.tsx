@@ -678,7 +678,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
             <div className="lg:col-span-9 xl:col-span-9 space-y-4 flex flex-col">
               
               {/* WIDE HORIZONTAL CARD CONTAINER (RỘNG VÀ CAO CÂN ĐỐI - KHÔNG CẦN CUỘN) */}
-              <div className={`perspective-[1200px] w-full min-h-[540px] sm:min-h-[600px] lg:min-h-[650px] relative select-none ${animClass}`}>
+              <div className={`perspective-[1200px] w-full h-[540px] sm:h-[600px] lg:h-[650px] relative select-none ${animClass}`}>
                 
                 {/* ✏️ IN-CARD EDITOR OVERLAY */}
                 {isEditing ? (
@@ -797,11 +797,13 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                   </div>
                 ) : (
                   <div
-                    className={`w-full cursor-pointer select-none ${isFlipped ? 'min-h-full' : 'h-full'}`}
+                    className="w-full h-full cursor-pointer select-none"
                     onClick={flipCard}
                   >
                     <div
-                      className={`relative w-full duration-500 transform-style-3d transition-transform ${isFlipped ? 'min-h-full rotate-y-180' : 'h-full'}`}
+                      className={`relative w-full h-full duration-500 transform-style-3d transition-transform ${
+                        isFlipped ? 'rotate-y-180' : ''
+                      }`}
                     >
                       
                       {/* ──────────────── FRONT FACE (MẶT TRƯỚC: TỪ VỰNG TO ĐẬM HOÀNG GIA) ──────────────── */}
@@ -933,7 +935,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
 
                       {/* ──────────────── BACK FACE (MẶT SAU: THẤY HẾT TOÀN BỘ KHÔNG CẦN CUỘN) ──────────────── */}
                       <div
-                        className={`card-face-back rounded-3xl ${currentTheme.backBg} border-2 ${currentTheme.backBorder} p-5 sm:p-7 flex flex-col gap-3 overflow-y-auto custom-scrollbar ${
+                        className={`card-face-back rounded-3xl ${currentTheme.backBg} border-2 ${currentTheme.backBorder} p-5 sm:p-7 flex flex-col gap-3 overflow-hidden ${
                           !isFlipped ? 'invisible opacity-0 pointer-events-none' : 'visible opacity-100 pointer-events-auto'
                         }`}
                         style={{
