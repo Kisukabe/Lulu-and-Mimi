@@ -563,19 +563,37 @@ export const VocabularyDetailView: React.FC<VocabularyDetailViewProps> = ({
 
                     {/* Word Forms */}
                     {((card.wordForms && card.wordForms.length > 0) || (card.wordFamily && card.wordFamily.length > 0)) && (
-                      <div className="p-3 bg-slate-50/70 dark:bg-slate-800/40 rounded-xl border border-slate-200/50 dark:border-slate-700/50 flex flex-wrap items-center gap-2">
-                        <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase">
-                          🌳 Word Forms (Họ từ / Dạng từ):
-                        </span>
-                        {(card.wordForms || card.wordFamily || []).map((wf, idx) => (
-                          <span
-                            key={idx}
-                            className="px-2 py-0.5 bg-white dark:bg-slate-800 rounded-md border border-slate-200 dark:border-slate-700 font-medium text-slate-700 dark:text-slate-300"
-                          >
-                            <strong className="text-indigo-600 dark:text-indigo-400 uppercase mr-1">{wf.form}:</strong> {wf.word}
-                            {wf.meaningVi ? ` (${wf.meaningVi})` : ''}
-                          </span>
-                        ))}
+                      <div className="p-3 bg-slate-50/70 dark:bg-slate-800/40 rounded-xl border border-slate-200/50 dark:border-slate-700/50 space-y-2">
+                        <div className="text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase flex items-center gap-1">
+                          <span>🌳 Word Forms (Họ từ / Dạng từ):</span>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
+                          {(card.wordForms || card.wordFamily || []).map((wf, idx) => (
+                            <div
+                              key={idx}
+                              className="p-2 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 space-y-0.5"
+                            >
+                              <div className="flex items-center justify-between gap-1">
+                                <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase">
+                                  {wf.form}
+                                </span>
+                                <span className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">
+                                  {wf.word}
+                                </span>
+                              </div>
+                              {wf.definitionEn && (
+                                <p className="text-[10px] text-slate-600 dark:text-slate-300 italic leading-snug">
+                                  🇬🇧 {wf.definitionEn}
+                                </p>
+                              )}
+                              {wf.meaningVi && (
+                                <p className="text-[10px] font-medium text-emerald-600 dark:text-emerald-400 leading-snug">
+                                  🇻🇳 {wf.meaningVi}
+                                </p>
+                              )}
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     )}
 

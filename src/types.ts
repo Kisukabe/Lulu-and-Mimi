@@ -34,6 +34,8 @@ export interface WordFormItem {
   form: WordForm;
   word: string;
   meaningVi?: string;
+  definitionEn?: string; // 🇬🇧 Định nghĩa tiếng Anh cho từng dạng từ
+  ipa?: string;          // Phiên âm IPA
 }
 export type WordFamilyItem = WordFormItem; // Alias tương thích
 

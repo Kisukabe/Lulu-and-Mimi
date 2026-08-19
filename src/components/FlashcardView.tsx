@@ -16,6 +16,8 @@ import {
   Shuffle,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
+  ChevronUp,
   BookOpen,
   Layers,
   Filter,
@@ -86,6 +88,16 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
   const [statusFilter, setStatusFilter] = useState<'all' | 'due_srs' | 'unmastered' | 'review' | 'mastered'>(initialFilter);
   const [cardsList, setCardsList] = useState<Flashcard[]>([]);
   const [showThemePicker, setShowThemePicker] = useState(false);
+
+  // Interactive expansion for Collocations & Word Forms on back face
+  const [expandedCollocations, setExpandedCollocations] = useState(false);
+  const [expandedWordForms, setExpandedWordForms] = useState(false);
+
+  // Reset expansion states whenever card changes
+  useEffect(() => {
+    setExpandedCollocations(false);
+    setExpandedWordForms(false);
+  }, [currentIndex]);
 
   useEffect(() => {
     setStatusFilter(initialFilter);
@@ -1018,22 +1030,80 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                             </div>
                           )}
 
-                          {/* 🔗 Dedicated Box: COLLOCATIONS */}
+                          {/* 🔗 Dedicated Box: COLLOCATIONS (Click to Expand / Collapse) */}
                           {backContentConfig.showCollocations && currentCard?.collocations && currentCard.collocations.length > 0 && (
-                            <div className={`p-2.5 sm:p-3 rounded-xl ${currentTheme.backBoxBg} border ${currentTheme.backBoxBorder} space-y-1.5`}>
-                              <div className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-yellow-300">
-                                Collocations
-                              </div>
-                              <div className="flex flex-wrap gap-1.5">
-                                {currentCard.collocations.map((col, idx) => (
-                                  <span
-                                    key={idx}
-                                    className="px-2.5 py-1 rounded-lg bg-black/40 text-yellow-200 text-xs sm:text-sm font-bold border border-yellow-400/25 tracking-tight"
-                                  >
-                                    {col}
+                            <div className={`p-2.5 sm:p-3 rounded-xl ${currentTheme.backBoxBg} border ${currentTheme.backBoxBorder} space-y-1.5 transition-all duration-200`}>
+                              <div
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setExpandedCollocations(!expandedCollocations);
+                                }}
+                                className="flex items-center justify-between cursor-pointer select-none group"
+                                title={expandedCollocations ? "Nhấn để thu gọn danh sách cụm từ" : "Nhấn để xem toàn bộ danh sách cụm từ"}
+                              >
+                                <div className="flex items-center gap-2">
+                                  <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-yellow-300 flex items-center gap-1.5">
+                                    <span>Collocations</span>
+                                    <span className="px-1.5 py-0.2 rounded-md bg-black/40 text-yellow-200 text-[10px] font-mono font-bold">
+                                      {currentCard.collocations.length}
+                                    </span>
                                   </span>
-                                ))}
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setExpandedCollocations(!expandedCollocations);
+                                  }}
+                                  className="text-[10px] sm:text-[11px] font-bold text-yellow-200/90 group-hover:text-yellow-100 flex items-center gap-1 bg-black/35 hover:bg-black/50 px-2 py-0.5 rounded-lg border border-yellow-400/20 transition cursor-pointer"
+                                >
+                                  <span>{expandedCollocations ? 'Thu gọn' : 'Xem toàn bộ'}</span>
+                                  {expandedCollocations ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                                </button>
                               </div>
+
+                              {/* Content: Collapsed vs Expanded */}
+                              {!expandedCollocations ? (
+                                <div
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setExpandedCollocations(true);
+                                  }}
+                                  className="flex flex-wrap items-center gap-1.5 cursor-pointer pt-0.5"
+                                  title="Nhấn để xem toàn bộ cụm từ"
+                                >
+                                  {currentCard.collocations.slice(0, 2).map((col, idx) => (
+                                    <span
+                                      key={idx}
+                                      className="px-2.5 py-1 rounded-lg bg-black/40 text-yellow-200 text-xs sm:text-sm font-bold border border-yellow-400/25 tracking-tight"
+                                    >
+                                      {col}
+                                    </span>
+                                  ))}
+                                  {currentCard.collocations.length > 2 && (
+                                    <span className="px-2.5 py-1 rounded-lg bg-yellow-400/15 hover:bg-yellow-400/25 text-yellow-300 text-xs font-bold border border-yellow-400/30 flex items-center gap-1 transition">
+                                      +{currentCard.collocations.length - 2} cụm từ khác...
+                                    </span>
+                                  )}
+                                </div>
+                              ) : (
+                                <div className="flex flex-wrap gap-1.5 pt-0.5 animate-in fade-in zoom-in-95 duration-150 max-h-[140px] overflow-y-auto custom-scrollbar pr-0.5">
+                                  {currentCard.collocations.map((col, idx) => (
+                                    <span
+                                      key={idx}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        speakText(col, preferredAccent);
+                                      }}
+                                      className="group inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-black/50 hover:bg-black/75 text-yellow-200 hover:text-yellow-100 text-xs sm:text-sm font-bold border border-yellow-400/30 hover:border-yellow-400/60 tracking-tight transition cursor-pointer"
+                                      title="Nhấn để nghe phát âm cụm từ này"
+                                    >
+                                      <span>{col}</span>
+                                      <Volume2 className="w-3 h-3 opacity-60 group-hover:opacity-100 transition-opacity" />
+                                    </span>
+                                  ))}
+                                </div>
+                              )}
                             </div>
                           )}
 
@@ -1078,29 +1148,115 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                             </div>
                           )}
 
-                          {/* 🌳 Dedicated Box: WORD FORMS */}
-                          {backContentConfig.showWordForms && ((currentCard?.wordForms && currentCard.wordForms.length > 0) || (currentCard?.wordFamily && currentCard.wordFamily.length > 0)) && (
-                            <div className={`p-2.5 sm:p-3 rounded-xl ${currentTheme.backBoxBg} border ${currentTheme.backBoxBorder} space-y-1`}>
-                              <div className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-yellow-300">
-                                Word Forms
-                              </div>
-                              <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
-                                {(currentCard.wordForms || currentCard.wordFamily || []).map((wf, idx) => (
-                                  <div
-                                    key={idx}
-                                    className="px-2 py-1 rounded-lg bg-black/40 border border-white/15 space-y-0.5"
-                                  >
-                                    <span className="text-[9px] font-black uppercase tracking-wider text-yellow-400/90 block">
-                                      {wf.form}
-                                    </span>
-                                    <span className="text-xs font-bold text-white block truncate">
-                                      {wf.word}
+                          {/* 🌳 Dedicated Box: WORD FORMS (Click to Expand / Collapse with English Definitions) */}
+                          {backContentConfig.showWordForms && ((currentCard?.wordForms && currentCard.wordForms.length > 0) || (currentCard?.wordFamily && currentCard.wordFamily.length > 0)) && (() => {
+                            const forms = currentCard.wordForms || currentCard.wordFamily || [];
+                            return (
+                              <div className={`p-2.5 sm:p-3 rounded-xl ${currentTheme.backBoxBg} border ${currentTheme.backBoxBorder} space-y-1.5 transition-all duration-200`}>
+                                <div
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setExpandedWordForms(!expandedWordForms);
+                                  }}
+                                  className="flex items-center justify-between cursor-pointer select-none group"
+                                  title={expandedWordForms ? "Nhấn để thu gọn họ từ" : "Nhấn để xem đầy đủ định nghĩa và phát âm các dạng từ"}
+                                >
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-yellow-300 flex items-center gap-1.5">
+                                      <span>Word Forms</span>
+                                      <span className="px-1.5 py-0.2 rounded-md bg-black/40 text-yellow-200 text-[10px] font-mono font-bold">
+                                        {forms.length}
+                                      </span>
                                     </span>
                                   </div>
-                                ))}
+                                  <button
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setExpandedWordForms(!expandedWordForms);
+                                    }}
+                                    className="text-[10px] sm:text-[11px] font-bold text-yellow-200/90 group-hover:text-yellow-100 flex items-center gap-1 bg-black/35 hover:bg-black/50 px-2 py-0.5 rounded-lg border border-yellow-400/20 transition cursor-pointer"
+                                  >
+                                    <span>{expandedWordForms ? 'Thu gọn' : 'Xem định nghĩa & chi tiết'}</span>
+                                    {expandedWordForms ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                                  </button>
+                                </div>
+
+                                {/* Content: Collapsed Preview vs Expanded Full Details */}
+                                {!expandedWordForms ? (
+                                  <div
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setExpandedWordForms(true);
+                                    }}
+                                    className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 cursor-pointer pt-0.5"
+                                    title="Nhấn để xem chi tiết định nghĩa các dạng từ"
+                                  >
+                                    {forms.map((wf, idx) => (
+                                      <div
+                                        key={idx}
+                                        className="px-2 py-1 rounded-lg bg-black/40 hover:bg-black/60 border border-white/15 hover:border-yellow-400/40 space-y-0.5 transition"
+                                      >
+                                        <span className="text-[9px] font-black uppercase tracking-wider text-yellow-400/90 block">
+                                          {wf.form}
+                                        </span>
+                                        <span className="text-xs font-bold text-white block truncate">
+                                          {wf.word}
+                                        </span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                ) : (
+                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 animate-in fade-in zoom-in-95 duration-150 max-h-[190px] overflow-y-auto custom-scrollbar pr-0.5">
+                                    {forms.map((wf, idx) => (
+                                      <div
+                                        key={idx}
+                                        className="p-2.5 rounded-xl bg-black/55 border border-white/20 space-y-1"
+                                      >
+                                        <div className="flex items-center justify-between gap-1.5">
+                                          <div className="flex items-center gap-1.5 min-w-0">
+                                            <span className="px-2 py-0.5 rounded-md bg-yellow-400/20 text-yellow-300 font-black text-[9px] uppercase tracking-wider border border-yellow-400/30 shrink-0">
+                                              {wf.form}
+                                            </span>
+                                            <span className="text-xs sm:text-sm font-black text-white truncate">
+                                              {wf.word}
+                                            </span>
+                                          </div>
+                                          <button
+                                            type="button"
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              speakText(wf.word, preferredAccent);
+                                            }}
+                                            className="p-1 rounded-md bg-white/10 hover:bg-white/25 text-slate-200 hover:text-white transition cursor-pointer shrink-0"
+                                            title="Nghe phát âm dạng từ này"
+                                          >
+                                            <Volume2 className="w-3 h-3" />
+                                          </button>
+                                        </div>
+
+                                        {/* 🇬🇧 English Definition for this word form */}
+                                        {wf.definitionEn && (
+                                          <p className="text-[11px] font-medium text-slate-200 leading-snug">
+                                            <strong className="text-yellow-300 font-bold">🇬🇧 EN: </strong>
+                                            {wf.definitionEn}
+                                          </p>
+                                        )}
+
+                                        {/* 🇻🇳 Vietnamese Meaning */}
+                                        {wf.meaningVi && (
+                                          <p className="text-[11px] font-semibold text-lime-300 leading-snug">
+                                            <strong className="text-lime-400 font-bold">🇻🇳 VN: </strong>
+                                            {wf.meaningVi}
+                                          </p>
+                                        )}
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
                               </div>
-                            </div>
-                          )}
+                            );
+                          })()}
 
                           {/* Empty body placeholder when user unchecks all detailed boxes */}
                           {!isAnyBodyFieldVisible && (

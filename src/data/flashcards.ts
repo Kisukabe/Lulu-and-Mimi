@@ -20,9 +20,9 @@ export const FLASHCARDS: Flashcard[] = [
     synonyms: ['bargaining', 'discussion', 'mediation', 'deliberation'],
     collocations: ['enter into negotiations', 'successful negotiation', 'contract negotiation'],
     wordForms: [
-      { form: 'verb', word: 'negotiate', meaningVi: 'thương lượng, đàm phán' },
-      { form: 'adjective', word: 'negotiable', meaningVi: 'có thể thương lượng được' },
-      { form: 'noun', word: 'negotiator', meaningVi: 'người đàm phán' },
+      { form: 'verb', word: 'negotiate', meaningVi: 'thương lượng, đàm phán', definitionEn: 'To have formal discussions with someone in order to reach an agreement with them.' },
+      { form: 'adjective', word: 'negotiable', meaningVi: 'có thể thương lượng được', definitionEn: 'Able to be discussed or changed before being decided or agreed upon.' },
+      { form: 'noun', word: 'negotiator', meaningVi: 'người đàm phán', definitionEn: 'Someone who takes part in formal discussions intended to reach an agreement.' },
     ],
     notes: 'Xuất hiện rất nhiều trong Part 6 và Part 7 dạng Email/Letter trao đổi hợp đồng.',
     difficulty: 'Easy',
@@ -43,7 +43,7 @@ export const FLASHCARDS: Flashcard[] = [
     synonyms: ['refund', 'compensate', 'repay'],
     collocations: ['reimburse expenses', 'reimburse travel costs', 'fully reimbursed'],
     wordForms: [
-      { form: 'noun', word: 'reimbursement', meaningVi: 'khoản tiền hoàn trả, sự hoàn phí' },
+      { form: 'noun', word: 'reimbursement', meaningVi: 'khoản tiền hoàn trả, sự hoàn phí', definitionEn: 'The act of paying back money to someone who has spent it for work purposes.' },
     ],
     notes: 'Bẫy từ vựng Part 5 & 7 TOEIC: Luôn đi kèm cụm từ "travel expenses" hoặc "receipt".',
     difficulty: 'Medium',
@@ -82,7 +82,7 @@ export const FLASHCARDS: Flashcard[] = [
     antonyms: ['optional', 'voluntary'],
     collocations: ['mandatory attendance', 'mandatory training', 'mandatory compliance'],
     wordForms: [
-      { form: 'noun', word: 'mandate', meaningVi: 'ủy nhiệm, lệnh bắt buộc' },
+      { form: 'noun', word: 'mandate', meaningVi: 'ủy nhiệm, lệnh bắt buộc', definitionEn: 'An official order or commission to do something.' },
     ],
     difficulty: 'Medium',
   },
@@ -102,8 +102,8 @@ export const FLASHCARDS: Flashcard[] = [
     synonyms: ['free', 'courtesy', 'gratis'],
     collocations: ['complimentary breakfast', 'complimentary beverage', 'complimentary ticket'],
     wordForms: [
-      { form: 'noun', word: 'compliment', meaningVi: 'lời khen ngợi' },
-      { form: 'verb', word: 'compliment', meaningVi: 'khen ngợi ai đó' },
+      { form: 'noun', word: 'compliment', meaningVi: 'lời khen ngợi', definitionEn: 'A polite expression of praise, admiration, or congratulation.' },
+      { form: 'verb', word: 'compliment', meaningVi: 'khen ngợi ai đó', definitionEn: 'To praise or express admiration for someone.' },
     ],
     notes: 'Rất hay xuất hiện trong Part 3, 4, 7 (quảng cáo khách sạn, nhà hàng, sự kiện).',
     difficulty: 'Easy',
@@ -142,8 +142,8 @@ export const FLASHCARDS: Flashcard[] = [
     antonyms: ['public', 'open', 'unrestricted'],
     collocations: ['strictly confidential', 'confidential document', 'confidential information'],
     wordForms: [
-      { form: 'noun', word: 'confidentiality', meaningVi: 'tính bảo mật' },
-      { form: 'adverb', word: 'confidentially', meaningVi: 'một cách bảo mật' },
+      { form: 'noun', word: 'confidentiality', meaningVi: 'tính bảo mật', definitionEn: 'The state of keeping or being kept secret or private.' },
+      { form: 'adverb', word: 'confidentially', meaningVi: 'một cách bảo mật', definitionEn: 'In a strict confidential manner; secretly or privately.' },
     ],
     difficulty: 'Medium',
   },
@@ -163,8 +163,8 @@ export const FLASHCARDS: Flashcard[] = [
     synonyms: ['standards', 'dimensions', 'requirements', 'specs'],
     collocations: ['technical specifications', 'meet specifications', 'product specifications'],
     wordForms: [
-      { form: 'verb', word: 'specify', meaningVi: 'chỉ rõ, ghi rõ' },
-      { form: 'adjective', word: 'specific', meaningVi: 'cụ thể, rõ ràng' },
+      { form: 'verb', word: 'specify', meaningVi: 'chỉ rõ, ghi rõ', definitionEn: 'To identify clearly and definitely; state a fact or requirement clearly.' },
+      { form: 'adjective', word: 'specific', meaningVi: 'cụ thể, rõ ràng', definitionEn: 'Clearly defined or identified; precise and detailed.' },
     ],
     difficulty: 'Medium',
   },
@@ -202,7 +202,7 @@ export const FLASHCARDS: Flashcard[] = [
     antonyms: ['flawless', 'intact', 'perfect'],
     collocations: ['defective product', 'defective parts', 'replace defective goods'],
     wordForms: [
-      { form: 'noun', word: 'defect', meaningVi: 'nhược điểm, lỗi' },
+      { form: 'noun', word: 'defect', meaningVi: 'nhược điểm, lỗi', definitionEn: 'A shortcoming, imperfection, or lack that prevents proper functioning.' },
     ],
     difficulty: 'Easy',
   },
@@ -222,8 +222,8 @@ export const FLASHCARDS: Flashcard[] = [
     synonyms: ['assign', 'entrust', 'hand over', 'allocate'],
     collocations: ['delegate authority', 'delegate responsibilities', 'delegate tasks'],
     wordForms: [
-      { form: 'noun', word: 'delegation', meaningVi: 'sự ủy quyền, đoàn đại biểu' },
-      { form: 'noun', word: 'delegate', meaningVi: 'đại biểu' },
+      { form: 'noun', word: 'delegation', meaningVi: 'sự ủy quyền, đoàn đại biểu', definitionEn: 'A body of delegates representing a group, or the act of delegating tasks.' },
+      { form: 'noun', word: 'delegate', meaningVi: 'đại biểu', definitionEn: 'A person sent or authorized to represent others.' },
     ],
     difficulty: 'Medium',
   },
@@ -243,7 +243,7 @@ export const FLASHCARDS: Flashcard[] = [
     synonyms: ['potential', 'possible', 'future', 'probable'],
     collocations: ['prospective clients', 'prospective buyers', 'prospective candidates'],
     wordForms: [
-      { form: 'noun', word: 'prospect', meaningVi: 'triển vọng, khách hàng tiềm năng' },
+      { form: 'noun', word: 'prospect', meaningVi: 'triển vọng, khách hàng tiềm năng', definitionEn: 'The possibility or likelihood of some future event occurring.' },
     ],
     difficulty: 'Hard',
   },

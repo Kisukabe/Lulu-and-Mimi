@@ -579,47 +579,57 @@ export const FlashcardCreator: React.FC<FlashcardCreatorProps> = ({
                 Chưa có dạng từ nào. Nhấn <strong>&quot;Mẫu 4 dạng&quot;</strong> hoặc <strong>&quot;+ Thêm dạng từ&quot;</strong> để nhập danh từ, động từ, tính từ, trạng từ liên quan.
               </p>
             ) : (
-              <div className="space-y-2">
+              <div className="space-y-2.5">
                 {wordForms.map((wf, idx) => (
                   <div
                     key={idx}
-                    className="flex items-center gap-2 bg-white dark:bg-slate-800/90 p-2 rounded-xl border border-slate-200 dark:border-slate-700 shadow-2xs"
+                    className="bg-white dark:bg-slate-800/90 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-2xs space-y-1.5"
                   >
-                    <select
-                      value={wf.form}
-                      onChange={(e) => handleUpdateWordFormItem(idx, 'form', e.target.value as WordForm)}
-                      aria-label="Loại dạng từ"
-                      className="px-2 py-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold text-amber-700 dark:text-amber-400 uppercase outline-none cursor-pointer w-28 shrink-0"
-                    >
-                      <option value="noun">Noun (N)</option>
-                      <option value="verb">Verb (V)</option>
-                      <option value="adjective">Adj (A)</option>
-                      <option value="adverb">Adv (Adv)</option>
-                      <option value="phrase">Phrase</option>
-                      <option value="idiom">Idiom</option>
-                    </select>
+                    <div className="flex items-center gap-2">
+                      <select
+                        value={wf.form}
+                        onChange={(e) => handleUpdateWordFormItem(idx, 'form', e.target.value as WordForm)}
+                        aria-label="Loại dạng từ"
+                        className="px-2 py-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold text-amber-700 dark:text-amber-400 uppercase outline-none cursor-pointer w-28 shrink-0"
+                      >
+                        <option value="noun">Noun (N)</option>
+                        <option value="verb">Verb (V)</option>
+                        <option value="adjective">Adj (A)</option>
+                        <option value="adverb">Adv (Adv)</option>
+                        <option value="phrase">Phrase</option>
+                        <option value="idiom">Idiom</option>
+                      </select>
+                      <input
+                        type="text"
+                        value={wf.word}
+                        onChange={(e) => handleUpdateWordFormItem(idx, 'word', e.target.value)}
+                        placeholder="Từ tiếng Anh (vd: resilience)"
+                        className="flex-1 min-w-[100px] px-2.5 py-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold text-slate-800 dark:text-slate-100 placeholder-slate-400 outline-none"
+                      />
+                      <input
+                        type="text"
+                        value={wf.meaningVi || ''}
+                        onChange={(e) => handleUpdateWordFormItem(idx, 'meaningVi', e.target.value)}
+                        placeholder="Nghĩa TV (vd: sự kiên cường)"
+                        className="flex-1 min-w-[100px] px-2.5 py-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs text-slate-800 dark:text-slate-100 placeholder-slate-400 outline-none"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveWordFormItem(idx)}
+                        className="p-1.5 text-slate-400 hover:text-rose-500 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/40 transition cursor-pointer"
+                        title="Xóa dạng từ này"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                    {/* English Definition for this Word Form */}
                     <input
                       type="text"
-                      value={wf.word}
-                      onChange={(e) => handleUpdateWordFormItem(idx, 'word', e.target.value)}
-                      placeholder="Từ tiếng Anh (vd: resilience)"
-                      className="flex-1 min-w-[100px] px-2.5 py-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold text-slate-800 dark:text-slate-100 placeholder-slate-400 outline-none"
+                      value={wf.definitionEn || ''}
+                      onChange={(e) => handleUpdateWordFormItem(idx, 'definitionEn', e.target.value)}
+                      placeholder="🇬🇧 Định nghĩa tiếng Anh cho dạng từ này (tùy chọn)..."
+                      className="w-full px-2.5 py-1.5 bg-slate-50/80 dark:bg-slate-900/80 border border-slate-200/80 dark:border-slate-700/80 rounded-lg text-[11px] text-slate-800 dark:text-slate-200 placeholder-slate-400 outline-none focus:border-amber-500/50"
                     />
-                    <input
-                      type="text"
-                      value={wf.meaningVi || ''}
-                      onChange={(e) => handleUpdateWordFormItem(idx, 'meaningVi', e.target.value)}
-                      placeholder="Nghĩa TV (vd: sự kiên cường)"
-                      className="flex-1 min-w-[100px] px-2.5 py-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs text-slate-800 dark:text-slate-100 placeholder-slate-400 outline-none"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveWordFormItem(idx)}
-                      className="p-1.5 text-slate-400 hover:text-rose-500 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/40 transition cursor-pointer"
-                      title="Xóa dạng từ này"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
                   </div>
                 ))}
               </div>
