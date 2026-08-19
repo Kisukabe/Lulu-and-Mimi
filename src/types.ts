@@ -76,6 +76,29 @@ export interface Flashcard {
   srsData?: SRSCardData;            // Dữ liệu thuật toán lặp lại ngắt quãng
 }
 
+// Cấu Hình Tùy Chọn Nội Dung Hiển Thị Ở Mặt Sau Flashcard
+export interface BackFaceDisplayConfig {
+  showVietnameseMeaning: boolean; // 🇻🇳 Nghĩa tiếng Việt
+  showDefinitionEn: boolean;      // 🇬🇧 Định nghĩa tiếng Anh
+  showExample: boolean;           // 📝 Câu ví dụ
+  showCollocations: boolean;      // 🔗 Cụm từ đi kèm (Collocations)
+  showSynonymsAntonyms: boolean;  // ⚖️ Từ đồng nghĩa & Trái nghĩa
+  showWordForms: boolean;         // 🌳 Họ từ / Biến thể (Word Forms)
+  showWordAndIpa: boolean;        // 🎙️ Từ vựng & Phiên âm IPA
+  showPartOfSpeech: boolean;      // 🏷️ Loại từ (Part of Speech)
+}
+
+export const DEFAULT_BACK_FACE_CONFIG: BackFaceDisplayConfig = {
+  showVietnameseMeaning: true,
+  showDefinitionEn: true,
+  showExample: true,
+  showCollocations: true,
+  showSynonymsAntonyms: true,
+  showWordForms: true,
+  showWordAndIpa: true,
+  showPartOfSpeech: true,
+};
+
 // Chủ Đề / Thư Mục Học Tập (Folder / Topic)
 export interface Topic {
   id: TopicId | string;

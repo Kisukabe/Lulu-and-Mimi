@@ -1,5 +1,14 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Flashcard, Topic, VocabType, TopicId, SRSCardData, WordForm } from '../types';
+import {
+  Flashcard,
+  Topic,
+  VocabType,
+  TopicId,
+  SRSCardData,
+  WordForm,
+  BackFaceDisplayConfig,
+  DEFAULT_BACK_FACE_CONFIG
+} from '../types';
 import {
   RotateCw,
   Sparkles,
@@ -81,6 +90,86 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
   useEffect(() => {
     setStatusFilter(initialFilter);
   }, [initialFilter]);
+
+  // Back-side content configuration state (localStorage persistence)
+  const BACK_CONTENT_CONFIG_KEY = 'lulu_mimi_back_face_display_config_v1';
+  const [backContentConfig, setBackContentConfig] = useState<BackFaceDisplayConfig>(() => {
+    try {
+      const saved = localStorage.getItem(BACK_CONTENT_CONFIG_KEY);
+      if (saved) {
+        return { ...DEFAULT_BACK_FACE_CONFIG, ...JSON.parse(saved) };
+      }
+    } catch {}
+    return DEFAULT_BACK_FACE_CONFIG;
+  });
+  const [showBackConfigModal, setShowBackConfigModal] = useState(false);
+
+  const updateBackContentConfig = (updates: Partial<BackFaceDisplayConfig>) => {
+    setBackContentConfig((prev) => {
+      const next = { ...prev, ...updates };
+      try {
+        localStorage.setItem(BACK_CONTENT_CONFIG_KEY, JSON.stringify(next));
+      } catch {}
+      return next;
+    });
+  };
+
+  const applyBackConfigPreset = (preset: 'all' | 'english_only' | 'vn_examples' | 'minimal' | 'default') => {
+    let nextConfig: BackFaceDisplayConfig = { ...DEFAULT_BACK_FACE_CONFIG };
+    if (preset === 'all' || preset === 'default') {
+      nextConfig = {
+        showVietnameseMeaning: true,
+        showDefinitionEn: true,
+        showExample: true,
+        showCollocations: true,
+        showSynonymsAntonyms: true,
+        showWordForms: true,
+        showWordAndIpa: true,
+        showPartOfSpeech: true,
+      };
+    } else if (preset === 'english_only') {
+      nextConfig = {
+        showVietnameseMeaning: false,
+        showDefinitionEn: true,
+        showExample: true,
+        showCollocations: true,
+        showSynonymsAntonyms: true,
+        showWordForms: true,
+        showWordAndIpa: true,
+        showPartOfSpeech: true,
+      };
+    } else if (preset === 'vn_examples') {
+      nextConfig = {
+        showVietnameseMeaning: true,
+        showDefinitionEn: false,
+        showExample: true,
+        showCollocations: true,
+        showSynonymsAntonyms: true,
+        showWordForms: false,
+        showWordAndIpa: true,
+        showPartOfSpeech: true,
+      };
+    } else if (preset === 'minimal') {
+      nextConfig = {
+        showVietnameseMeaning: true,
+        showDefinitionEn: true,
+        showExample: false,
+        showCollocations: false,
+        showSynonymsAntonyms: false,
+        showWordForms: false,
+        showWordAndIpa: true,
+        showPartOfSpeech: true,
+      };
+    }
+    setBackContentConfig(nextConfig);
+    try {
+      localStorage.setItem(BACK_CONTENT_CONFIG_KEY, JSON.stringify(nextConfig));
+    } catch {}
+  };
+
+  const activeBackFieldsCount = useMemo(() => {
+    return Object.values(backContentConfig).filter(Boolean).length;
+  }, [backContentConfig]);
 
   // Auto-play audio preference
   const [autoPlayAudio, setAutoPlayAudio] = useState<boolean>(() => {
@@ -238,6 +327,16 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
 
   // Current Card
   const currentCard = cardsList[currentIndex] || null;
+
+  const isAnyBodyFieldVisible = useMemo(() => {
+    return (
+      (backContentConfig.showDefinitionEn && Boolean(currentCard?.definitionEn)) ||
+      (backContentConfig.showExample && Boolean(currentCard?.example)) ||
+      (backContentConfig.showCollocations && Boolean(currentCard?.collocations && currentCard.collocations.length > 0)) ||
+      (backContentConfig.showSynonymsAntonyms && Boolean((currentCard?.synonyms && currentCard.synonyms.length > 0) || (currentCard?.antonyms && currentCard.antonyms.length > 0))) ||
+      (backContentConfig.showWordForms && Boolean((currentCard?.wordForms && currentCard.wordForms.length > 0) || (currentCard?.wordFamily && currentCard.wordFamily.length > 0)))
+    );
+  }, [backContentConfig, currentCard]);
 
   // Speak word
   const speakText = useCallback(
@@ -511,6 +610,19 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
               </div>
             )}
           </div>
+
+          {/* 🎛️ Tùy chọn nội dung mặt sau */}
+          <button
+            onClick={() => setShowBackConfigModal(true)}
+            className="flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 rounded-2xl bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800 text-sm sm:text-base font-black text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer active:scale-95 shadow-sm"
+            title="Tùy chỉnh các trường thông tin xuất hiện ở mặt sau flashcard"
+          >
+            <SlidersHorizontal className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500" />
+            <span className="hidden sm:inline">Nội dung mặt sau</span>
+            <span className="px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400 text-xs font-bold font-mono">
+              {activeBackFieldsCount}/8
+            </span>
+          </button>
 
           {/* Quick Add */}
           {onOpenQuickAdd && (
@@ -825,31 +937,37 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                         <div className="flex items-center justify-between pb-2.5 border-b border-white/15 shrink-0">
                           <div className="flex flex-wrap items-center gap-2.5">
                             {/* Part of Speech Pill */}
-                            <div className="px-3.5 py-1.5 rounded-xl bg-black/80 text-white flex items-center justify-center font-black text-xs sm:text-sm tracking-wider shadow-md border-2 border-white/20 uppercase">
-                              {currentCard?.wordForm ? currentCard.wordForm : 'word'}
-                            </div>
+                            {backContentConfig.showPartOfSpeech && (
+                              <div className="px-3.5 py-1.5 rounded-xl bg-black/80 text-white flex items-center justify-center font-black text-xs sm:text-sm tracking-wider shadow-md border-2 border-white/20 uppercase">
+                                {currentCard?.wordForm ? currentCard.wordForm : 'word'}
+                              </div>
+                            )}
 
                             {/* Từ vựng + Phiên âm IPA ở mặt sau */}
-                            <div className="flex items-center gap-2 bg-black/35 px-3 py-1 rounded-xl border border-white/15">
-                              <span className="text-sm sm:text-base font-black text-yellow-300">
-                                {currentCard?.front}
-                              </span>
-                              {hasIpa && (
-                                <span className="text-xs sm:text-sm font-mono font-bold text-slate-200">
-                                  {cardIpa}
+                            {backContentConfig.showWordAndIpa && (
+                              <div className="flex items-center gap-2 bg-black/35 px-3 py-1 rounded-xl border border-white/15">
+                                <span className="text-sm sm:text-base font-black text-yellow-300">
+                                  {currentCard?.front}
                                 </span>
-                              )}
-                            </div>
+                                {hasIpa && (
+                                  <span className="text-xs sm:text-sm font-mono font-bold text-slate-200">
+                                    {cardIpa}
+                                  </span>
+                                )}
+                              </div>
+                            )}
 
                             {/* Nghĩa tiếng Việt */}
-                            <div className="flex items-center gap-1.5">
-                              <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-black/30 text-lime-300 border border-lime-400/30">
-                                🇻🇳 NGHĨA
-                              </span>
-                              <span className="text-sm sm:text-lg font-black text-white leading-tight">
-                                {currentCard?.back}
-                              </span>
-                            </div>
+                            {backContentConfig.showVietnameseMeaning && currentCard?.back && (
+                              <div className="flex items-center gap-1.5">
+                                <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-black/30 text-lime-300 border border-lime-400/30">
+                                  🇻🇳 NGHĨA
+                                </span>
+                                <span className="text-sm sm:text-lg font-black text-white leading-tight">
+                                  {currentCard?.back}
+                                </span>
+                              </div>
+                            )}
                           </div>
 
                           <div className="flex items-center gap-1.5">
@@ -877,7 +995,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                         <div className="my-auto space-y-2.5 py-1 flex-1 flex flex-col justify-center">
                           
                           {/* 🇬🇧 English Definition Box (TO RÕ RÀNG) */}
-                          {currentCard?.definitionEn && (
+                          {backContentConfig.showDefinitionEn && currentCard?.definitionEn && (
                             <div className={`p-3.5 sm:p-4 rounded-xl ${currentTheme.backBoxBg} border-2 ${currentTheme.backBoxBorder} space-y-1 shadow-sm`}>
                               <div className="text-[11px] sm:text-xs font-black uppercase tracking-wider text-yellow-300 flex items-center gap-1.5">
                                 <span>Definition</span>
@@ -889,7 +1007,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                           )}
 
                           {/* Example Box */}
-                          {currentCard?.example && (
+                          {backContentConfig.showExample && currentCard?.example && (
                             <div className={`p-3 sm:p-3.5 rounded-xl ${currentTheme.backBoxBg} border ${currentTheme.backBoxBorder} space-y-0.5`}>
                               <div className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-yellow-300">
                                 Example
@@ -901,7 +1019,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                           )}
 
                           {/* 🔗 Dedicated Box: COLLOCATIONS */}
-                          {currentCard?.collocations && currentCard.collocations.length > 0 && (
+                          {backContentConfig.showCollocations && currentCard?.collocations && currentCard.collocations.length > 0 && (
                             <div className={`p-2.5 sm:p-3 rounded-xl ${currentTheme.backBoxBg} border ${currentTheme.backBoxBorder} space-y-1.5`}>
                               <div className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-yellow-300">
                                 Collocations
@@ -920,7 +1038,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                           )}
 
                           {/* ⚖️ Dedicated Box: SYNONYMS & ANTONYMS */}
-                          {((currentCard?.synonyms && currentCard.synonyms.length > 0) || (currentCard?.antonyms && currentCard.antonyms.length > 0)) && (
+                          {backContentConfig.showSynonymsAntonyms && ((currentCard?.synonyms && currentCard.synonyms.length > 0) || (currentCard?.antonyms && currentCard.antonyms.length > 0)) && (
                             <div className={`p-2.5 sm:p-3 rounded-xl ${currentTheme.backBoxBg} border ${currentTheme.backBoxBorder} space-y-1.5`}>
                               {currentCard.synonyms && currentCard.synonyms.length > 0 && (
                                 <div className="flex flex-wrap items-center gap-1.5">
@@ -961,7 +1079,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                           )}
 
                           {/* 🌳 Dedicated Box: WORD FORMS */}
-                          {((currentCard?.wordForms && currentCard.wordForms.length > 0) || (currentCard?.wordFamily && currentCard.wordFamily.length > 0)) && (
+                          {backContentConfig.showWordForms && ((currentCard?.wordForms && currentCard.wordForms.length > 0) || (currentCard?.wordFamily && currentCard.wordFamily.length > 0)) && (
                             <div className={`p-2.5 sm:p-3 rounded-xl ${currentTheme.backBoxBg} border ${currentTheme.backBoxBorder} space-y-1`}>
                               <div className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-yellow-300">
                                 Word Forms
@@ -983,6 +1101,29 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                               </div>
                             </div>
                           )}
+
+                          {/* Empty body placeholder when user unchecks all detailed boxes */}
+                          {!isAnyBodyFieldVisible && (
+                            <div className="text-center py-6 px-4 bg-black/25 border border-white/10 rounded-2xl space-y-2 my-auto">
+                              <div className="text-sm font-bold text-yellow-300">
+                                ⚡ Nội dung chi tiết mặt sau đang được ẩn
+                              </div>
+                              <p className="text-xs text-white/80 max-w-md mx-auto">
+                                Bạn có thể tùy chọn bật lại định nghĩa, ví dụ, cụm từ hoặc họ từ theo ý muốn.
+                              </p>
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setShowBackConfigModal(true);
+                                }}
+                                className="px-3.5 py-1.5 rounded-xl bg-white/20 hover:bg-white/30 text-white text-xs font-black transition cursor-pointer"
+                              >
+                                🎛️ Mở tùy chọn nội dung mặt sau
+                              </button>
+                            </div>
+                          )}
+
                         </div>
 
                         {/* Back Bottom Bar */}
@@ -1231,6 +1372,268 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
             </div>
           </div>
 
+        </div>
+      )}
+
+      {/* ════════ MODAL TÙY CHỌN NỘI DUNG MẶT SAU FLASHCARD ════════ */}
+      {showBackConfigModal && (
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
+          <div className="relative w-full max-w-xl bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-7 shadow-2xl space-y-5 animate-in fade-in zoom-in-95 duration-150">
+            
+            {/* Modal Header */}
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-amber-500/10 text-amber-500 flex items-center justify-center">
+                  <SlidersHorizontal className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white">
+                    Tùy Chọn Nội Dung Mặt Sau
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    Bật / tắt các trường thông tin bạn muốn xem khi lật mặt sau flashcard.
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowBackConfigModal(false)}
+                className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center transition cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Quick Presets Strip */}
+            <div className="space-y-2">
+              <label className="text-[11px] font-black uppercase text-slate-400 tracking-wider block">
+                Chế Độ Thiết Lập Nhanh (Presets):
+              </label>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                <button
+                  type="button"
+                  onClick={() => applyBackConfigPreset('all')}
+                  className="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 hover:bg-amber-500/10 hover:border-amber-500/40 text-slate-800 dark:text-slate-200 text-xs font-bold transition flex items-center justify-center gap-1 cursor-pointer"
+                >
+                  <span>⚡ Đầy đủ</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => applyBackConfigPreset('english_only')}
+                  className="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 hover:bg-indigo-500/10 hover:border-indigo-500/40 text-slate-800 dark:text-slate-200 text-xs font-bold transition flex items-center justify-center gap-1 cursor-pointer"
+                  title="Ẩn nghĩa tiếng Việt để luyện phản xạ 100% tiếng Anh"
+                >
+                  <span>🇬🇧 Chỉ Tiếng Anh</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => applyBackConfigPreset('vn_examples')}
+                  className="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 hover:bg-emerald-500/10 hover:border-emerald-500/40 text-slate-800 dark:text-slate-200 text-xs font-bold transition flex items-center justify-center gap-1 cursor-pointer"
+                >
+                  <span>🇻🇳 TV & Ví dụ</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => applyBackConfigPreset('minimal')}
+                  className="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 hover:bg-purple-500/10 hover:border-purple-500/40 text-slate-800 dark:text-slate-200 text-xs font-bold transition flex items-center justify-center gap-1 cursor-pointer"
+                >
+                  <span>🎯 Tối giản</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Config Toggles List */}
+            <div className="space-y-2.5 max-h-[380px] overflow-y-auto pr-1 custom-scrollbar">
+              
+              {/* 1. Definition EN */}
+              <label className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-800 hover:border-amber-500/30 transition cursor-pointer">
+                <div className="flex items-center gap-3">
+                  <span className="text-lg">🇬🇧</span>
+                  <div>
+                    <div className="text-xs sm:text-sm font-black text-slate-900 dark:text-white">
+                      Định nghĩa tiếng Anh (EN Definition)
+                    </div>
+                    <div className="text-[11px] text-slate-500 dark:text-slate-400">
+                      Giải thích chi tiết nghĩa từ bằng tiếng Anh (chuẩn Cambridge)
+                    </div>
+                  </div>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={backContentConfig.showDefinitionEn}
+                  onChange={(e) => updateBackContentConfig({ showDefinitionEn: e.target.checked })}
+                  className="w-5 h-5 accent-amber-500 rounded cursor-pointer"
+                />
+              </label>
+
+              {/* 2. Vietnamese Meaning */}
+              <label className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-800 hover:border-amber-500/30 transition cursor-pointer">
+                <div className="flex items-center gap-3">
+                  <span className="text-lg">🇻🇳</span>
+                  <div>
+                    <div className="text-xs sm:text-sm font-black text-slate-900 dark:text-white">
+                      Nghĩa tiếng Việt
+                    </div>
+                    <div className="text-[11px] text-slate-500 dark:text-slate-400">
+                      Dịch nghĩa tiếng Việt trọng tâm ở thanh tiêu đề mặt sau
+                    </div>
+                  </div>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={backContentConfig.showVietnameseMeaning}
+                  onChange={(e) => updateBackContentConfig({ showVietnameseMeaning: e.target.checked })}
+                  className="w-5 h-5 accent-amber-500 rounded cursor-pointer"
+                />
+              </label>
+
+              {/* 3. Example */}
+              <label className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-800 hover:border-amber-500/30 transition cursor-pointer">
+                <div className="flex items-center gap-3">
+                  <span className="text-lg">📝</span>
+                  <div>
+                    <div className="text-xs sm:text-sm font-black text-slate-900 dark:text-white">
+                      Câu ví dụ (Example)
+                    </div>
+                    <div className="text-[11px] text-slate-500 dark:text-slate-400">
+                      Câu ví dụ minh họa ngữ cảnh sử dụng thực tế
+                    </div>
+                  </div>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={backContentConfig.showExample}
+                  onChange={(e) => updateBackContentConfig({ showExample: e.target.checked })}
+                  className="w-5 h-5 accent-amber-500 rounded cursor-pointer"
+                />
+              </label>
+
+              {/* 4. Collocations */}
+              <label className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-800 hover:border-amber-500/30 transition cursor-pointer">
+                <div className="flex items-center gap-3">
+                  <span className="text-lg">🔗</span>
+                  <div>
+                    <div className="text-xs sm:text-sm font-black text-slate-900 dark:text-white">
+                      Cụm từ đi kèm (Collocations)
+                    </div>
+                    <div className="text-[11px] text-slate-500 dark:text-slate-400">
+                      Các cụm từ ghép tự nhiên và phổ biến của từ vựng
+                    </div>
+                  </div>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={backContentConfig.showCollocations}
+                  onChange={(e) => updateBackContentConfig({ showCollocations: e.target.checked })}
+                  className="w-5 h-5 accent-amber-500 rounded cursor-pointer"
+                />
+              </label>
+
+              {/* 5. Synonyms & Antonyms */}
+              <label className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-800 hover:border-amber-500/30 transition cursor-pointer">
+                <div className="flex items-center gap-3">
+                  <span className="text-lg">⚖️</span>
+                  <div>
+                    <div className="text-xs sm:text-sm font-black text-slate-900 dark:text-white">
+                      Từ đồng nghĩa & Trái nghĩa (Synonyms / Antonyms)
+                    </div>
+                    <div className="text-[11px] text-slate-500 dark:text-slate-400">
+                      Mở rộng vốn từ với các từ tương đồng hoặc tương phản
+                    </div>
+                  </div>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={backContentConfig.showSynonymsAntonyms}
+                  onChange={(e) => updateBackContentConfig({ showSynonymsAntonyms: e.target.checked })}
+                  className="w-5 h-5 accent-amber-500 rounded cursor-pointer"
+                />
+              </label>
+
+              {/* 6. Word Forms */}
+              <label className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-800 hover:border-amber-500/30 transition cursor-pointer">
+                <div className="flex items-center gap-3">
+                  <span className="text-lg">🌳</span>
+                  <div>
+                    <div className="text-xs sm:text-sm font-black text-slate-900 dark:text-white">
+                      Họ từ / Biến thể (Word Forms)
+                    </div>
+                    <div className="text-[11px] text-slate-500 dark:text-slate-400">
+                      Bảng các dạng từ liên quan (Danh từ, Động từ, Tính từ, Trạng từ)
+                    </div>
+                  </div>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={backContentConfig.showWordForms}
+                  onChange={(e) => updateBackContentConfig({ showWordForms: e.target.checked })}
+                  className="w-5 h-5 accent-amber-500 rounded cursor-pointer"
+                />
+              </label>
+
+              {/* 7. Word & IPA */}
+              <label className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-800 hover:border-amber-500/30 transition cursor-pointer">
+                <div className="flex items-center gap-3">
+                  <span className="text-lg">🎙️</span>
+                  <div>
+                    <div className="text-xs sm:text-sm font-black text-slate-900 dark:text-white">
+                      Từ vựng & Phiên âm IPA ở mặt sau
+                    </div>
+                    <div className="text-[11px] text-slate-500 dark:text-slate-400">
+                      Hiển thị lại từ tiếng Anh và ký hiệu phiên âm quốc tế
+                    </div>
+                  </div>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={backContentConfig.showWordAndIpa}
+                  onChange={(e) => updateBackContentConfig({ showWordAndIpa: e.target.checked })}
+                  className="w-5 h-5 accent-amber-500 rounded cursor-pointer"
+                />
+              </label>
+
+              {/* 8. Part of Speech */}
+              <label className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-800 hover:border-amber-500/30 transition cursor-pointer">
+                <div className="flex items-center gap-3">
+                  <span className="text-lg">🏷️</span>
+                  <div>
+                    <div className="text-xs sm:text-sm font-black text-slate-900 dark:text-white">
+                      Loại từ (Part of Speech)
+                    </div>
+                    <div className="text-[11px] text-slate-500 dark:text-slate-400">
+                      Nhãn phân loại (NOUN, VERB, ADJECTIVE...)
+                    </div>
+                  </div>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={backContentConfig.showPartOfSpeech}
+                  onChange={(e) => updateBackContentConfig({ showPartOfSpeech: e.target.checked })}
+                  className="w-5 h-5 accent-amber-500 rounded cursor-pointer"
+                />
+              </label>
+
+            </div>
+
+            {/* Modal Footer */}
+            <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-800">
+              <button
+                type="button"
+                onClick={() => applyBackConfigPreset('default')}
+                className="px-4 py-2 rounded-xl text-xs font-bold text-slate-500 hover:text-slate-900 dark:hover:text-white transition cursor-pointer"
+              >
+                Khôi phục mặc định
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowBackConfigModal(false)}
+                className={`px-6 py-2.5 ${currentTheme.nextBtnBg} text-xs font-black rounded-xl shadow-md transition cursor-pointer active:scale-95`}
+              >
+                Đã Xong
+              </button>
+            </div>
+
+          </div>
         </div>
       )}
 
