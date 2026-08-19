@@ -1003,20 +1003,45 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                           </div>
                         </div>
 
-                        {/* Back Content Body (Phân bổ gọn gàng để nhìn hết) */}
-                        <div className="my-auto space-y-2.5 py-1 flex-1 flex flex-col justify-center">
+                        {/* Back Content Body (Phân bổ co giãn thông minh, cuộn mượt mà nếu nội dung dài) */}
+                        <div className="my-auto space-y-2.5 py-1 flex-1 flex flex-col justify-center overflow-y-auto custom-scrollbar min-h-0 pr-0.5">
                           
-                          {/* 🇬🇧 English Definition Box (TO RÕ RÀNG) */}
-                          {backContentConfig.showDefinitionEn && currentCard?.definitionEn && (
-                            <div className={`p-3.5 sm:p-4 rounded-xl ${currentTheme.backBoxBg} border-2 ${currentTheme.backBoxBorder} space-y-1 shadow-sm`}>
-                              <div className="text-[11px] sm:text-xs font-black uppercase tracking-wider text-yellow-300 flex items-center gap-1.5">
-                                <span>Definition</span>
+                          {/* 🇬🇧 English Definition Box (KHUNG THÔNG MINH CO GIÃN THEO ĐỘ DÀI - TO RÕ & HIỆN ĐẦY ĐỦ) */}
+                          {backContentConfig.showDefinitionEn && currentCard?.definitionEn && (() => {
+                            const defLength = currentCard.definitionEn.length;
+                            // Phân cấp kích cỡ chữ và padding linh hoạt theo độ dài định nghĩa
+                            const textStyle = defLength < 60
+                              ? "text-base sm:text-lg lg:text-xl font-black leading-snug tracking-normal"
+                              : defLength < 140
+                              ? "text-sm sm:text-base lg:text-lg font-bold leading-relaxed tracking-wide"
+                              : "text-xs sm:text-sm lg:text-base font-semibold leading-relaxed tracking-normal";
+
+                            return (
+                              <div className={`p-3.5 sm:p-4.5 rounded-2xl ${currentTheme.backBoxBg} border-2 ${currentTheme.backBoxBorder} space-y-2 shadow-sm transition-all duration-200 w-full`}>
+                                <div className="flex items-center justify-between">
+                                  <div className="text-[11px] sm:text-xs font-black uppercase tracking-wider text-yellow-300 flex items-center gap-1.5">
+                                    <BookOpen className="w-3.5 h-3.5 text-yellow-300 shrink-0" />
+                                    <span>English Definition</span>
+                                  </div>
+                                  <button
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      speakText(currentCard.definitionEn!, preferredAccent);
+                                    }}
+                                    className="p-1 sm:px-2 sm:py-0.5 rounded-lg bg-black/35 hover:bg-black/60 text-yellow-200 hover:text-yellow-100 border border-yellow-400/20 transition cursor-pointer flex items-center gap-1 text-[10px] sm:text-[11px] font-bold"
+                                    title="Nghe phát âm định nghĩa tiếng Anh"
+                                  >
+                                    <Volume2 className="w-3 h-3" />
+                                    <span className="hidden sm:inline">Phát âm</span>
+                                  </button>
+                                </div>
+                                <p className={`${textStyle} text-white break-words whitespace-normal`}>
+                                  {currentCard.definitionEn}
+                                </p>
                               </div>
-                              <p className="text-sm sm:text-base lg:text-lg font-bold text-white leading-snug tracking-wide">
-                                {currentCard.definitionEn}
-                              </p>
-                            </div>
-                          )}
+                            );
+                          })()}
 
                           {/* Example Box */}
                           {backContentConfig.showExample && currentCard?.example && (
@@ -1237,7 +1262,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
 
                                         {/* 🇬🇧 English Definition for this word form */}
                                         {wf.definitionEn && (
-                                          <p className="text-[11px] font-medium text-slate-200 leading-snug">
+                                          <p className="text-[11px] sm:text-xs font-medium text-slate-100 leading-snug break-words">
                                             <strong className="text-yellow-300 font-bold">🇬🇧 EN: </strong>
                                             {wf.definitionEn}
                                           </p>
