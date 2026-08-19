@@ -1063,7 +1063,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                                   onClick={(e) => { e.stopPropagation(); setExpandedCollocations(!expandedCollocations); }}
                                   className="flex items-center gap-0.5 text-[10px] font-bold text-yellow-200/80 hover:text-yellow-100 transition cursor-pointer"
                                 >
-                                  {expandedCollocations ? <><ChevronUp className="w-3 h-3" /></> : <><ChevronDown className="w-3 h-3" /></>}
+                                  {expandedCollocations ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
                                 </button>
                               </div>
 
