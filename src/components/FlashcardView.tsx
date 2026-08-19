@@ -935,7 +935,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
 
                       {/* ──────────────── BACK FACE (MẶT SAU: THẤY HẾT TOÀN BỘ KHÔNG CẦN CUỘN) ──────────────── */}
                       <div
-                        className={`card-face-back rounded-3xl ${currentTheme.backBg} border-2 ${currentTheme.backBorder} p-5 sm:p-7 flex flex-col justify-between overflow-hidden ${
+                        className={`card-face-back rounded-3xl ${currentTheme.backBg} border-2 ${currentTheme.backBorder} p-5 sm:p-7 flex flex-col gap-3 overflow-hidden ${
                           !isFlipped ? 'invisible opacity-0 pointer-events-none' : 'visible opacity-100 pointer-events-auto'
                         }`}
                         style={{
@@ -945,24 +945,24 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                           transition: 'opacity 0.2s ease-in-out, visibility 0.2s ease-in-out'
                         }}
                       >
-                        {/* Back Top Bar (Hiển thị loại từ + Từ vựng + IPA + Nghĩa tiếng Việt) */}
-                        <div className="flex items-center justify-between pb-2.5 border-b border-white/15 shrink-0">
-                          <div className="flex flex-wrap items-center gap-2.5">
-                            {/* Part of Speech Pill */}
+                        {/* ── TOP BAR: Word + IPA + Part of Speech + Vietnamese meaning ── */}
+                        <div className="flex items-start justify-between gap-2 pb-2.5 border-b border-white/15 shrink-0">
+                          <div className="flex flex-wrap items-center gap-2 min-w-0">
+                            {/* Part of Speech */}
                             {backContentConfig.showPartOfSpeech && (
-                              <div className="px-3.5 py-1.5 rounded-xl bg-black/80 text-white flex items-center justify-center font-black text-xs sm:text-sm tracking-wider shadow-md border-2 border-white/20 uppercase">
-                                {currentCard?.wordForm ? currentCard.wordForm : 'word'}
-                              </div>
+                              <span className="px-2.5 py-1 rounded-lg bg-black/80 text-white font-black text-[10px] sm:text-xs tracking-wider border border-white/20 uppercase shrink-0">
+                                {currentCard?.wordForm ?? 'word'}
+                              </span>
                             )}
 
-                            {/* Từ vựng + Phiên âm IPA ở mặt sau */}
+                            {/* Từ vựng + IPA */}
                             {backContentConfig.showWordAndIpa && (
-                              <div className="flex items-center gap-2 bg-black/35 px-3 py-1 rounded-xl border border-white/15">
-                                <span className="text-sm sm:text-base font-black text-yellow-300">
+                              <div className="flex items-center gap-1.5 bg-black/35 px-2.5 py-1 rounded-lg border border-white/15 shrink-0">
+                                <span className="text-sm sm:text-base font-black text-yellow-300 leading-none">
                                   {currentCard?.front}
                                 </span>
                                 {hasIpa && (
-                                  <span className="text-xs sm:text-sm font-mono font-bold text-slate-200">
+                                  <span className="text-xs sm:text-sm font-mono font-bold text-slate-300 leading-none">
                                     {cardIpa}
                                   </span>
                                 )}
@@ -972,22 +972,20 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                             {/* Nghĩa tiếng Việt */}
                             {backContentConfig.showVietnameseMeaning && currentCard?.back && (
                               <div className="flex items-center gap-1.5">
-                                <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-black/30 text-lime-300 border border-lime-400/30">
-                                  🇻🇳 NGHĨA
+                                <span className="px-1.5 py-0.5 rounded-md bg-lime-400/15 text-lime-300 font-black text-[9px] sm:text-[10px] uppercase tracking-wider border border-lime-400/25 shrink-0">
+                                  🇻🇳
                                 </span>
-                                <span className="text-sm sm:text-lg font-black text-white leading-tight">
-                                  {currentCard?.back}
+                                <span className="text-sm sm:text-base font-black text-white leading-tight">
+                                  {currentCard.back}
                                 </span>
                               </div>
                             )}
                           </div>
 
-                          <div className="flex items-center gap-1.5">
+                          {/* Actions: Speaker + Edit */}
+                          <div className="flex items-center gap-1 shrink-0">
                             <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                playPronunciation(preferredAccent);
-                              }}
+                              onClick={(e) => { e.stopPropagation(); playPronunciation(preferredAccent); }}
                               className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white transition cursor-pointer"
                               title="Nghe phát âm"
                             >
@@ -1003,128 +1001,99 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                           </div>
                         </div>
 
-                        {/* Back Content Body (Phân bổ co giãn thông minh, cuộn mượt mà nếu nội dung dài) */}
-                        <div className="my-auto space-y-2.5 py-1 flex-1 flex flex-col justify-center overflow-y-auto custom-scrollbar min-h-0 pr-0.5">
-                          
-                          {/* 🇬🇧 English Definition Box (KHUNG THÔNG MINH CO GIÃN THEO ĐỘ DÀI - TO RÕ & HIỆN ĐẦY ĐỦ) */}
-                          {backContentConfig.showDefinitionEn && currentCard?.definitionEn && (() => {
-                            const defLength = currentCard.definitionEn.length;
-                            // Phân cấp kích cỡ chữ và padding linh hoạt theo độ dài định nghĩa
-                            const textStyle = defLength < 60
-                              ? "text-base sm:text-lg lg:text-xl font-black leading-snug tracking-normal"
-                              : defLength < 140
-                              ? "text-sm sm:text-base lg:text-lg font-bold leading-relaxed tracking-wide"
-                              : "text-xs sm:text-sm lg:text-base font-semibold leading-relaxed tracking-normal";
+                        {/* ── BODY: Tất cả nội dung trong khung bo tròn nhỏ, cuộn khi cần ── */}
+                        <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar flex flex-col gap-2 pr-0.5">
 
+                          {/* 📖 English Definition */}
+                          {backContentConfig.showDefinitionEn && currentCard?.definitionEn && (() => {
+                            const len = currentCard.definitionEn.length;
+                            const textCls = len < 70
+                              ? "text-sm sm:text-base lg:text-lg font-black leading-snug"
+                              : len < 160
+                              ? "text-sm sm:text-sm lg:text-base font-bold leading-relaxed"
+                              : "text-xs sm:text-sm font-semibold leading-relaxed";
                             return (
-                              <div className={`p-3.5 sm:p-4.5 rounded-2xl ${currentTheme.backBoxBg} border-2 ${currentTheme.backBoxBorder} space-y-2 shadow-sm transition-all duration-200 w-full`}>
+                              <div className={`rounded-xl ${currentTheme.backBoxBg} border-2 ${currentTheme.backBoxBorder} p-3 sm:p-3.5 flex flex-col gap-1.5 shadow-sm`}>
                                 <div className="flex items-center justify-between">
-                                  <div className="text-[11px] sm:text-xs font-black uppercase tracking-wider text-yellow-300 flex items-center gap-1.5">
-                                    <BookOpen className="w-3.5 h-3.5 text-yellow-300 shrink-0" />
-                                    <span>English Definition</span>
+                                  <div className="flex items-center gap-1.5 text-yellow-300">
+                                    <BookOpen className="w-3 h-3 shrink-0" />
+                                    <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider">Definition</span>
                                   </div>
                                   <button
                                     type="button"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      speakText(currentCard.definitionEn!, preferredAccent);
-                                    }}
-                                    className="p-1 sm:px-2 sm:py-0.5 rounded-lg bg-black/35 hover:bg-black/60 text-yellow-200 hover:text-yellow-100 border border-yellow-400/20 transition cursor-pointer flex items-center gap-1 text-[10px] sm:text-[11px] font-bold"
-                                    title="Nghe phát âm định nghĩa tiếng Anh"
+                                    onClick={(e) => { e.stopPropagation(); speakText(currentCard.definitionEn!, preferredAccent); }}
+                                    className="p-1 rounded-md bg-black/30 hover:bg-black/55 text-yellow-200/80 hover:text-yellow-100 border border-yellow-400/20 transition cursor-pointer"
+                                    title="Nghe phát âm định nghĩa"
                                   >
                                     <Volume2 className="w-3 h-3" />
-                                    <span className="hidden sm:inline">Phát âm</span>
                                   </button>
                                 </div>
-                                <p className={`${textStyle} text-white break-words whitespace-normal`}>
+                                <p className={`${textCls} text-white break-words`}>
                                   {currentCard.definitionEn}
                                 </p>
                               </div>
                             );
                           })()}
 
-                          {/* Example Box */}
+                          {/* 💬 Example */}
                           {backContentConfig.showExample && currentCard?.example && (
-                            <div className={`p-3 sm:p-3.5 rounded-xl ${currentTheme.backBoxBg} border ${currentTheme.backBoxBorder} space-y-0.5`}>
-                              <div className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-yellow-300">
-                                Example
-                              </div>
-                              <p className="text-xs sm:text-sm italic font-semibold text-white leading-tight">
+                            <div className={`rounded-xl ${currentTheme.backBoxBg} border ${currentTheme.backBoxBorder} p-3 sm:p-3.5 flex flex-col gap-1 shadow-sm`}>
+                              <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-yellow-300">Example</span>
+                              <p className="text-xs sm:text-sm italic font-semibold text-white/90 leading-relaxed break-words">
                                 "{currentCard.example}"
                               </p>
                             </div>
                           )}
 
-                          {/* 🔗 Dedicated Box: COLLOCATIONS (Click to Expand / Collapse) */}
+                          {/* 🔗 Collocations */}
                           {backContentConfig.showCollocations && currentCard?.collocations && currentCard.collocations.length > 0 && (
-                            <div className={`p-2.5 sm:p-3 rounded-xl ${currentTheme.backBoxBg} border ${currentTheme.backBoxBorder} space-y-1.5 transition-all duration-200`}>
+                            <div className={`rounded-xl ${currentTheme.backBoxBg} border ${currentTheme.backBoxBorder} p-3 sm:p-3.5 flex flex-col gap-2 shadow-sm`}>
                               <div
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setExpandedCollocations(!expandedCollocations);
-                                }}
+                                onClick={(e) => { e.stopPropagation(); setExpandedCollocations(!expandedCollocations); }}
                                 className="flex items-center justify-between cursor-pointer select-none group"
-                                title={expandedCollocations ? "Nhấn để thu gọn danh sách cụm từ" : "Nhấn để xem toàn bộ danh sách cụm từ"}
                               >
-                                <div className="flex items-center gap-2">
-                                  <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-yellow-300 flex items-center gap-1.5">
-                                    <span>Collocations</span>
-                                    <span className="px-1.5 py-0.2 rounded-md bg-black/40 text-yellow-200 text-[10px] font-mono font-bold">
-                                      {currentCard.collocations.length}
-                                    </span>
+                                <div className="flex items-center gap-1.5 text-yellow-300">
+                                  <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider">Collocations</span>
+                                  <span className="px-1.5 py-px rounded bg-black/40 text-yellow-200 text-[9px] font-mono font-bold border border-yellow-400/20">
+                                    {currentCard.collocations.length}
                                   </span>
                                 </div>
                                 <button
                                   type="button"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setExpandedCollocations(!expandedCollocations);
-                                  }}
-                                  className="text-[10px] sm:text-[11px] font-bold text-yellow-200/90 group-hover:text-yellow-100 flex items-center gap-1 bg-black/35 hover:bg-black/50 px-2 py-0.5 rounded-lg border border-yellow-400/20 transition cursor-pointer"
+                                  onClick={(e) => { e.stopPropagation(); setExpandedCollocations(!expandedCollocations); }}
+                                  className="flex items-center gap-0.5 text-[10px] font-bold text-yellow-200/80 hover:text-yellow-100 transition cursor-pointer"
                                 >
-                                  <span>{expandedCollocations ? 'Thu gọn' : 'Xem toàn bộ'}</span>
-                                  {expandedCollocations ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                                  {expandedCollocations ? <><ChevronUp className="w-3 h-3" /></> : <><ChevronDown className="w-3 h-3" /></>}
                                 </button>
                               </div>
 
-                              {/* Content: Collapsed vs Expanded */}
                               {!expandedCollocations ? (
                                 <div
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setExpandedCollocations(true);
-                                  }}
-                                  className="flex flex-wrap items-center gap-1.5 cursor-pointer pt-0.5"
-                                  title="Nhấn để xem toàn bộ cụm từ"
+                                  onClick={(e) => { e.stopPropagation(); setExpandedCollocations(true); }}
+                                  className="flex flex-wrap gap-1.5 cursor-pointer"
                                 >
-                                  {currentCard.collocations.slice(0, 2).map((col, idx) => (
-                                    <span
-                                      key={idx}
-                                      className="px-2.5 py-1 rounded-lg bg-black/40 text-yellow-200 text-xs sm:text-sm font-bold border border-yellow-400/25 tracking-tight"
-                                    >
+                                  {currentCard.collocations.slice(0, 3).map((col, idx) => (
+                                    <span key={idx} className="px-2 py-0.5 rounded-md bg-black/40 text-yellow-200 text-xs font-bold border border-yellow-400/20">
                                       {col}
                                     </span>
                                   ))}
-                                  {currentCard.collocations.length > 2 && (
-                                    <span className="px-2.5 py-1 rounded-lg bg-yellow-400/15 hover:bg-yellow-400/25 text-yellow-300 text-xs font-bold border border-yellow-400/30 flex items-center gap-1 transition">
-                                      +{currentCard.collocations.length - 2} cụm từ khác...
+                                  {currentCard.collocations.length > 3 && (
+                                    <span className="px-2 py-0.5 rounded-md bg-yellow-400/10 text-yellow-300 text-xs font-bold border border-yellow-400/25">
+                                      +{currentCard.collocations.length - 3} nữa…
                                     </span>
                                   )}
                                 </div>
                               ) : (
-                                <div className="flex flex-wrap gap-1.5 pt-0.5 animate-in fade-in zoom-in-95 duration-150 max-h-[140px] overflow-y-auto custom-scrollbar pr-0.5">
+                                <div className="flex flex-wrap gap-1.5 animate-in fade-in duration-150">
                                   {currentCard.collocations.map((col, idx) => (
                                     <span
                                       key={idx}
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        speakText(col, preferredAccent);
-                                      }}
-                                      className="group inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-black/50 hover:bg-black/75 text-yellow-200 hover:text-yellow-100 text-xs sm:text-sm font-bold border border-yellow-400/30 hover:border-yellow-400/60 tracking-tight transition cursor-pointer"
-                                      title="Nhấn để nghe phát âm cụm từ này"
+                                      onClick={(e) => { e.stopPropagation(); speakText(col, preferredAccent); }}
+                                      className="group inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-black/45 hover:bg-black/70 text-yellow-200 hover:text-yellow-100 text-xs font-bold border border-yellow-400/25 hover:border-yellow-400/55 transition cursor-pointer"
+                                      title="Nghe phát âm"
                                     >
-                                      <span>{col}</span>
-                                      <Volume2 className="w-3 h-3 opacity-60 group-hover:opacity-100 transition-opacity" />
+                                      {col}
+                                      <Volume2 className="w-2.5 h-2.5 opacity-50 group-hover:opacity-100 transition-opacity" />
                                     </span>
                                   ))}
                                 </div>
@@ -1132,38 +1101,27 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                             </div>
                           )}
 
-                          {/* ⚖️ Dedicated Box: SYNONYMS & ANTONYMS */}
+                          {/* ⚖️ Synonyms & Antonyms */}
                           {backContentConfig.showSynonymsAntonyms && ((currentCard?.synonyms && currentCard.synonyms.length > 0) || (currentCard?.antonyms && currentCard.antonyms.length > 0)) && (
-                            <div className={`p-2.5 sm:p-3 rounded-xl ${currentTheme.backBoxBg} border ${currentTheme.backBoxBorder} space-y-1.5`}>
+                            <div className={`rounded-xl ${currentTheme.backBoxBg} border ${currentTheme.backBoxBorder} p-3 sm:p-3.5 flex flex-col gap-2 shadow-sm`}>
                               {currentCard.synonyms && currentCard.synonyms.length > 0 && (
                                 <div className="flex flex-wrap items-center gap-1.5">
-                                  <span className="text-[11px] font-black uppercase text-lime-300 tracking-wider min-w-[80px]">
-                                    Synonyms:
-                                  </span>
-                                  <div className="flex flex-wrap gap-1 flex-1">
+                                  <span className="text-[10px] font-black uppercase text-lime-300 tracking-wider shrink-0 min-w-[62px]">Synonyms:</span>
+                                  <div className="flex flex-wrap gap-1">
                                     {currentCard.synonyms.map((syn, idx) => (
-                                      <span
-                                        key={idx}
-                                        className="px-2.5 py-0.5 rounded-md bg-black/35 text-lime-200 text-xs sm:text-sm font-bold border border-lime-400/20"
-                                      >
+                                      <span key={idx} className="px-2 py-0.5 rounded-md bg-lime-400/10 text-lime-200 text-xs font-bold border border-lime-400/20">
                                         {syn}
                                       </span>
                                     ))}
                                   </div>
                                 </div>
                               )}
-
                               {currentCard.antonyms && currentCard.antonyms.length > 0 && (
-                                <div className="flex flex-wrap items-center gap-1.5 pt-1 border-t border-white/10">
-                                  <span className="text-[11px] font-black uppercase text-rose-300 tracking-wider min-w-[80px]">
-                                    Antonyms:
-                                  </span>
-                                  <div className="flex flex-wrap gap-1 flex-1">
+                                <div className="flex flex-wrap items-center gap-1.5 pt-1.5 border-t border-white/10">
+                                  <span className="text-[10px] font-black uppercase text-rose-300 tracking-wider shrink-0 min-w-[62px]">Antonyms:</span>
+                                  <div className="flex flex-wrap gap-1">
                                     {currentCard.antonyms.map((ant, idx) => (
-                                      <span
-                                        key={idx}
-                                        className="px-2.5 py-0.5 rounded-md bg-black/35 text-rose-200 text-xs sm:text-sm font-bold border border-rose-400/20"
-                                      >
+                                      <span key={idx} className="px-2 py-0.5 rounded-md bg-rose-400/10 text-rose-200 text-xs font-bold border border-rose-400/20">
                                         {ant}
                                       </span>
                                     ))}
@@ -1173,106 +1131,71 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                             </div>
                           )}
 
-                          {/* 🌳 Dedicated Box: WORD FORMS (Click to Expand / Collapse with English Definitions) */}
+                          {/* 🌳 Word Forms */}
                           {backContentConfig.showWordForms && ((currentCard?.wordForms && currentCard.wordForms.length > 0) || (currentCard?.wordFamily && currentCard.wordFamily.length > 0)) && (() => {
                             const forms = currentCard.wordForms || currentCard.wordFamily || [];
                             return (
-                              <div className={`p-2.5 sm:p-3 rounded-xl ${currentTheme.backBoxBg} border ${currentTheme.backBoxBorder} space-y-1.5 transition-all duration-200`}>
+                              <div className={`rounded-xl ${currentTheme.backBoxBg} border ${currentTheme.backBoxBorder} p-3 sm:p-3.5 flex flex-col gap-2 shadow-sm`}>
                                 <div
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setExpandedWordForms(!expandedWordForms);
-                                  }}
+                                  onClick={(e) => { e.stopPropagation(); setExpandedWordForms(!expandedWordForms); }}
                                   className="flex items-center justify-between cursor-pointer select-none group"
-                                  title={expandedWordForms ? "Nhấn để thu gọn họ từ" : "Nhấn để xem đầy đủ định nghĩa và phát âm các dạng từ"}
                                 >
-                                  <div className="flex items-center gap-2">
-                                    <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-yellow-300 flex items-center gap-1.5">
-                                      <span>Word Forms</span>
-                                      <span className="px-1.5 py-0.2 rounded-md bg-black/40 text-yellow-200 text-[10px] font-mono font-bold">
-                                        {forms.length}
-                                      </span>
+                                  <div className="flex items-center gap-1.5 text-yellow-300">
+                                    <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider">Word Forms</span>
+                                    <span className="px-1.5 py-px rounded bg-black/40 text-yellow-200 text-[9px] font-mono font-bold border border-yellow-400/20">
+                                      {forms.length}
                                     </span>
                                   </div>
                                   <button
                                     type="button"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      setExpandedWordForms(!expandedWordForms);
-                                    }}
-                                    className="text-[10px] sm:text-[11px] font-bold text-yellow-200/90 group-hover:text-yellow-100 flex items-center gap-1 bg-black/35 hover:bg-black/50 px-2 py-0.5 rounded-lg border border-yellow-400/20 transition cursor-pointer"
+                                    onClick={(e) => { e.stopPropagation(); setExpandedWordForms(!expandedWordForms); }}
+                                    className="flex items-center gap-0.5 text-[10px] font-bold text-yellow-200/80 hover:text-yellow-100 transition cursor-pointer"
                                   >
-                                    <span>{expandedWordForms ? 'Thu gọn' : 'Xem định nghĩa & chi tiết'}</span>
-                                    {expandedWordForms ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                                    <span>{expandedWordForms ? 'Thu gọn' : 'Chi tiết'}</span>
+                                    {expandedWordForms ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
                                   </button>
                                 </div>
 
-                                {/* Content: Collapsed Preview vs Expanded Full Details */}
                                 {!expandedWordForms ? (
                                   <div
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      setExpandedWordForms(true);
-                                    }}
-                                    className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 cursor-pointer pt-0.5"
-                                    title="Nhấn để xem chi tiết định nghĩa các dạng từ"
+                                    onClick={(e) => { e.stopPropagation(); setExpandedWordForms(true); }}
+                                    className="flex flex-wrap gap-1.5 cursor-pointer"
                                   >
                                     {forms.map((wf, idx) => (
-                                      <div
-                                        key={idx}
-                                        className="px-2 py-1 rounded-lg bg-black/40 hover:bg-black/60 border border-white/15 hover:border-yellow-400/40 space-y-0.5 transition"
-                                      >
-                                        <span className="text-[9px] font-black uppercase tracking-wider text-yellow-400/90 block">
-                                          {wf.form}
-                                        </span>
-                                        <span className="text-xs font-bold text-white block truncate">
-                                          {wf.word}
-                                        </span>
+                                      <div key={idx} className="flex items-center gap-1 px-2 py-1 rounded-lg bg-black/40 border border-white/15">
+                                        <span className="text-[9px] font-black uppercase text-yellow-400/80 tracking-wider">{wf.form}</span>
+                                        <span className="text-xs font-bold text-white">{wf.word}</span>
                                       </div>
                                     ))}
                                   </div>
                                 ) : (
-                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 animate-in fade-in zoom-in-95 duration-150 max-h-[190px] overflow-y-auto custom-scrollbar pr-0.5">
+                                  <div className="flex flex-col gap-1.5 animate-in fade-in duration-150">
                                     {forms.map((wf, idx) => (
-                                      <div
-                                        key={idx}
-                                        className="p-2.5 rounded-xl bg-black/55 border border-white/20 space-y-1"
-                                      >
+                                      <div key={idx} className="rounded-lg bg-black/40 border border-white/15 p-2 flex flex-col gap-1">
                                         <div className="flex items-center justify-between gap-1.5">
                                           <div className="flex items-center gap-1.5 min-w-0">
-                                            <span className="px-2 py-0.5 rounded-md bg-yellow-400/20 text-yellow-300 font-black text-[9px] uppercase tracking-wider border border-yellow-400/30 shrink-0">
+                                            <span className="px-1.5 py-0.5 rounded bg-yellow-400/20 text-yellow-300 font-black text-[9px] uppercase tracking-wider border border-yellow-400/25 shrink-0">
                                               {wf.form}
                                             </span>
-                                            <span className="text-xs sm:text-sm font-black text-white truncate">
-                                              {wf.word}
-                                            </span>
+                                            <span className="text-xs sm:text-sm font-black text-white truncate">{wf.word}</span>
                                           </div>
                                           <button
                                             type="button"
-                                            onClick={(e) => {
-                                              e.stopPropagation();
-                                              speakText(wf.word, preferredAccent);
-                                            }}
-                                            className="p-1 rounded-md bg-white/10 hover:bg-white/25 text-slate-200 hover:text-white transition cursor-pointer shrink-0"
-                                            title="Nghe phát âm dạng từ này"
+                                            onClick={(e) => { e.stopPropagation(); speakText(wf.word, preferredAccent); }}
+                                            className="p-1 rounded bg-white/10 hover:bg-white/25 text-slate-300 hover:text-white transition cursor-pointer shrink-0"
+                                            title="Nghe phát âm"
                                           >
-                                            <Volume2 className="w-3 h-3" />
+                                            <Volume2 className="w-2.5 h-2.5" />
                                           </button>
                                         </div>
-
-                                        {/* 🇬🇧 English Definition for this word form */}
                                         {wf.definitionEn && (
-                                          <p className="text-[11px] sm:text-xs font-medium text-slate-100 leading-snug break-words">
-                                            <strong className="text-yellow-300 font-bold">🇬🇧 EN: </strong>
-                                            {wf.definitionEn}
+                                          <p className="text-[11px] font-medium text-slate-100 leading-snug break-words">
+                                            <strong className="text-yellow-300 font-semibold">EN: </strong>{wf.definitionEn}
                                           </p>
                                         )}
-
-                                        {/* 🇻🇳 Vietnamese Meaning */}
                                         {wf.meaningVi && (
-                                          <p className="text-[11px] font-semibold text-lime-300 leading-snug">
-                                            <strong className="text-lime-400 font-bold">🇻🇳 VN: </strong>
-                                            {wf.meaningVi}
+                                          <p className="text-[11px] font-semibold text-lime-300 leading-snug break-words">
+                                            <strong className="text-lime-400 font-semibold">VN: </strong>{wf.meaningVi}
                                           </p>
                                         )}
                                       </div>
@@ -1283,32 +1206,25 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                             );
                           })()}
 
-                          {/* Empty body placeholder when user unchecks all detailed boxes */}
+                          {/* Placeholder khi tất cả ô tắt */}
                           {!isAnyBodyFieldVisible && (
-                            <div className="text-center py-6 px-4 bg-black/25 border border-white/10 rounded-2xl space-y-2 my-auto">
-                              <div className="text-sm font-bold text-yellow-300">
-                                ⚡ Nội dung chi tiết mặt sau đang được ẩn
-                              </div>
-                              <p className="text-xs text-white/80 max-w-md mx-auto">
-                                Bạn có thể tùy chọn bật lại định nghĩa, ví dụ, cụm từ hoặc họ từ theo ý muốn.
-                              </p>
+                            <div className="flex-1 flex flex-col items-center justify-center gap-2 text-center py-6 px-4 bg-black/20 border border-white/10 rounded-xl">
+                              <p className="text-sm font-bold text-yellow-300">⚡ Nội dung mặt sau đang ẩn</p>
+                              <p className="text-xs text-white/70">Bật lại định nghĩa, ví dụ... trong tùy chọn.</p>
                               <button
                                 type="button"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setShowBackConfigModal(true);
-                                }}
-                                className="px-3.5 py-1.5 rounded-xl bg-white/20 hover:bg-white/30 text-white text-xs font-black transition cursor-pointer"
+                                onClick={(e) => { e.stopPropagation(); setShowBackConfigModal(true); }}
+                                className="px-3 py-1.5 rounded-lg bg-white/20 hover:bg-white/30 text-white text-xs font-black transition cursor-pointer mt-1"
                               >
-                                🎛️ Mở tùy chọn nội dung mặt sau
+                                🎛️ Tùy chọn mặt sau
                               </button>
                             </div>
                           )}
 
                         </div>
 
-                        {/* Back Bottom Bar */}
-                        <div className="flex items-center justify-between pt-1.5 border-t border-white/15 text-[11px] text-white/80 font-bold shrink-0">
+                        {/* ── BOTTOM BAR ── */}
+                        <div className="flex items-center justify-between pt-1.5 border-t border-white/15 text-[11px] text-white/70 font-bold shrink-0">
                           <span>
                             {currentCardSRS ? `Ôn tiếp: ${formatSRSCountdown(currentCardSRS.nextReviewDate)}` : 'Trạng thái: Mới học'}
                           </span>
