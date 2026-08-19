@@ -967,17 +967,6 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                               </div>
                             )}
 
-                            {/* Nghĩa tiếng Việt */}
-                            {backContentConfig.showVietnameseMeaning && currentCard?.back && (
-                              <div className="flex items-center gap-1.5">
-                                <span className="px-1.5 py-0.5 rounded-md bg-lime-400/15 text-lime-300 font-black text-[9px] sm:text-[10px] uppercase tracking-wider border border-lime-400/25 shrink-0">
-                                  🇻🇳
-                                </span>
-                                <span className="text-sm sm:text-base font-black text-white leading-tight">
-                                  {currentCard.back}
-                                </span>
-                              </div>
-                            )}
                           </div>
 
                           {/* Actions: Speaker + Edit */}
@@ -1001,6 +990,26 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
 
                         {/* ── BODY: Tất cả nội dung trong khung bo tròn nhỏ, cuộn khi cần ── */}
                         <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar flex flex-col gap-2 pr-0.5">
+
+                          {/* 🇻🇳 Nghĩa tiếng Việt */}
+                          {backContentConfig.showVietnameseMeaning && currentCard?.back && (() => {
+                            const viLen = currentCard.back.length;
+                            const viTextCls = viLen < 30
+                              ? "text-base sm:text-xl lg:text-2xl font-black leading-tight"
+                              : viLen < 70
+                              ? "text-sm sm:text-lg lg:text-xl font-black leading-snug"
+                              : "text-sm sm:text-base font-bold leading-relaxed";
+                            return (
+                              <div className={`rounded-xl ${currentTheme.backBoxBg} border-2 border-lime-400/35 p-3 sm:p-3.5 flex flex-col gap-1.5 shadow-sm`}>
+                                <div className="flex items-center gap-1.5">
+                                  <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-lime-300">🇻🇳 Nghĩa</span>
+                                </div>
+                                <p className={`${viTextCls} text-lime-100 break-words`}>
+                                  {currentCard.back}
+                                </p>
+                              </div>
+                            );
+                          })()}
 
                           {/* 📖 English Definition */}
                           {backContentConfig.showDefinitionEn && currentCard?.definitionEn && (() => {

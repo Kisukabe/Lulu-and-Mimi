@@ -712,46 +712,75 @@ export const FlashcardCreator: React.FC<FlashcardCreatorProps> = ({
                 </div>
 
                 {/* Back Side Preview */}
-                <div className="absolute inset-0 w-full h-full bg-slate-900 text-white border-2 border-amber-500/60 rounded-3xl p-5 flex flex-col justify-between shadow-md backface-hidden rotate-y-180 overflow-y-auto custom-scrollbar">
-                  <div className="flex items-center justify-between text-[11px] font-black text-amber-400">
-                    <span>MẶT SAU (NGHĨA & ĐỊNH NGHĨA)</span>
-                    <span className="text-slate-400 truncate max-w-[120px]">{front}</span>
+                <div className="absolute inset-0 w-full h-full bg-slate-900 text-white border-2 border-amber-500/60 rounded-3xl p-4 flex flex-col gap-2.5 shadow-md backface-hidden rotate-y-180 overflow-y-auto custom-scrollbar">
+                  
+                  {/* Top bar: word + part of speech */}
+                  <div className="flex items-center justify-between pb-2 border-b border-white/15 shrink-0">
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <span className="px-2 py-0.5 rounded-md bg-black/70 text-white font-black text-[9px] tracking-wider border border-white/20 uppercase">
+                        {wordForm}
+                      </span>
+                      <span className="text-sm font-black text-yellow-300 leading-none">
+                        {front || 'word'}
+                      </span>
+                      {pronunciation && (
+                        <span className="text-[10px] font-mono font-bold text-slate-300">
+                          {pronunciation}
+                        </span>
+                      )}
+                    </div>
+                    <span className="text-[9px] font-black uppercase text-amber-400/60">MẶT SAU</span>
                   </div>
 
-                  <div className="text-center my-auto space-y-2 py-2">
-                    {definitionEn && (
-                      <p className="text-xs text-indigo-300 font-medium italic bg-indigo-950/60 p-2 rounded-xl border border-indigo-900 text-left line-clamp-2">
-                        🇬🇧 {definitionEn}
+                  {/* Body: unified rounded boxes */}
+                  <div className="flex flex-col gap-1.5 flex-1">
+
+                    {/* 🇻🇳 Nghĩa tiếng Việt */}
+                    <div className="rounded-xl bg-white/8 border-2 border-lime-400/35 p-2.5 flex flex-col gap-1">
+                      <span className="text-[9px] font-black uppercase tracking-wider text-lime-300">🇻🇳 Nghĩa</span>
+                      <p className={`font-black text-lime-100 leading-tight break-words ${back ? 'text-sm' : 'text-xs opacity-40'}`}>
+                        {back || 'Nhập nghĩa tiếng Việt...'}
                       </p>
-                    )}
-                    <h4 className="text-base sm:text-lg font-black text-emerald-400">
-                      🇻🇳 {back || 'Nhập nghĩa tiếng Việt...'}
-                    </h4>
-                    {example && (
-                      <p className="text-xs text-slate-300 italic bg-slate-800/80 p-2 rounded-xl border border-slate-700 text-left line-clamp-2">
-                        &quot;{example}&quot;
-                      </p>
+                    </div>
+
+                    {/* 📖 English Definition */}
+                    {definitionEn ? (
+                      <div className="rounded-xl bg-white/8 border-2 border-yellow-400/30 p-2.5 flex flex-col gap-1">
+                        <div className="flex items-center gap-1 text-yellow-300">
+                          <BookOpen className="w-2.5 h-2.5 shrink-0" />
+                          <span className="text-[9px] font-black uppercase tracking-wider">Definition</span>
+                        </div>
+                        <p className="text-[11px] font-semibold text-white leading-relaxed break-words line-clamp-3">
+                          {definitionEn}
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="rounded-xl bg-white/5 border border-white/10 p-2 text-center">
+                        <p className="text-[10px] text-slate-500 italic">Chưa có định nghĩa tiếng Anh</p>
+                      </div>
                     )}
 
-                    {/* Word Forms in Preview */}
+                    {/* 💬 Example */}
+                    {example && (
+                      <div className="rounded-xl bg-white/8 border border-white/15 p-2.5 flex flex-col gap-1">
+                        <span className="text-[9px] font-black uppercase tracking-wider text-yellow-300">Example</span>
+                        <p className="text-[11px] italic font-semibold text-white/85 leading-relaxed break-words line-clamp-2">
+                          "{example}"
+                        </p>
+                      </div>
+                    )}
+
+                    {/* 🌳 Word Forms */}
                     {wordForms.some((wf) => wf.word && wf.word.trim().length > 0) && (
-                      <div className="pt-2 border-t border-slate-800 text-left">
-                        <span className="text-[10px] font-black text-amber-400 uppercase tracking-wider block mb-1">
-                          🌳 Word Forms (Dạng từ):
-                        </span>
-                        <div className="grid grid-cols-2 gap-1.5">
+                      <div className="rounded-xl bg-white/8 border border-white/15 p-2.5 flex flex-col gap-1.5">
+                        <span className="text-[9px] font-black uppercase tracking-wider text-yellow-300">Word Forms</span>
+                        <div className="flex flex-wrap gap-1">
                           {wordForms
                             .filter((wf) => wf.word && wf.word.trim().length > 0)
                             .map((wf, idx) => (
-                              <div
-                                key={idx}
-                                className="bg-slate-800/90 border border-slate-700/80 p-1.5 rounded-lg text-[10px]"
-                              >
-                                <span className="text-amber-400 uppercase font-black mr-1">{wf.form}:</span>
-                                <span className="font-bold text-white">{wf.word}</span>
-                                {wf.meaningVi && (
-                                  <span className="text-slate-400 block truncate text-[9px]">{wf.meaningVi}</span>
-                                )}
+                              <div key={idx} className="flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-black/40 border border-white/15">
+                                <span className="text-[8px] font-black uppercase text-yellow-400/80 tracking-wider">{wf.form}</span>
+                                <span className="text-[10px] font-bold text-white">{wf.word}</span>
                               </div>
                             ))}
                         </div>
