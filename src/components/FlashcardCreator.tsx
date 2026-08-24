@@ -69,6 +69,7 @@ export const FlashcardCreator: React.FC<FlashcardCreatorProps> = ({
   const [example, setExample] = useState('');
   const [exampleVi, setExampleVi] = useState('');
   const [synonymsInput, setSynonymsInput] = useState('');
+  const [antonymsInput, setAntonymsInput] = useState('');
   const [collocationsInput, setCollocationsInput] = useState('');
   const [wordForms, setWordForms] = useState<WordFormItem[]>([]);
   const [notes, setNotes] = useState('');
@@ -173,6 +174,10 @@ export const FlashcardCreator: React.FC<FlashcardCreatorProps> = ({
         setSynonymsInput(data.synonyms.slice(0, 4).join(', '));
       }
 
+      if (data.antonyms && data.antonyms.length > 0) {
+        setAntonymsInput(data.antonyms.slice(0, 4).join(', '));
+      }
+
       if (data.collocations && data.collocations.length > 0) {
         setCollocationsInput(data.collocations.slice(0, 4).join(', '));
       }
@@ -208,6 +213,7 @@ export const FlashcardCreator: React.FC<FlashcardCreatorProps> = ({
     setExample('');
     setExampleVi('');
     setSynonymsInput('');
+    setAntonymsInput('');
     setCollocationsInput('');
     setWordForms([]);
     setNotes('');
@@ -231,6 +237,7 @@ export const FlashcardCreator: React.FC<FlashcardCreatorProps> = ({
     setExample(card.example || '');
     setExampleVi(card.exampleVi || '');
     setSynonymsInput(card.synonyms ? card.synonyms.join(', ') : '');
+    setAntonymsInput(card.antonyms ? card.antonyms.join(', ') : '');
     setCollocationsInput(card.collocations ? card.collocations.join(', ') : '');
     const currentForms = card.wordForms || card.wordFamily;
     setWordForms(currentForms ? [...currentForms] : []);
@@ -264,6 +271,11 @@ export const FlashcardCreator: React.FC<FlashcardCreatorProps> = ({
       .map((s) => s.trim())
       .filter(Boolean);
 
+    const antonyms = antonymsInput
+      .split(',')
+      .map((a) => a.trim())
+      .filter(Boolean);
+
     const collocations = collocationsInput
       .split(',')
       .map((c) => c.trim())
@@ -293,6 +305,7 @@ export const FlashcardCreator: React.FC<FlashcardCreatorProps> = ({
       example: example.trim() || undefined,
       exampleVi: exampleVi.trim() || undefined,
       synonyms: synonyms.length > 0 ? synonyms : undefined,
+      antonyms: antonyms.length > 0 ? antonyms : undefined,
       collocations: collocations.length > 0 ? collocations : undefined,
       wordForms: cleanWordForms.length > 0 ? cleanWordForms : undefined,
       wordFamily: cleanWordForms.length > 0 ? cleanWordForms : undefined,
@@ -605,30 +618,43 @@ export const FlashcardCreator: React.FC<FlashcardCreatorProps> = ({
             />
           </div>
 
-          {/* Synonyms & Collocations */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {/* Synonyms, Antonyms & Collocations */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div className="space-y-1">
-              <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400">
-                Từ đồng nghĩa (cách nhau dấu phẩy)
+              <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                <span>🔗 Từ đồng nghĩa</span>
               </label>
               <input
                 type="text"
                 value={synonymsInput}
                 onChange={(e) => setSynonymsInput(e.target.value)}
-                placeholder="tough, adaptable, robust"
+                placeholder="tough, robust"
                 className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-800 dark:text-slate-100"
               />
             </div>
 
             <div className="space-y-1">
-              <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400">
-                Collocation (cách nhau dấu phẩy)
+              <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                <span>⛔ Từ trái nghĩa</span>
+              </label>
+              <input
+                type="text"
+                value={antonymsInput}
+                onChange={(e) => setAntonymsInput(e.target.value)}
+                placeholder="fragile, weak"
+                className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-800 dark:text-slate-100"
+              />
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                <span>🤝 Collocation</span>
               </label>
               <input
                 type="text"
                 value={collocationsInput}
                 onChange={(e) => setCollocationsInput(e.target.value)}
-                placeholder="highly resilient, resilient spirit"
+                placeholder="highly resilient"
                 className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-800 dark:text-slate-100"
               />
             </div>
@@ -859,6 +885,36 @@ export const FlashcardCreator: React.FC<FlashcardCreatorProps> = ({
                       </div>
                     )}
 
+                    {/* ⚖️ Synonyms & Antonyms Preview */}
+                    {(synonymsInput.trim() || antonymsInput.trim()) && (
+                      <div className="rounded-xl bg-white/8 border border-white/15 p-2.5 flex flex-col gap-1.5">
+                        {synonymsInput.trim() && (
+                          <div className="flex flex-wrap items-center gap-1">
+                            <span className="text-[8px] font-black uppercase text-lime-400 tracking-wider shrink-0">Synonyms:</span>
+                            <div className="flex flex-wrap gap-1">
+                              {synonymsInput.split(',').map((s) => s.trim()).filter(Boolean).map((s, idx) => (
+                                <span key={idx} className="px-1.5 py-0.5 rounded bg-lime-400/20 text-lime-200 text-[9px] font-bold">
+                                  {s}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                        {antonymsInput.trim() && (
+                          <div className="flex flex-wrap items-center gap-1 pt-1 border-t border-white/10">
+                            <span className="text-[8px] font-black uppercase text-rose-400 tracking-wider shrink-0">Antonyms:</span>
+                            <div className="flex flex-wrap gap-1">
+                              {antonymsInput.split(',').map((a) => a.trim()).filter(Boolean).map((a, idx) => (
+                                <span key={idx} className="px-1.5 py-0.5 rounded bg-rose-400/20 text-rose-200 text-[9px] font-bold">
+                                  {a}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
                     {/* 🌳 Word Forms */}
                     {wordForms.some((wf) => wf.word && wf.word.trim().length > 0) && (
                       <div className="rounded-xl bg-white/8 border border-white/15 p-2.5 flex flex-col gap-1.5">
@@ -959,9 +1015,10 @@ export const FlashcardCreator: React.FC<FlashcardCreatorProps> = ({
               (wf) => wf.word.toLowerCase().includes(q) || (wf.meaningVi && wf.meaningVi.toLowerCase().includes(q))
             );
             const matchSyn = card.synonyms?.some((s) => s.toLowerCase().includes(q));
+            const matchAnt = card.antonyms?.some((a) => a.toLowerCase().includes(q));
             const matchCol = card.collocations?.some((c) => c.toLowerCase().includes(q));
 
-            if (!matchFront && !matchBack && !matchDef && !matchEx && !matchExVi && !matchTopic && !matchPron && !matchForms && !matchSyn && !matchCol) {
+            if (!matchFront && !matchBack && !matchDef && !matchEx && !matchExVi && !matchTopic && !matchPron && !matchForms && !matchSyn && !matchAnt && !matchCol) {
               return false;
             }
           }

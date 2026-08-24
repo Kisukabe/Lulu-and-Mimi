@@ -134,6 +134,7 @@ export const AiAssistant: React.FC<AiAssistantProps> = ({
       example: suggested.example,
       exampleVi: suggested.exampleVi,
       synonyms: suggested.synonyms,
+      antonyms: suggested.antonyms,
       isCustom: true,
       createdAt: new Date().toISOString(),
     };

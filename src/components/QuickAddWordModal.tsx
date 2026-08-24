@@ -147,6 +147,7 @@ export const QuickAddWordModal: React.FC<QuickAddWordModalProps> = ({
         example: firstDef?.example || data.examples[0] || `We frequently use "${data.word}" in daily communication.`,
         exampleVi: firstDef?.exampleVi,
         synonyms: data.synonyms.slice(0, 5),
+        antonyms: data.antonyms?.slice(0, 5),
         collocations: data.collocations?.slice(0, 4),
         wordForms: data.wordForms || data.wordFamily,
         wordFamily: data.wordForms || data.wordFamily,
@@ -209,6 +210,7 @@ export const QuickAddWordModal: React.FC<QuickAddWordModalProps> = ({
       example: previewCard.example?.trim(),
       exampleVi: previewCard.exampleVi?.trim(),
       synonyms: previewCard.synonyms,
+      antonyms: previewCard.antonyms,
       collocations: previewCard.collocations,
       wordForms: currentWordForms,
       wordFamily: currentWordForms,
@@ -275,6 +277,7 @@ export const QuickAddWordModal: React.FC<QuickAddWordModalProps> = ({
           audioUs: usPhonetic?.audio,
           example: firstDef?.example || data.examples[0],
           synonyms: data.synonyms.slice(0, 4),
+          antonyms: data.antonyms?.slice(0, 4),
           wordForms: data.wordForms || data.wordFamily,
           wordFamily: data.wordForms || data.wordFamily,
           isCustom: true,
@@ -542,6 +545,32 @@ export const QuickAddWordModal: React.FC<QuickAddWordModalProps> = ({
                       <p className="text-xs italic text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-900 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700/80">
                         &quot;{previewCard.example}&quot;
                       </p>
+                    </div>
+                  )}
+
+                  {/* Synonyms & Antonyms */}
+                  {((previewCard.synonyms && previewCard.synonyms.length > 0) || (previewCard.antonyms && previewCard.antonyms.length > 0)) && (
+                    <div className="space-y-1.5 bg-white dark:bg-slate-900 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700">
+                      {previewCard.synonyms && previewCard.synonyms.length > 0 && (
+                        <div className="flex flex-wrap items-center gap-1">
+                          <span className="text-[9px] font-black uppercase text-emerald-600 dark:text-emerald-400">🔗 Đồng nghĩa:</span>
+                          {previewCard.synonyms.map((s, idx) => (
+                            <span key={idx} className="text-[10px] px-1.5 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-medium">
+                              {s}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                      {previewCard.antonyms && previewCard.antonyms.length > 0 && (
+                        <div className="flex flex-wrap items-center gap-1 pt-1 border-t border-slate-100 dark:border-slate-800">
+                          <span className="text-[9px] font-black uppercase text-rose-600 dark:text-rose-400">⛔ Trái nghĩa:</span>
+                          {previewCard.antonyms.map((a, idx) => (
+                            <span key={idx} className="text-[10px] px-1.5 py-0.5 rounded-md bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 font-medium">
+                              {a}
+                            </span>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   )}
 

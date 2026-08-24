@@ -117,7 +117,7 @@ export const VocabularyDetailView: React.FC<VocabularyDetailViewProps> = ({
         if (statusFilter === 'review' && !needReviewIds.includes(card.id)) return false;
         if (statusFilter === 'unmastered' && masteredIds.includes(card.id)) return false;
 
-        // Search query filter (matches front, back, definitionEn, examples, synonyms)
+        // Search query filter (matches front, back, definitionEn, examples, synonyms, antonyms)
         if (searchQuery.trim()) {
           const q = searchQuery.toLowerCase().trim();
           const matchFront = card.front.toLowerCase().includes(q);
@@ -125,7 +125,8 @@ export const VocabularyDetailView: React.FC<VocabularyDetailViewProps> = ({
           const matchDefEn = card.definitionEn?.toLowerCase().includes(q);
           const matchExample = card.example?.toLowerCase().includes(q);
           const matchSynonym = card.synonyms?.some((s) => s.toLowerCase().includes(q));
-          if (!matchFront && !matchBack && !matchDefEn && !matchExample && !matchSynonym) {
+          const matchAntonym = card.antonyms?.some((a) => a.toLowerCase().includes(q));
+          if (!matchFront && !matchBack && !matchDefEn && !matchExample && !matchSynonym && !matchAntonym) {
             return false;
           }
         }
@@ -522,8 +523,8 @@ export const VocabularyDetailView: React.FC<VocabularyDetailViewProps> = ({
                       </div>
                     )}
 
-                    {/* Synonyms & Collocations */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {/* Synonyms, Antonyms & Collocations */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
                       {card.synonyms && card.synonyms.length > 0 && (
                         <div className="p-3 bg-slate-50/70 dark:bg-slate-800/40 rounded-xl border border-slate-200/50 dark:border-slate-700/50">
                           <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase block mb-1">
@@ -533,9 +534,27 @@ export const VocabularyDetailView: React.FC<VocabularyDetailViewProps> = ({
                             {card.synonyms.map((s, idx) => (
                               <span
                                 key={idx}
-                                className="px-2 py-0.5 bg-white dark:bg-slate-800 rounded-md border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-medium"
+                                className="px-2 py-0.5 bg-white dark:bg-slate-800 rounded-md border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-medium text-xs"
                               >
                                 {s}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {card.antonyms && card.antonyms.length > 0 && (
+                        <div className="p-3 bg-rose-50/50 dark:bg-rose-950/20 rounded-xl border border-rose-200/50 dark:border-rose-800/40">
+                          <span className="text-[10px] font-bold text-rose-500 dark:text-rose-400 uppercase block mb-1">
+                            ⛔ Từ trái nghĩa:
+                          </span>
+                          <div className="flex flex-wrap gap-1">
+                            {card.antonyms.map((a, idx) => (
+                              <span
+                                key={idx}
+                                className="px-2 py-0.5 bg-white dark:bg-slate-800 rounded-md border border-rose-200 dark:border-rose-800/60 text-rose-700 dark:text-rose-300 font-medium text-xs"
+                              >
+                                {a}
                               </span>
                             ))}
                           </div>
@@ -551,7 +570,7 @@ export const VocabularyDetailView: React.FC<VocabularyDetailViewProps> = ({
                             {card.collocations.map((c, idx) => (
                               <span
                                 key={idx}
-                                className="px-2 py-0.5 bg-amber-50 dark:bg-amber-950/40 rounded-md border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-300 font-medium"
+                                className="px-2 py-0.5 bg-amber-50 dark:bg-amber-950/40 rounded-md border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-300 font-medium text-xs"
                               >
                                 {c}
                               </span>
