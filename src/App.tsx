@@ -642,6 +642,7 @@ export default function App() {
               topics={allFolders}
               selectedTopic={selectedTopic}
               customFlashcards={userProgress.customFlashcards || []}
+              allFlashcards={allFlashcards}
               onSaveFlashcard={handleSaveCustomFlashcard}
               onDeleteFlashcard={handleDeleteCustomFlashcard}
               onImportFlashcards={handleImportFlashcards}
@@ -737,6 +738,7 @@ export default function App() {
         isOpen={isQuickAddModalOpen}
         onClose={() => setIsQuickAddModalOpen(false)}
         folders={allFolders}
+        allCards={allFlashcards}
         selectedTopic={quickAddTopic}
         onAddFlashcard={handleQuickAddSingleCard}
         onAddMultipleFlashcards={handleQuickAddMultipleCards}

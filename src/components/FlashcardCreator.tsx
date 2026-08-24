@@ -14,6 +14,10 @@ import {
   Loader2,
   BookOpen,
   Layers,
+  AlertTriangle,
+  AlertCircle,
+  X,
+  Filter,
 } from 'lucide-react';
 import axios from 'axios';
 import { API_ENDPOINTS } from '../config/api';
@@ -22,6 +26,7 @@ interface FlashcardCreatorProps {
   topics: Topic[];
   selectedTopic?: string;
   customFlashcards: Flashcard[];
+  allFlashcards?: Flashcard[];
   onSaveFlashcard: (flashcard: Flashcard) => void;
   onDeleteFlashcard: (id: string) => void;
   onImportFlashcards: (cards: Flashcard[]) => void;
@@ -32,6 +37,7 @@ export const FlashcardCreator: React.FC<FlashcardCreatorProps> = ({
   topics,
   selectedTopic,
   customFlashcards,
+  allFlashcards,
   onSaveFlashcard,
   onDeleteFlashcard,
   onImportFlashcards,
@@ -66,6 +72,21 @@ export const FlashcardCreator: React.FC<FlashcardCreatorProps> = ({
   const [collocationsInput, setCollocationsInput] = useState('');
   const [wordForms, setWordForms] = useState<WordFormItem[]>([]);
   const [notes, setNotes] = useState('');
+
+  // 🔎 Search & Filter for Custom Cards List
+  const [listSearchQuery, setListSearchQuery] = useState('');
+  const [listFolderFilter, setListFolderFilter] = useState<string>('all');
+  const [listOnlyDuplicates, setListOnlyDuplicates] = useState(false);
+
+  // ⚠️ Duplicate Detection in the form
+  const duplicateMatches = React.useMemo(() => {
+    const term = front.trim().toLowerCase();
+    if (!term || term.length < 2) return [];
+    const pool = allFlashcards && allFlashcards.length > 0 ? allFlashcards : customFlashcards;
+    return pool.filter(
+      (c) => c.front.trim().toLowerCase() === term && c.id !== editingId
+    );
+  }, [front, allFlashcards, customFlashcards, editingId]);
 
   // Keep topic synced with selectedTopic if not editing an existing card
   React.useEffect(() => {
@@ -223,6 +244,21 @@ export const FlashcardCreator: React.FC<FlashcardCreatorProps> = ({
     e.preventDefault();
     if (!front.trim() || !back.trim()) return;
 
+    // Check duplicate warning on new card creation
+    if (!editingId && duplicateMatches.length > 0) {
+      const topicNames = Array.from(
+        new Set(
+          duplicateMatches.map(
+            (m) => topics.find((t) => t.id === m.topic)?.title || m.topic
+          )
+        )
+      ).join(', ');
+      const proceed = window.confirm(
+        `⚠️ Cảnh báo: Từ "${front.trim()}" đã tồn tại trong bộ thẻ (${topicNames}).\n\nBạn có chắc chắn muốn tạo thêm thẻ trùng lặp này không?`
+      );
+      if (!proceed) return;
+    }
+
     const synonyms = synonymsInput
       .split(',')
       .map((s) => s.trim())
@@ -375,6 +411,59 @@ export const FlashcardCreator: React.FC<FlashcardCreatorProps> = ({
               <p className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1 pt-0.5">
                 <Check className="w-3.5 h-3.5" /> Đã lấy thông tin IPA, định nghĩa tiếng Anh & ví dụ thành công!
               </p>
+            )}
+
+            {/* ⚠️ Cảnh báo từ trùng lặp trực tiếp khi đang nhập */}
+            {duplicateMatches.length > 0 && (
+              <div className="p-3 rounded-2xl bg-amber-500/10 dark:bg-amber-500/15 border-2 border-amber-500/35 text-amber-900 dark:text-amber-200 space-y-2 animate-in fade-in duration-150">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5 text-xs font-black text-amber-700 dark:text-amber-300">
+                    <AlertTriangle className="w-4 h-4 shrink-0 text-amber-500" />
+                    <span>Từ này đã có trong bộ thẻ ({duplicateMatches.length} thẻ trùng)</span>
+                  </div>
+                </div>
+
+                <div className="space-y-1.5 max-h-36 overflow-y-auto pr-1 custom-scrollbar">
+                  {duplicateMatches.map((match) => (
+                    <div
+                      key={match.id}
+                      className="flex items-center justify-between gap-2 p-2 rounded-xl bg-white/95 dark:bg-slate-900/95 border border-amber-500/20 text-xs shadow-xs"
+                    >
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="font-black text-slate-900 dark:text-white">
+                            {match.front}
+                          </span>
+                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 font-bold">
+                            {topics.find((t) => t.id === match.topic)?.title || match.topic}
+                          </span>
+                          <span className="text-[10px] text-slate-500 font-mono">
+                            {match.wordForm}
+                          </span>
+                        </div>
+                        <p className="text-[11px] font-medium text-slate-600 dark:text-slate-300 truncate pt-0.5">
+                          👉 {match.back}
+                        </p>
+                      </div>
+
+                      {match.isCustom ? (
+                        <button
+                          type="button"
+                          onClick={() => handleEdit(match)}
+                          className="px-2.5 py-1 rounded-lg bg-amber-400 hover:bg-amber-500 text-slate-950 font-black text-[10px] transition cursor-pointer shrink-0 shadow-xs"
+                          title="Tải thẻ này vào biểu mẫu để chỉnh sửa"
+                        >
+                          Sửa Thẻ Này
+                        </button>
+                      ) : (
+                        <span className="px-2 py-0.5 rounded text-[10px] font-bold text-slate-400 bg-slate-100 dark:bg-slate-800 shrink-0">
+                          Thẻ mẫu
+                        </span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
             )}
           </div>
 
@@ -826,112 +915,273 @@ export const FlashcardCreator: React.FC<FlashcardCreatorProps> = ({
       </div>
 
       {/* 📋 List of Custom Created Flashcards */}
-      <div className="space-y-4 pt-4 border-t border-slate-200 dark:border-slate-800">
-        <div className="flex items-center justify-between">
-          <h3 className="text-base font-extrabold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-            <BookOpen className="w-5 h-5 text-amber-500" />
-            Danh Sách Thẻ Bạn Đã Tạo ({customFlashcards.length} thẻ)
-          </h3>
-        </div>
+      {(() => {
+        // Map of custom cards duplicate occurrences
+        const duplicateCountsMap: Record<string, number> = {};
+        customFlashcards.forEach((c) => {
+          const key = c.front.trim().toLowerCase();
+          duplicateCountsMap[key] = (duplicateCountsMap[key] || 0) + 1;
+        });
 
-        {customFlashcards.length === 0 ? (
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 text-center space-y-2">
-            <p className="text-sm font-bold text-slate-700 dark:text-slate-300">
-              Bạn chưa tự tạo thẻ flashcard nào
-            </p>
-            <p className="text-xs text-slate-400">
-              Hãy dùng biểu mẫu phía trên hoặc tra cứu trong tab <strong>&quot;Tra Từ Điển&quot;</strong> để thêm từ vựng mới vào kho!
-            </p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {customFlashcards.map((card) => {
-              const forms = card.wordForms || card.wordFamily;
-              return (
-                <div
-                  key={card.id}
-                  className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 flex flex-col justify-between gap-3 shadow-xs hover:border-amber-300 transition"
-                >
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
-                        {card.vocabType} • {card.wordForm}
-                      </span>
-                      <span className="text-[11px] text-slate-400">
-                        {topics.find((t) => t.id === card.topic)?.title || card.topic}
-                      </span>
-                    </div>
+        // Set of fronts in system default cards
+        const systemFrontsSet = new Set(
+          (allFlashcards || [])
+            .filter((c) => !c.isCustom)
+            .map((c) => c.front.trim().toLowerCase())
+        );
 
-                    <h4 className="text-lg font-black text-slate-900 dark:text-white">
-                      {card.front}
-                    </h4>
-                    {card.pronunciation && (
-                      <span className="text-xs font-mono text-indigo-600 dark:text-indigo-400">
-                        {card.pronunciation}
-                      </span>
-                    )}
-                    {card.definitionEn && (
-                      <p className="text-xs text-indigo-600 dark:text-indigo-300 italic pt-0.5 line-clamp-2">
-                        🇬🇧 {card.definitionEn}
-                      </p>
-                    )}
-                    <p className="text-xs font-bold text-slate-700 dark:text-slate-200 pt-0.5">
-                      👉 {card.back}
-                    </p>
-                    {card.example && (
-                      <p className="text-xs text-slate-500 dark:text-slate-400 italic pt-0.5 line-clamp-2">
-                        &quot;{card.example}&quot;
-                      </p>
-                    )}
+        const checkIsCardDuplicated = (card: Flashcard) => {
+          const key = card.front.trim().toLowerCase();
+          return (duplicateCountsMap[key] || 0) > 1 || systemFrontsSet.has(key);
+        };
 
-                    {/* Word Forms pills in card list */}
-                    {forms && forms.length > 0 && (
-                      <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
-                        <p className="text-[10px] font-bold text-amber-600 dark:text-amber-400 mb-1">
-                          🌳 Word Forms:
-                        </p>
-                        <div className="flex flex-wrap gap-1">
-                          {forms.map((wf, idx) => (
-                            <span
-                              key={idx}
-                              className="text-[10px] px-2 py-0.5 rounded-lg bg-amber-50 dark:bg-slate-800 border border-amber-200/60 dark:border-slate-700 text-slate-700 dark:text-slate-300"
-                            >
-                              <strong className="text-amber-600 dark:text-amber-400 uppercase mr-1">{wf.form}:</strong>
-                              {wf.word} {wf.meaningVi ? `(${wf.meaningVi})` : ''}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
+        const totalDuplicateCardsCount = customFlashcards.filter((c) => checkIsCardDuplicated(c)).length;
 
-                  <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+        // Filtered custom cards based on search query, folder filter & duplicate toggle
+        const filteredCustomCards = customFlashcards.filter((card) => {
+          if (listFolderFilter !== 'all' && card.topic !== listFolderFilter) {
+            return false;
+          }
+          if (listOnlyDuplicates && !checkIsCardDuplicated(card)) {
+            return false;
+          }
+          if (listSearchQuery.trim()) {
+            const q = listSearchQuery.trim().toLowerCase();
+            const forms = card.wordForms || card.wordFamily || [];
+            const matchFront = card.front.toLowerCase().includes(q);
+            const matchBack = card.back.toLowerCase().includes(q);
+            const matchDef = card.definitionEn?.toLowerCase().includes(q);
+            const matchEx = card.example?.toLowerCase().includes(q);
+            const matchExVi = card.exampleVi?.toLowerCase().includes(q);
+            const matchTopic = (topics.find((t) => t.id === card.topic)?.title || card.topic).toLowerCase().includes(q);
+            const matchPron = (card.pronunciation || card.pronunciationUs || card.pronunciationUk || '').toLowerCase().includes(q);
+            const matchForms = forms.some(
+              (wf) => wf.word.toLowerCase().includes(q) || (wf.meaningVi && wf.meaningVi.toLowerCase().includes(q))
+            );
+            const matchSyn = card.synonyms?.some((s) => s.toLowerCase().includes(q));
+            const matchCol = card.collocations?.some((c) => c.toLowerCase().includes(q));
+
+            if (!matchFront && !matchBack && !matchDef && !matchEx && !matchExVi && !matchTopic && !matchPron && !matchForms && !matchSyn && !matchCol) {
+              return false;
+            }
+          }
+          return true;
+        });
+
+        return (
+          <div className="space-y-4 pt-6 border-t border-slate-200 dark:border-slate-800">
+            
+            {/* Header & Small Search Box Toolbar */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+              <div>
+                <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-slate-100 flex items-center gap-2">
+                  <BookOpen className="w-5 h-5 text-amber-500" />
+                  <span>Danh Sách Thẻ Bạn Đã Tạo</span>
+                  <span className="px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-300 text-xs font-black">
+                    {filteredCustomCards.length}/{customFlashcards.length} thẻ
+                  </span>
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 pt-0.5">
+                  Tìm kiếm, lọc thư mục và kiểm tra phát hiện từ trùng lặp
+                </p>
+              </div>
+
+              {/* Small Search Box & Filter Controls */}
+              <div className="flex flex-wrap items-center gap-2">
+                
+                {/* 🔍 Khung nhỏ tìm kiếm từ */}
+                <div className="relative flex-1 sm:w-60">
+                  <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    value={listSearchQuery}
+                    onChange={(e) => setListSearchQuery(e.target.value)}
+                    placeholder="Tìm từ, nghĩa, ví dụ..."
+                    className="w-full pl-8 pr-7 py-2 bg-slate-100 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
+                  />
+                  {listSearchQuery && (
                     <button
-                      onClick={() => handleEdit(card)}
-                      className="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
-                      title="Chỉnh sửa thẻ"
+                      type="button"
+                      onClick={() => setListSearchQuery('')}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer p-0.5"
+                      title="Xóa tìm kiếm"
                     >
-                      <Edit className="w-4 h-4" />
+                      <X className="w-3.5 h-3.5" />
                     </button>
-
-                    <button
-                      onClick={() => {
-                        if (confirm(`Bạn có chắc chắn muốn xóa thẻ "${card.front}" không?`)) {
-                          onDeleteFlashcard(card.id);
-                        }
-                      }}
-                      className="p-2 rounded-xl text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/60 transition cursor-pointer"
-                      title="Xóa thẻ"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
+                  )}
                 </div>
-              );
-            })}
+
+                {/* Folder filter */}
+                <select
+                  value={listFolderFilter}
+                  onChange={(e) => setListFolderFilter(e.target.value)}
+                  className="px-2.5 py-2 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 outline-none cursor-pointer"
+                >
+                  <option value="all">📁 Tất cả thư mục</option>
+                  {topics.filter((t) => t.id !== 'all').map((t) => (
+                    <option key={t.id} value={t.id}>
+                      {t.emoji || '📁'} {t.title}
+                    </option>
+                  ))}
+                </select>
+
+                {/* ⚠️ Nút lọc từ trùng lặp nếu có */}
+                {totalDuplicateCardsCount > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => setListOnlyDuplicates((prev) => !prev)}
+                    className={`px-3 py-2 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-1.5 border ${
+                      listOnlyDuplicates
+                        ? 'bg-rose-500 text-white border-rose-600 shadow-xs'
+                        : 'bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-800/60 hover:bg-rose-100 dark:hover:bg-rose-900/50'
+                    }`}
+                    title={listOnlyDuplicates ? 'Hiển thị tất cả thẻ' : 'Chỉ hiển thị các từ bị trùng lặp'}
+                  >
+                    <AlertTriangle className="w-3.5 h-3.5" />
+                    <span>Trùng lặp ({totalDuplicateCardsCount})</span>
+                  </button>
+                )}
+
+              </div>
+            </div>
+
+            {/* Content List */}
+            {customFlashcards.length === 0 ? (
+              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 text-center space-y-2">
+                <p className="text-sm font-bold text-slate-700 dark:text-slate-300">
+                  Bạn chưa tự tạo thẻ flashcard nào
+                </p>
+                <p className="text-xs text-slate-400">
+                  Hãy dùng biểu mẫu phía trên hoặc tra cứu trong tab <strong>&quot;Tra Từ Điển&quot;</strong> để thêm từ vựng mới vào kho!
+                </p>
+              </div>
+            ) : filteredCustomCards.length === 0 ? (
+              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 text-center space-y-3">
+                <div className="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-500 flex items-center justify-center mx-auto">
+                  <Search className="w-6 h-6" />
+                </div>
+                <p className="text-sm font-bold text-slate-700 dark:text-slate-300">
+                  Không tìm thấy thẻ nào khớp với bộ lọc
+                </p>
+                <p className="text-xs text-slate-400">
+                  {listSearchQuery ? `Không có từ nào chứa từ khóa "${listSearchQuery}".` : 'Hãy thử thay đổi điều kiện lọc thư mục hoặc từ trùng lặp.'}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setListSearchQuery('');
+                    setListFolderFilter('all');
+                    setListOnlyDuplicates(false);
+                  }}
+                  className="px-4 py-2 rounded-xl bg-amber-400 text-slate-950 text-xs font-black shadow-xs hover:bg-amber-300 transition cursor-pointer"
+                >
+                  Xóa Bộ Lọc
+                </button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {filteredCustomCards.map((card) => {
+                  const forms = card.wordForms || card.wordFamily;
+                  const isDup = checkIsCardDuplicated(card);
+
+                  return (
+                    <div
+                      key={card.id}
+                      className={`bg-white dark:bg-slate-900 border rounded-3xl p-5 flex flex-col justify-between gap-3 shadow-xs transition ${
+                        isDup
+                          ? 'border-rose-300 dark:border-rose-800/80 bg-rose-50/20 dark:bg-rose-950/10'
+                          : 'border-slate-200 dark:border-slate-800 hover:border-amber-300'
+                      }`}
+                    >
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
+                              {card.vocabType} • {card.wordForm}
+                            </span>
+                            {isDup && (
+                              <span className="text-[10px] font-black px-2 py-0.5 rounded-md bg-rose-500/15 border border-rose-500/30 text-rose-600 dark:text-rose-400 flex items-center gap-1">
+                                <AlertTriangle className="w-3 h-3" /> Trùng lặp
+                              </span>
+                            )}
+                          </div>
+                          <span className="text-[11px] text-slate-400">
+                            {topics.find((t) => t.id === card.topic)?.title || card.topic}
+                          </span>
+                        </div>
+
+                        <h4 className="text-lg font-black text-slate-900 dark:text-white flex items-center gap-2">
+                          <span>{card.front}</span>
+                        </h4>
+                        {card.pronunciation && (
+                          <span className="text-xs font-mono text-indigo-600 dark:text-indigo-400">
+                            {card.pronunciation}
+                          </span>
+                        )}
+                        {card.definitionEn && (
+                          <p className="text-xs text-indigo-600 dark:text-indigo-300 italic pt-0.5 line-clamp-2">
+                            🇬🇧 {card.definitionEn}
+                          </p>
+                        )}
+                        <p className="text-xs font-bold text-slate-700 dark:text-slate-200 pt-0.5">
+                          👉 {card.back}
+                        </p>
+                        {card.example && (
+                          <p className="text-xs text-slate-500 dark:text-slate-400 italic pt-0.5 line-clamp-2">
+                            &quot;{card.example}&quot;
+                          </p>
+                        )}
+
+                        {/* Word Forms pills in card list */}
+                        {forms && forms.length > 0 && (
+                          <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
+                            <p className="text-[10px] font-bold text-amber-600 dark:text-amber-400 mb-1">
+                              🌳 Word Forms:
+                            </p>
+                            <div className="flex flex-wrap gap-1">
+                              {forms.map((wf, idx) => (
+                                <span
+                                  key={idx}
+                                  className="text-[10px] px-2 py-0.5 rounded-lg bg-amber-50 dark:bg-slate-800 border border-amber-200/60 dark:border-slate-700 text-slate-700 dark:text-slate-300"
+                                >
+                                  <strong className="text-amber-600 dark:text-amber-400 uppercase mr-1">{wf.form}:</strong>
+                                  {wf.word} {wf.meaningVi ? `(${wf.meaningVi})` : ''}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+                        <button
+                          onClick={() => handleEdit(card)}
+                          className="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                          title="Chỉnh sửa thẻ"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </button>
+
+                        <button
+                          onClick={() => {
+                            if (confirm(`Bạn có chắc chắn muốn xóa thẻ "${card.front}" không?`)) {
+                              onDeleteFlashcard(card.id);
+                            }
+                          }}
+                          className="p-2 rounded-xl text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/60 transition cursor-pointer"
+                          title="Xóa thẻ"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
-        )}
-      </div>
+        );
+      })()}
 
     </div>
   );

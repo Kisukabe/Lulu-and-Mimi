@@ -13,6 +13,7 @@ import {
   ArrowRight,
   ListPlus,
   AlertCircle,
+  AlertTriangle,
   Wand2,
 } from 'lucide-react';
 import axios from 'axios';
@@ -22,6 +23,7 @@ interface QuickAddWordModalProps {
   isOpen: boolean;
   onClose: () => void;
   folders: Topic[];
+  allCards?: Flashcard[];
   initialTargetFolder?: string;
   selectedTopic: string;
   onAddFlashcard: (card: Flashcard) => void;
@@ -33,6 +35,7 @@ export const QuickAddWordModal: React.FC<QuickAddWordModalProps> = ({
   isOpen,
   onClose,
   folders,
+  allCards,
   initialTargetFolder,
   selectedTopic,
   onAddFlashcard,
@@ -65,6 +68,13 @@ export const QuickAddWordModal: React.FC<QuickAddWordModalProps> = ({
   const [previewCard, setPreviewCard] = useState<Partial<Flashcard> | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successSaved, setSuccessSaved] = useState(false);
+
+  // ⚠️ Duplicate detection
+  const duplicateMatches = React.useMemo(() => {
+    const term = (previewCard?.front || wordInput).trim().toLowerCase();
+    if (!term || term.length < 2 || !allCards) return [];
+    return allCards.filter((c) => c.front.trim().toLowerCase() === term);
+  }, [previewCard?.front, wordInput, allCards]);
 
   // Bulk words state
   const [bulkInput, setBulkInput] = useState('');
@@ -170,6 +180,16 @@ export const QuickAddWordModal: React.FC<QuickAddWordModalProps> = ({
   // Save single card
   const handleSaveCard = () => {
     if (!previewCard || !previewCard.front) return;
+
+    if (duplicateMatches.length > 0) {
+      const topicNames = Array.from(
+        new Set(duplicateMatches.map((m) => folders.find((f) => f.id === m.topic)?.title || m.topic))
+      ).join(', ');
+      const proceed = window.confirm(
+        `⚠️ Cảnh báo: Từ "${previewCard.front}" đã tồn tại trong bộ thẻ (${topicNames}).\n\nBạn có chắc chắn muốn tạo thêm thẻ này không?`
+      );
+      if (!proceed) return;
+    }
 
     const currentWordForms = previewCard.wordForms || previewCard.wordFamily;
 
@@ -453,6 +473,16 @@ export const QuickAddWordModal: React.FC<QuickAddWordModalProps> = ({
                       </span>
                     </div>
                   </div>
+
+                  {/* ⚠️ Cảnh báo từ trùng lặp */}
+                  {duplicateMatches.length > 0 && (
+                    <div className="p-2.5 rounded-2xl bg-amber-500/15 border border-amber-500/30 text-amber-900 dark:text-amber-200 text-xs flex items-center gap-2">
+                      <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0" />
+                      <span className="font-bold">
+                        Từ này đã có trong bộ thẻ ({duplicateMatches.map((m) => folders.find((f) => f.id === m.topic)?.title || m.topic).join(', ')})
+                      </span>
+                    </div>
+                  )}
 
                   {/* Word & Pronunciation */}
                   <div className="flex items-start justify-between gap-3">
