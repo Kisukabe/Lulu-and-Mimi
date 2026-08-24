@@ -31,11 +31,25 @@ const THEME_KEY = 'lulu_mimi_theme_mode_v1';
 const TOPIC_KEY = 'lulu_mimi_selected_topic_v1';
 const FOLDERS_KEY = 'lulu_mimi_folders_list_v2';
 const GEMINI_KEY_STORAGE = 'lulu_mimi_gemini_key_v1';
+const TAB_KEY = 'lulu_mimi_active_tab_v1';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<
-    'flashcards' | 'vocabulary' | 'dictionary' | 'create' | 'quiz' | 'practice' | 'ai' | 'stats'
-  >('flashcards');
+  const VALID_TABS = ['flashcards', 'vocabulary', 'dictionary', 'create', 'quiz', 'practice', 'ai', 'stats'] as const;
+  type TabId = typeof VALID_TABS[number];
+
+  const [activeTab, setActiveTabState] = useState<TabId>(() => {
+    try {
+      const saved = localStorage.getItem(TAB_KEY) as TabId;
+      if (saved && (VALID_TABS as readonly string[]).includes(saved)) return saved;
+    } catch {}
+    return 'flashcards';
+  });
+
+  // Persist tab changes to localStorage
+  const setActiveTab = (tab: TabId) => {
+    setActiveTabState(tab);
+    try { localStorage.setItem(TAB_KEY, tab); } catch {}
+  };
 
   const [flashcardStatusFilter, setFlashcardStatusFilter] = useState<'all' | 'due_srs' | 'unmastered' | 'review' | 'mastered'>('all');
 
