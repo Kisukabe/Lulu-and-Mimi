@@ -310,6 +310,17 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
     }
   }, []);
 
+  // Track previous filter criteria to detect actual filter changes vs mastery toggles
+  const prevFilterRef = React.useRef({ selectedTopic, selectedVocabType, statusFilter, flashcardsLength: flashcards.length });
+  const currentCardIdRef = React.useRef<string | null>(null);
+
+  // Keep track of the current card ID for position preservation
+  useEffect(() => {
+    if (cardsList[currentIndex]) {
+      currentCardIdRef.current = cardsList[currentIndex].id;
+    }
+  }, [currentIndex, cardsList]);
+
   // Filter Cards
   useEffect(() => {
     let filtered = flashcards;
@@ -332,9 +343,37 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
       filtered = filtered.filter((card) => masteredIds.includes(card.id));
     }
 
+    const prev = prevFilterRef.current;
+    const isFilterChange =
+      prev.selectedTopic !== selectedTopic ||
+      prev.selectedVocabType !== selectedVocabType ||
+      prev.statusFilter !== statusFilter ||
+      prev.flashcardsLength !== flashcards.length;
+
+    prevFilterRef.current = { selectedTopic, selectedVocabType, statusFilter, flashcardsLength: flashcards.length };
+
     setCardsList(filtered);
-    setCurrentIndex(0);
-    setIsFlipped(false);
+
+    if (isFilterChange) {
+      // Actual filter change: reset to beginning
+      setCurrentIndex(0);
+      setIsFlipped(false);
+    } else {
+      // Mastery/review toggle: preserve position
+      setCurrentIndex((prevIndex) => {
+        // Try to find the current card in the new filtered list
+        const savedId = currentCardIdRef.current;
+        if (savedId) {
+          const newIdx = filtered.findIndex((c) => c.id === savedId);
+          if (newIdx >= 0) return newIdx;
+        }
+        // Card was removed from list (e.g. marked mastered while filtering unmastered)
+        // Stay at same index position, clamped to new list length
+        if (filtered.length === 0) return 0;
+        return Math.min(prevIndex, filtered.length - 1);
+      });
+      setIsFlipped(false);
+    }
   }, [flashcards, selectedTopic, selectedVocabType, statusFilter, masteredIds, needReviewIds, srsRecords]);
 
   // Current Card
@@ -392,27 +431,31 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
   // Card Animation state
   const [animDirection, setAnimDirection] = useState<'next' | 'prev' | null>(null);
 
+  // Ref to always have fresh cardsList in setTimeout closures (Bug #2 fix)
+  const cardsListRef = React.useRef(cardsList);
+  cardsListRef.current = cardsList;
+
   const nextCard = useCallback(() => {
-    if (cardsList.length <= 1) return;
+    if (cardsListRef.current.length <= 1) return;
     setAnimDirection('next');
     playNativeSound('swoosh');
     setTimeout(() => {
       setIsFlipped(false);
-      setCurrentIndex((prev) => (prev + 1) % cardsList.length);
+      setCurrentIndex((prev) => (prev + 1) % cardsListRef.current.length);
       setAnimDirection(null);
     }, 120);
-  }, [cardsList.length, playNativeSound]);
+  }, [playNativeSound]);
 
   const prevCard = useCallback(() => {
-    if (cardsList.length <= 1) return;
+    if (cardsListRef.current.length <= 1) return;
     setAnimDirection('prev');
     playNativeSound('swoosh');
     setTimeout(() => {
       setIsFlipped(false);
-      setCurrentIndex((prev) => (prev - 1 + cardsList.length) % cardsList.length);
+      setCurrentIndex((prev) => (prev - 1 + cardsListRef.current.length) % cardsListRef.current.length);
       setAnimDirection(null);
     }, 120);
-  }, [cardsList.length, playNativeSound]);
+  }, [playNativeSound]);
 
   const flipCard = useCallback(() => {
     playNativeSound('flip');
@@ -442,7 +485,6 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
         if (currentCard) {
           playNativeSound('again');
           if (onRateCardSRS) onRateCardSRS(currentCard.id, 1);
-          if (masteredIds.includes(currentCard.id)) onToggleMastered(currentCard.id);
           nextCard();
         }
       } else if (e.key === '2') {
@@ -450,7 +492,6 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
         if (currentCard) {
           playNativeSound('master');
           if (onRateCardSRS) onRateCardSRS(currentCard.id, 4);
-          if (!masteredIds.includes(currentCard.id)) onToggleMastered(currentCard.id);
           nextCard();
         }
       } else if (e.key === 'ArrowRight') {
@@ -464,7 +505,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [flipCard, nextCard, prevCard, currentCard, onRateCardSRS, masteredIds, onToggleMastered, playNativeSound]);
+  }, [flipCard, nextCard, prevCard, currentCard, onRateCardSRS, playNativeSound]);
 
   // Direct In-Card Edit state
   const [isEditing, setIsEditing] = useState(false);
@@ -1260,7 +1301,6 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                     if (currentCard) {
                       playNativeSound('again');
                       if (onRateCardSRS) onRateCardSRS(currentCard.id, 1);
-                      if (masteredIds.includes(currentCard.id)) onToggleMastered(currentCard.id);
                       nextCard();
                     }
                   }}
@@ -1291,7 +1331,6 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                     if (currentCard) {
                       playNativeSound('master');
                       if (onRateCardSRS) onRateCardSRS(currentCard.id, 4);
-                      if (!masteredIds.includes(currentCard.id)) onToggleMastered(currentCard.id);
                       nextCard();
                     }
                   }}

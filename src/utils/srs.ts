@@ -180,7 +180,34 @@ export function previewNextInterval(
   existingData: SRSCardData | undefined,
   rating: 1 | 2 | 3 | 4 | 5
 ): number {
-  // Tạm thời bỏ jitter để preview chính xác
-  const result = calculateNextSRS('__preview__', existingData, rating);
-  return result.interval;
+  const currentRepetitions = existingData?.repetitions ?? 0;
+  const currentInterval    = existingData?.interval    ?? 0;
+  let   easeFactor         = existingData?.easeFactor  ?? 2.5;
+
+  const qMap: Record<number, number> = { 1: 0, 2: 2, 3: 3, 4: 5, 5: 5 };
+  const q = qMap[rating] ?? 3;
+  const efDelta = 0.1 - (5 - q) * (0.08 + (5 - q) * 0.02);
+  easeFactor = Math.min(3.5, Math.max(1.3, easeFactor + efDelta));
+
+  let newInterval = 1;
+
+  if (rating === 1) {
+    newInterval = 1;
+  } else if (rating === 2) {
+    newInterval = currentInterval <= 1 ? 1 : Math.max(1, Math.round(currentInterval * 0.8));
+  } else {
+    const newRepetitions = currentRepetitions + 1;
+    if (newRepetitions === 1) {
+      newInterval = rating >= 4 ? 3 : 1;
+    } else if (newRepetitions === 2) {
+      newInterval = rating >= 4 ? 6 : 3;
+    } else {
+      const base = Math.round(currentInterval * easeFactor);
+      newInterval = rating >= 4 ? Math.round(base * 1.3) : base;
+    }
+    newInterval = Math.min(365, Math.max(1, newInterval));
+  }
+
+  // Không áp dụng jitter để preview ổn định
+  return newInterval;
 }
