@@ -12,7 +12,7 @@
     "build:backend": "esbuild server/standalone.ts --bundle --platform=node --format=cjs --packages=external --sourcemap --outfile=dist/server-backend.cjs",
     "start": "node dist/server.cjs",
     "start:backend": "node dist/server-backend.cjs",
-    "clean": "rm -rf dist",
+    "clean": "rimraf dist",
     "lint": "tsc --noEmit",
     "docker:push": "bash scripts/docker-push-backend.sh"
   },
@@ -41,6 +41,7 @@
     "@types/react-dom": "^19.0.4",
     "autoprefixer": "^10.4.21",
     "esbuild": "^0.25.0",
+    "rimraf": "^6.1.3",
     "tailwindcss": "^4.1.14",
     "tsx": "^4.21.0",
     "typescript": "~5.8.2"
